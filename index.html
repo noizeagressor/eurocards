@@ -8,6 +8,7 @@
     <style>
         :root {
             --blue: #007aff;
+            --green: #34c759;
             --bg: #ffffff;
             --sec-bg: #f2f2f7;
             --text: #000000;
@@ -32,92 +33,52 @@
         /* ШАПКА */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .user-block { display: flex; align-items: center; gap: 12px; }
-        
-        /* АВАТАРКА */
         .avatar { 
-            width: 42px; height: 42px; 
-            border-radius: 50%; 
-            background: #fff; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
-            border: 2px solid #fff;
+            width: 44px; height: 44px; border-radius: 50%; 
+            background: linear-gradient(135deg, var(--blue), #5ac8fa);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 2px solid #fff;
             display: flex; justify-content: center; align-items: center;
-            overflow: hidden; font-weight: bold; color: var(--blue);
-            background-size: cover;
-            background-position: center;
+            overflow: hidden; font-weight: bold; color: white; font-size: 18px;
+            background-size: cover; background-position: center;
         }
 
-        /* 3D КАРТА (ТВОЙ ДИЗАЙН) */
-        .card-wrapper {
-            perspective: 1200px;
-            margin: 10px 0 30px;
-            display: flex; justify-content: center;
-        }
-
+        /* 3D КАРТА */
+        .card-wrapper { perspective: 1200px; margin: 10px 0 30px; display: flex; justify-content: center; }
         .main-card { 
-            position: relative;
-            width: 100%;
-            max-width: 340px;
-            height: 200px;
-            
-            /* ВОТ ТУТ ТВОЯ КАРТА */
+            position: relative; width: 100%; max-width: 340px; height: 200px;
             background: url('card.png') center/cover no-repeat; 
-            
-            border-radius: 22px; 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
-            transform-style: preserve-3d;
-            animation: tilt 8s infinite ease-in-out;
-            overflow: hidden;
+            border-radius: 22px; box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            transform-style: preserve-3d; animation: tilt 8s infinite ease-in-out;
         }
+        @keyframes tilt { 0%, 100% { transform: rotateY(-7deg) rotateX(5deg); } 50% { transform: rotateY(7deg) rotateX(-5deg); } }
 
-        /* Блик на карте */
-        .main-card::after {
-            content: "";
-            position: absolute;
-            top: 0; left: -100%; right: 0; bottom: 0;
-            background: linear-gradient(105deg, 
-                transparent 30%, 
-                rgba(255,255,255,0.1) 45%, 
-                rgba(255,255,255,0.2) 50%, 
-                rgba(255,255,255,0.1) 55%, 
-                transparent 70%);
-            animation: shine 8s infinite ease-in-out;
-        }
-
-        @keyframes tilt {
-            0%, 100% { transform: rotateY(-7deg) rotateX(5deg); }
-            50% { transform: rotateY(7deg) rotateX(-5deg); }
-        }
-
-        @keyframes shine {
-            0%, 100% { transform: translateX(-100%); opacity: 0; }
-            45%, 55% { opacity: 1; }
-            50% { transform: translateX(200%); }
-        }
-
+        /* КНОПКИ И ФОРМЫ */
         .get-btn { 
-            background: var(--blue); color: white; border: none; 
-            width: 100%; padding: 18px; border-radius: 16px; 
-            font-weight: bold; font-size: 17px; transition: 0.2s;
-            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25);
+            background: var(--blue); color: white; border: none; width: 100%; padding: 18px; 
+            border-radius: 16px; font-weight: bold; font-size: 17px; transition: 0.2s;
+            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25); margin-top: 10px;
         }
         .get-btn:active { transform: scale(0.96); }
 
-        .section-title { font-size: 22px; font-weight: 800; margin: 30px 0 15px; }
-
-        .carousel { display: flex; overflow-x: auto; gap: 15px; padding: 10px 5px; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
-        .carousel::-webkit-scrollbar { display: none; }
-
-        .carousel-item { 
-            min-width: 270px; scroll-snap-align: center;
-            background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border-radius: 24px; padding: 22px; display: flex; align-items: center; gap: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 12px; color: var(--hint); margin-bottom: 6px; text-transform: uppercase; padding-left: 5px; }
+        input { 
+            width: 100%; border: 1px solid rgba(0,0,0,0.05); background: white; 
+            padding: 15px; border-radius: 14px; font-size: 16px; color: var(--text);
+            box-sizing: border-box; outline: none; transition: 0.3s;
         }
+        input:focus { border-color: var(--blue); }
+        input.valid { border-color: var(--green); background: #f2fff5; }
 
+        /* ЦЕНЫ */
+        .price-container { text-align: center; margin: 20px 0; }
+        .old-price { text-decoration: line-through; color: var(--hint); font-size: 18px; display: none; }
+        .new-price { font-size: 32px; font-weight: 900; color: var(--text); }
+
+        /* НАВИГАЦИЯ */
         .nav-bar { 
-            position: fixed; bottom: 0; width: 100%; 
-            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            position: fixed; bottom: 0; width: 100%; background: rgba(255, 255, 255, 0.85); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border-top: 0.5px solid rgba(0,0,0,0.08); display: flex; justify-content: space-around; 
             padding: 10px 0 35px; z-index: 1000;
         }
@@ -125,7 +86,7 @@
         .nav-item.active { color: var(--blue); font-weight: bold; }
         .nav-icon { font-size: 24px; display: block; margin-bottom: 4px; }
 
-        .list-item { background: var(--bg); padding: 20px; border-radius: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .list-item { background: var(--bg); padding: 20px; border-radius: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
     </style>
 </head>
 <body>
@@ -133,66 +94,55 @@
     <div id="home" class="page active">
         <div class="header">
             <div class="user-block">
-                <div id="user-avatar" class="avatar">?</div>
-                <div id="user-name" style="font-weight: bold; font-size: 18px;">Привет!</div>
+                <div id="user-avatar" class="avatar"></div>
+                <div style="font-weight: bold; font-size: 18px;">Привет, <span id="user-name-title">Герой</span>!</div>
             </div>
-            <div style="font-size: 22px;">🔔</div>
+            <div style="font-size: 22px;">🎁</div>
         </div>
         
         <div class="card-wrapper">
             <div class="main-card"></div>
         </div>
-
-        <button class="get-btn" onclick="switchPage('tariffs')">ОФОРМИТЬ КАРТУ</button>
-
-        <div class="section-title">Преимущества</div>
-        <div class="carousel">
-            <div class="carousel-item">
-                <div style="font-size: 30px;">🚀</div>
-                <div>
-                    <div style="font-weight: bold; font-size: 17px;">Скорость</div>
-                    <div style="font-size: 13px; opacity: 0.7;">Готова через 2-4ч</div>
-                </div>
-            </div>
-            <div class="carousel-item">
-                <div style="font-size: 30px;">🛡️</div>
-                <div>
-                    <div style="font-weight: bold; font-size: 17px;">Надежность</div>
-                    <div style="font-size: 13px; opacity: 0.7;">Ваши данные под защитой</div>
-                </div>
-            </div>
-        </div>
+        <button class="get-btn" onclick="switchPage('tariffs')">ВЫБРАТЬ ТАРИФ</button>
     </div>
 
     <div id="tariffs" class="page">
-        <div class="section-title">Тарифы</div>
-        <div class="list-item" style="flex-direction: column; gap: 12px;">
+        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Доступные тарифы</div>
+        <div class="list-item" style="flex-direction: column; align-items: flex-start; gap: 10px;">
             <div style="color: var(--blue); font-weight: bold;">Standard</div>
-            <div style="font-size: 28px; font-weight: 900;">9 000 ₽</div>
-            <button class="get-btn" onclick="order('Standard', 9000)">ВЫБРАТЬ</button>
+            <div style="font-size: 26px; font-weight: 900;">9 000 ₽</div>
+            <button class="get-btn" onclick="openOrder('Standard', 9000)">ВЫБРАТЬ</button>
         </div>
-        <div class="list-item" style="flex-direction: column; gap: 12px;">
+        <div class="list-item" style="flex-direction: column; align-items: flex-start; gap: 10px;">
             <div style="color: #ff9500; font-weight: bold;">Expert</div>
-            <div style="font-size: 28px; font-weight: 900;">12 000 ₽</div>
-            <button class="get-btn" style="background: #ff9500;" onclick="order('Expert', 12000)">ВЫБРАТЬ</button>
+            <div style="font-size: 26px; font-weight: 900;">12 000 ₽</div>
+            <button class="get-btn" style="background: #ff9500;" onclick="openOrder('Expert', 12000)">ВЫБРАТЬ</button>
         </div>
     </div>
 
-    <div id="bonuses" class="page">
-        <div class="section-title">Бонусы</div>
-        <div class="carousel-item" style="min-width: 100%; box-sizing: border-box; background: white;">
-            <div>
-                <div style="font-weight: bold;">Пригласи друга</div>
-                <div style="font-size: 14px; opacity: 0.7; margin-top: 5px;">Получай 1 000 ₽ за каждого</div>
-            </div>
-            <div style="font-size: 40px;">💰</div>
+    <div id="order-page" class="page">
+        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Оформление заявки</div>
+        
+        <div class="input-group">
+            <label>Имя и Фамилия (EN)</label>
+            <input type="text" id="order-name" placeholder="IVAN IVANOV">
         </div>
-    </div>
+        <div class="input-group">
+            <label>Дата рождения</label>
+            <input type="date" id="order-birth">
+        </div>
+        <div class="input-group">
+            <label>Промокод</label>
+            <input type="text" id="promo-input" placeholder="Введите код..." oninput="checkPromo()">
+        </div>
 
-    <div id="settings" class="page">
-        <div class="section-title">Инфо</div>
-        <div class="list-item" onclick="tg.openTelegramLink('https://t.me/eurocards_ru')"><span>Наш канал</span> <span>›</span></div>
-        <div class="list-item" onclick="tg.openTelegramLink('https://t.me/your_support')"><span>Поддержка</span> <span>›</span></div>
+        <div class="price-container">
+            <div id="old-price-view" class="old-price">0 ₽</div>
+            <div id="current-price-view" class="new-price">0 ₽</div>
+        </div>
+
+        <button class="get-btn" onclick="submitOrder()">ОФОРМИТЬ КАРТУ</button>
+        <button class="get-btn" style="background: none; color: var(--hint); box-shadow: none;" onclick="switchPage('tariffs')">Назад к тарифам</button>
     </div>
 
     <div class="nav-bar">
@@ -201,9 +151,6 @@
         </div>
         <div class="nav-item" onclick="switchPage('tariffs', this)">
             <span class="nav-icon">💳</span>Тарифы
-        </div>
-        <div class="nav-item" onclick="switchPage('bonuses', this)">
-            <span class="nav-icon">✨</span>Бонусы
         </div>
         <div class="nav-item" onclick="switchPage('settings', this)">
             <span class="nav-icon">ℹ️</span>Инфо
@@ -214,14 +161,24 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // ДАННЫЕ ЮЗЕРА (Аватар + Имя)
+        // --- БАЗА ПРОМОКОДОВ ---
+        const PROMO_DATABASE = {
+            'SALE500': 500,  // Скидка 500 руб
+            'EURO2026': 1000, // Скидка 1000 руб
+            'ADMIN': 5000     // Скидка 5000 руб
+        };
+
+        let currentTariff = "";
+        let basePrice = 0;
+        let finalPrice = 0;
+
+        // --- ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ---
         let user = tg.initDataUnsafe.user;
         if (user) {
-            document.getElementById('user-name').innerText = user.first_name;
+            document.getElementById('user-name-title').innerText = user.first_name;
             let avatar = document.getElementById('user-avatar');
             if (user.photo_url) {
                 avatar.style.backgroundImage = `url('${user.photo_url}')`;
-                avatar.innerText = '';
             } else {
                 avatar.innerText = user.first_name[0].toUpperCase();
             }
@@ -234,17 +191,70 @@
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                 el.classList.add('active');
             }
-            window.scrollTo(0, 0);
-            tg.HapticFeedback.impactOccurred('light');
+            window.scrollTo(0,0);
         }
 
-        function order(tariff, price) {
-            tg.showConfirm(`Заказать тариф ${tariff}?`, (ok) => {
-                if(ok) {
-                    tg.sendData(JSON.stringify({ tariff: tariff, price: price }));
-                    tg.HapticFeedback.notificationOccurred('success');
-                }
-            });
+        // --- ОТКРЫТИЕ ФОРМЫ ЗАКАЗА ---
+        function openOrder(tariff, price) {
+            currentTariff = tariff;
+            basePrice = price;
+            finalPrice = price;
+            
+            document.getElementById('current-price-view').innerText = price + " ₽";
+            document.getElementById('old-price-view').style.display = "none";
+            document.getElementById('promo-input').value = "";
+            document.getElementById('promo-input').classList.remove('valid');
+            
+            switchPage('order-page');
+        }
+
+        // --- ПРОВЕРКА ПРОМОКОДА ---
+        function checkPromo() {
+            let input = document.getElementById('promo-input');
+            let code = input.value.toUpperCase().trim();
+            let oldPriceView = document.getElementById('old-price-view');
+            let currentPriceView = document.getElementById('current-price-view');
+
+            if (PROMO_DATABASE[code]) {
+                let discount = PROMO_DATABASE[code];
+                finalPrice = basePrice - discount;
+                
+                input.classList.add('valid');
+                oldPriceView.innerText = basePrice + " ₽";
+                oldPriceView.style.display = "block";
+                currentPriceView.innerText = finalPrice + " ₽";
+                currentPriceView.style.color = "var(--green)";
+                
+                tg.HapticFeedback.notificationOccurred('success');
+            } else {
+                input.classList.remove('valid');
+                finalPrice = basePrice;
+                oldPriceView.style.display = "none";
+                currentPriceView.innerText = basePrice + " ₽";
+                currentPriceView.style.color = "var(--text)";
+            }
+        }
+
+        // --- ОТПРАВКА ДАННЫХ ---
+        function submitOrder() {
+            let name = document.getElementById('order-name').value;
+            let birth = document.getElementById('order-birth').value;
+            let promo = document.getElementById('promo-input').value;
+
+            if (!name || !birth) {
+                tg.showAlert("Заполните Имя, Фамилию и Дату рождения!");
+                return;
+            }
+
+            let orderData = {
+                tariff: currentTariff,
+                price: finalPrice,
+                customer_name: name,
+                customer_birth: birth,
+                promo_used: promo || "нет"
+            };
+
+            tg.sendData(JSON.stringify(orderData));
         }
     </script>
 </body>
