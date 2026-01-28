@@ -3,64 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>EuroBridge | Оформить</title>
+    <title>EuroBridge</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; background: var(--tg-theme-secondary-bg-color); color: var(--tg-theme-text-color); margin: 0; padding: 15px; }
-        .card-preview { background: linear-gradient(135deg, #ff416c, #ff4b2b); border-radius: 12px; padding: 15px; color: white; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(255, 65, 108, 0.3); }
-        .input-group { background: var(--tg-theme-bg-color); border-radius: 10px; padding: 10px; margin-bottom: 10px; }
-        label { font-size: 12px; color: var(--tg-theme-hint-color); display: block; margin-bottom: 5px; }
+        body { font-family: sans-serif; background: var(--tg-theme-secondary-bg-color); color: var(--tg-theme-text-color); padding: 15px; margin: 0; }
+        .card { background: linear-gradient(135deg, #ff416c, #ff4b2b); border-radius: 12px; padding: 20px; color: white; margin-bottom: 20px; text-align: center; font-weight: bold; }
+        .form-group { background: var(--tg-theme-bg-color); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
+        label { display: block; font-size: 12px; color: var(--tg-theme-hint-color); margin-bottom: 5px; }
         input, select { width: 100%; border: none; background: transparent; color: var(--tg-theme-text-color); font-size: 16px; outline: none; }
-        .price-tag { font-size: 24px; font-weight: bold; text-align: center; margin: 20px 0; color: var(--tg-theme-button-color); }
-        .btn { background: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); border: none; border-radius: 10px; padding: 15px; width: 100%; font-weight: bold; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn { background: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); border: none; border-radius: 10px; padding: 18px; width: 100%; font-weight: bold; font-size: 16px; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="card-preview">
-        <div style="font-weight: bold;">EuroBridge Elite</div>
-        <div style="font-size: 10px; opacity: 0.7; margin-top: 5px;">Личная карта на ваш загран</div>
+    <div class="card">EUROBRIDGE PREMIUM</div>
+
+    <div class="form-group">
+        <label>ВАШЕ ИМЯ</label>
+        <input type="text" id="name" placeholder="Введите имя...">
     </div>
 
-    <div class="input-group">
-        <label>Ваше имя</label>
-        <input type="text" id="userName" placeholder="Иван Иванов">
-    </div>
-
-    <div class="input-group">
-        <label>Выберите тариф</label>
-        <select id="tariff" onchange="updatePrice()">
-            <option value="9000">Standard (Только карта)</option>
-            <option value="12000">Expert (+ Гайд по IBKR)</option>
-            <option value="15000">VIP (Под ключ + Антифрод)</option>
+    <div class="form-group">
+        <label>ТАРИФ</label>
+        <select id="tariff">
+            <option value="9000">Standard — 9 000 ₽</option>
+            <option value="12000">Expert — 12 000 ₽</option>
+            <option value="15000">VIP — 15 000 ₽</option>
         </select>
     </div>
 
-    <div class="price-tag" id="totalPrice">9 000 ₽</div>
-
-    <button class="btn" onclick="sendOrder()">Заказать карту</button>
+    <button class="btn" onclick="send()">ЗАКАЗАТЬ КАРТУ</button>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        function updatePrice() {
-            let price = document.getElementById('tariff').value;
-            document.getElementById('totalPrice').innerText = price + " ₽";
-        }
+        function send() {
+            let n = document.getElementById('name').value;
+            let t = document.getElementById('tariff');
+            if(!n) { alert("Введите имя!"); return; }
 
-        function sendOrder() {
-            let name = document.getElementById('userName').value;
-            let tariff = document.getElementById('tariff').options[document.getElementById('tariff').selectedIndex].text;
-            let price = document.getElementById('tariff').value;
-
-            if(!name) { alert("Введите имя!"); return; }
-
-            let data = {
-                name: name,
-                tariff: tariff,
-                price: price
+            let result = {
+                name: n,
+                tariff: t.options[t.selectedIndex].text,
+                price: t.value
             };
-            tg.sendData(JSON.stringify(data));
+            tg.sendData(JSON.stringify(result));
         }
     </script>
 </body>
