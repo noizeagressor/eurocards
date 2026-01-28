@@ -3,50 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>EuroCards Bot</title>
+    <title>EuroBridge Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --blue: #007aff;
-            --bg: #ffffff;
-            --sec-bg: #f2f2f7;
-            --text: #000000;
-            --hint: #8e8e93;
-        }
+<style>
+    :root {
+        --blue: #007aff;
+        --bg: #ffffff;
+        --sec-bg: #f2f2f7;
+        --text: #000000;
+        --hint: #8e8e93;
+        --glass: rgba(255, 255, 255, 0.4);
+    }
 
-        body { background: linear-gradient(180deg, #f8f9ff 0%, #e2e7ff 100%);
+    /* ШАГ 2: ПРАВИЛЬНЫЙ ФОН */
+    body { 
+        font-family: -apple-system, sans-serif; 
+        /* Градиент, чтобы стекло "заиграло" */
+        background: linear-gradient(180deg, #f0f2f8 0%, #e2e7ff 100%);
         background-attachment: fixed;
         min-height: 100vh;
-        font-family: -apple-system, sans-serif;
-        margin: 0;
-        padding: 0;
-        color: #000000; } }
+        margin: 0; 
+        padding: 0; 
+        color: var(--text);
+        overflow-x: hidden;
+    }
 
-        /* Шапка */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #eee; }
+    .page { display: none; padding: 20px; padding-bottom: 100px; animation: fadeIn 0.2s ease-in; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Главная карта */
-        .main-card { background: #fff; border: 1px solid #e5e5ea; border-radius: 20px; padding: 25px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .card-img { width: 100%; max-width: 280px; margin-bottom: 15px; border-radius: 10px; }
-        .get-btn { background: var(--blue); color: white; border: none; width: 80%; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 16px; }
+    /* ШАПКА */
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
-        /* Карусель FAQ */
-        .section-title { font-size: 20px; font-weight: bold; margin-bottom: 15px; }
-        .carousel { display: flex; overflow-x: auto; gap: 12px; scrollbar-width: none; margin-bottom: 25px; }
-        .carousel-item { min-width: 280px; background: var(--sec-bg); border-radius: 15px; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .carousel-item img { width: 80px; }
+    /* ГЛАВНАЯ КАРТА (С ГРАДИЕНТОМ) */
+    .main-card { 
+        background: linear-gradient(135deg, #2c3e50, #000000); 
+        border-radius: 24px; 
+        padding: 25px; 
+        text-align: center; 
+        margin-bottom: 25px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        color: white;
+    }
+    .card-img { width: 100%; max-width: 260px; margin-bottom: 15px; }
 
-        /* Навигация внизу */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: #fff; border-top: 1px solid #e5e5ea; display: flex; justify-content: space-around; padding: 10px 0 25px; }
-        .nav-item { text-align: center; color: var(--hint); font-size: 10px; text-decoration: none; flex: 1; cursor: pointer; }
-        .nav-item.active { color: var(--blue); }
-        .nav-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+    .get-btn { 
+        background: var(--blue); color: white; border: none; 
+        width: 100%; padding: 16px; border-radius: 14px; 
+        font-weight: bold; font-size: 16px; transition: 0.2s;
+    }
+    .get-btn:active { transform: scale(0.97); }
 
-        /* Список настроек */
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f2f2f7; cursor: pointer; }
-        .list-item:last-child { border-bottom: none; }
-    </style>
+    /* ТИТУЛЫ СЕКЦИЙ */
+    .section-title { font-size: 20px; font-weight: 800; margin: 25px 0 15px; padding: 0 5px; }
+
+    /* КАРУСЕЛЬ (СТЕКЛО) */
+    .carousel { 
+        display: flex; overflow-x: auto; gap: 15px; 
+        padding: 10px 5px; scrollbar-width: none; 
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+    }
+    .carousel::-webkit-scrollbar { display: none; }
+
+    .carousel-item { 
+        min-width: 260px; 
+        scroll-snap-align: center;
+        background: var(--glass);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border-radius: 22px; 
+        padding: 20px; 
+        display: flex; 
+        align-items: center; 
+        gap: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+    }
+
+    /* НАВИГАЦИЯ (НИЗ) */
+    .nav-bar { 
+        position: fixed; bottom: 0; width: 100%; 
+        background: rgba(255, 255, 255, 0.8); 
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 0.5px solid rgba(0,0,0,0.1); 
+        display: flex; justify-content: space-around; 
+        padding: 10px 0 30px; 
+        z-index: 100;
+    }
+    .nav-item { text-align: center; color: var(--hint); font-size: 10px; flex: 1; cursor: pointer; transition: 0.2s; }
+    .nav-item.active { color: var(--blue); transform: translateY(-2px); }
+    .nav-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+
+    /* СПИСКИ И ТАРИФЫ */
+    .list-item { 
+        background: var(--bg); padding: 18px; 
+        border-radius: 16px; margin-bottom: 10px;
+        display: flex; justify-content: space-between; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+</style>
 </head>
 <body>
 
@@ -57,7 +115,7 @@
         </div>
         
         <div class="main-card">
-            <img src="https://imgur.com/a/4vPMhU9" class="card-img" alt="Card Preview"> <div style="margin-bottom: 15px; font-weight: bold;">Европейская карта Visa</div>
+            <img src="https://i.imgur.com/GscT8Cq.png" class="card-img" alt="Card Preview"> <div style="margin-bottom: 15px; font-weight: bold;">Европейская карта Visa</div>
             <button class="get-btn" onclick="switchPage('tariffs')">ПОЛУЧИТЬ</button>
         </div>
 
@@ -167,5 +225,3 @@
     </script>
 </body>
 </html>
-
-
