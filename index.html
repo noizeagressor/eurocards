@@ -52,7 +52,7 @@
         }
         @keyframes tilt { 0%, 100% { transform: rotateY(-7deg) rotateX(5deg); } 50% { transform: rotateY(7deg) rotateX(-5deg); } }
 
-        /* КНОПКИ И ФОРМЫ */
+        /* ФОРМЫ И КНОПКИ */
         .get-btn { 
             background: var(--blue); color: white; border: none; width: 100%; padding: 18px; 
             border-radius: 16px; font-weight: bold; font-size: 17px; transition: 0.2s;
@@ -70,7 +70,17 @@
         input:focus { border-color: var(--blue); }
         input.valid { border-color: var(--green); background: #f2fff5; }
 
-        /* ЦЕНЫ */
+        /* ЭКРАН УСПЕХА */
+        .success-icon { font-size: 80px; margin-bottom: 20px; animation: scaleUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes scaleUp { from { transform: scale(0); } to { transform: scale(1); } }
+        
+        .success-card {
+            background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-radius: 30px; padding: 40px 20px; text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        }
+
         .price-container { text-align: center; margin: 20px 0; }
         .old-price { text-decoration: line-through; color: var(--hint); font-size: 18px; display: none; }
         .new-price { font-size: 32px; font-weight: 900; color: var(--text); }
@@ -86,7 +96,7 @@
         .nav-item.active { color: var(--blue); font-weight: bold; }
         .nav-icon { font-size: 24px; display: block; margin-bottom: 4px; }
 
-        .list-item { background: var(--bg); padding: 20px; border-radius: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .list-item { background: var(--bg); padding: 20px; border-radius: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
@@ -99,7 +109,6 @@
             </div>
             <div style="font-size: 22px;">🎁</div>
         </div>
-        
         <div class="card-wrapper">
             <div class="main-card"></div>
         </div>
@@ -107,7 +116,7 @@
     </div>
 
     <div id="tariffs" class="page">
-        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Доступные тарифы</div>
+        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Тарифы</div>
         <div class="list-item" style="flex-direction: column; align-items: flex-start; gap: 10px;">
             <div style="color: var(--blue); font-weight: bold;">Standard</div>
             <div style="font-size: 26px; font-weight: 900;">9 000 ₽</div>
@@ -121,31 +130,38 @@
     </div>
 
     <div id="order-page" class="page">
-        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Оформление заявки</div>
-        
+        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Данные для карты</div>
         <div class="input-group">
-            <label>Имя и Фамилия (EN)</label>
+            <label>Name & Surname (English)</label>
             <input type="text" id="order-name" placeholder="IVAN IVANOV">
         </div>
         <div class="input-group">
-            <label>Дата рождения</label>
+            <label>Birthday</label>
             <input type="date" id="order-birth">
         </div>
         <div class="input-group">
-            <label>Промокод</label>
-            <input type="text" id="promo-input" placeholder="Введите код..." oninput="checkPromo()">
+            <label>Promo Code</label>
+            <input type="text" id="promo-input" placeholder="Код..." oninput="checkPromo()">
         </div>
-
         <div class="price-container">
             <div id="old-price-view" class="old-price">0 ₽</div>
             <div id="current-price-view" class="new-price">0 ₽</div>
         </div>
-
-        <button class="get-btn" onclick="submitOrder()">ОФОРМИТЬ КАРТУ</button>
-        <button class="get-btn" style="background: none; color: var(--hint); box-shadow: none;" onclick="switchPage('tariffs')">Назад к тарифам</button>
+        <button class="get-btn" onclick="showSuccess()">ОФОРМИТЬ КАРТУ</button>
     </div>
 
-    <div class="nav-bar">
+    <div id="success-page" class="page">
+        <div class="success-card">
+            <div class="success-icon">✅</div>
+            <div style="font-size: 22px; font-weight: 800; margin-bottom: 10px;">Заявка отправлена!</div>
+            <div style="font-size: 15px; color: var(--hint); line-height: 1.5; margin-bottom: 30px;">
+                Ваши данные приняты. Ожидайте ответа менеджера в течение 6 часов.
+            </div>
+            <button class="get-btn" onclick="finalSubmit()">ОТЛИЧНО</button>
+        </div>
+    </div>
+
+    <div class="nav-bar" id="bottom-nav">
         <div class="nav-item active" onclick="switchPage('home', this)">
             <span class="nav-icon">🏠</span>Главная
         </div>
@@ -161,18 +177,10 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // --- БАЗА ПРОМОКОДОВ ---
-        const PROMO_DATABASE = {
-            'SALE500': 500,  // Скидка 500 руб
-            'EURO2026': 1000, // Скидка 1000 руб
-            'ADMIN': 5000     // Скидка 5000 руб
-        };
+        const PROMO_DATABASE = { 'SALE500': 500, 'EURO2026': 1000 };
+        let currentTariff = "", basePrice = 0, finalPrice = 0;
 
-        let currentTariff = "";
-        let basePrice = 0;
-        let finalPrice = 0;
-
-        // --- ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ---
+        // ДАННЫЕ ЮЗЕРА
         let user = tg.initDataUnsafe.user;
         if (user) {
             document.getElementById('user-name-title').innerText = user.first_name;
@@ -194,66 +202,55 @@
             window.scrollTo(0,0);
         }
 
-        // --- ОТКРЫТИЕ ФОРМЫ ЗАКАЗА ---
         function openOrder(tariff, price) {
             currentTariff = tariff;
             basePrice = price;
             finalPrice = price;
-            
             document.getElementById('current-price-view').innerText = price + " ₽";
-            document.getElementById('old-price-view').style.display = "none";
-            document.getElementById('promo-input').value = "";
-            document.getElementById('promo-input').classList.remove('valid');
-            
             switchPage('order-page');
         }
 
-        // --- ПРОВЕРКА ПРОМОКОДА ---
         function checkPromo() {
             let input = document.getElementById('promo-input');
             let code = input.value.toUpperCase().trim();
-            let oldPriceView = document.getElementById('old-price-view');
-            let currentPriceView = document.getElementById('current-price-view');
-
             if (PROMO_DATABASE[code]) {
-                let discount = PROMO_DATABASE[code];
-                finalPrice = basePrice - discount;
-                
+                finalPrice = basePrice - PROMO_DATABASE[code];
                 input.classList.add('valid');
-                oldPriceView.innerText = basePrice + " ₽";
-                oldPriceView.style.display = "block";
-                currentPriceView.innerText = finalPrice + " ₽";
-                currentPriceView.style.color = "var(--green)";
-                
+                document.getElementById('old-price-view').innerText = basePrice + " ₽";
+                document.getElementById('old-price-view').style.display = "block";
+                document.getElementById('current-price-view').innerText = finalPrice + " ₽";
+                document.getElementById('current-price-view').style.color = "var(--green)";
                 tg.HapticFeedback.notificationOccurred('success');
             } else {
                 input.classList.remove('valid');
                 finalPrice = basePrice;
-                oldPriceView.style.display = "none";
-                currentPriceView.innerText = basePrice + " ₽";
-                currentPriceView.style.color = "var(--text)";
+                document.getElementById('old-price-view').style.display = "none";
+                document.getElementById('current-price-view').innerText = basePrice + " ₽";
+                document.getElementById('current-price-view').style.color = "var(--text)";
             }
         }
 
-        // --- ОТПРАВКА ДАННЫХ ---
-        function submitOrder() {
+        function showSuccess() {
             let name = document.getElementById('order-name').value;
             let birth = document.getElementById('order-birth').value;
-            let promo = document.getElementById('promo-input').value;
-
             if (!name || !birth) {
-                tg.showAlert("Заполните Имя, Фамилию и Дату рождения!");
+                tg.showAlert("Заполните все данные!");
                 return;
             }
+            // Скрываем навигацию и показываем успех
+            document.getElementById('bottom-nav').style.display = "none";
+            switchPage('success-page');
+            tg.HapticFeedback.notificationOccurred('success');
+        }
 
+        function finalSubmit() {
             let orderData = {
                 tariff: currentTariff,
                 price: finalPrice,
-                customer_name: name,
-                customer_birth: birth,
-                promo_used: promo || "нет"
+                name: document.getElementById('order-name').value,
+                birth: document.getElementById('order-birth').value,
+                promo: document.getElementById('promo-input').value || "нет"
             };
-
             tg.sendData(JSON.stringify(orderData));
         }
     </script>
