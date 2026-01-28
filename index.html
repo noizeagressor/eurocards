@@ -3,52 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>EuroBridge</title>
+    <title>EuroBridge | Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; background: var(--tg-theme-secondary-bg-color); color: var(--tg-theme-text-color); padding: 15px; margin: 0; }
-        .card { background: linear-gradient(135deg, #ff416c, #ff4b2b); border-radius: 12px; padding: 20px; color: white; margin-bottom: 20px; text-align: center; font-weight: bold; }
-        .form-group { background: var(--tg-theme-bg-color); border-radius: 10px; padding: 15px; margin-bottom: 10px; }
-        label { display: block; font-size: 12px; color: var(--tg-theme-hint-color); margin-bottom: 5px; }
-        input, select { width: 100%; border: none; background: transparent; color: var(--tg-theme-text-color); font-size: 16px; outline: none; }
-        .btn { background: var(--tg-theme-button-color); color: var(--tg-theme-button-text-color); border: none; border-radius: 10px; padding: 18px; width: 100%; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        :root {
+            --accent: #ff4b2b;
+            --accent-grad: linear-gradient(135deg, #ff416c, #ff4b2b);
+            --bg: var(--tg-theme-bg-color, #ffffff);
+            --text: var(--tg-theme-text-color, #222222);
+            --hint: var(--tg-theme-hint-color, #999999);
+            --sec-bg: var(--tg-theme-secondary-bg-color, #f4f4f7);
+        }
+
+        body { font-family: -apple-system, system-ui; background: var(--sec-bg); color: var(--text); margin: 0; padding-bottom: 50px; }
+        
+        /* Секция Header */
+        header { background: var(--accent-grad); padding: 30px 20px; text-align: center; color: white; border-bottom-left-radius: 25px; border-bottom-right-radius: 25px; margin-bottom: 20px; }
+        header h1 { margin: 0; font-size: 24px; }
+        header p { margin: 5px 0 0; opacity: 0.8; font-size: 14px; }
+
+        /* Тарифы (Карточки) */
+        .section-title { padding: 0 20px; font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+        .tariffs-container { display: flex; overflow-x: auto; padding: 0 20px 20px; gap: 15px; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .tariffs-container::-webkit-scrollbar { display: none; }
+        .tariff-card { 
+            min-width: 260px; background: var(--bg); border-radius: 20px; padding: 20px; 
+            scroll-snap-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .tariff-card.active { border: 2px solid var(--accent); }
+        .tariff-name { font-weight: bold; font-size: 18px; color: var(--accent); }
+        .tariff-price { font-size: 28px; font-weight: 900; margin: 10px 0; }
+        .tariff-features { list-style: none; padding: 0; margin: 15px 0; font-size: 13px; line-height: 1.6; color: var(--hint); }
+        .tariff-features li::before { content: "✓ "; color: var(--accent); }
+
+        /* FAQ (Аккордеон) */
+        .faq-item { background: var(--bg); margin: 0 20px 10px; border-radius: 12px; overflow: hidden; }
+        .faq-question { padding: 15px; font-weight: 600; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; }
+        .faq-answer { padding: 0 15px 15px; font-size: 13px; color: var(--hint); display: none; }
+
+        /* Отзывы */
+        .review-card { background: var(--bg); margin: 0 20px 10px; padding: 15px; border-radius: 12px; font-size: 13px; font-style: italic; }
+        .review-author { display: block; margin-top: 10px; font-weight: bold; font-style: normal; color: var(--accent); }
+
+        /* Форма заказа */
+        .order-form { background: var(--bg); margin: 20px; padding: 20px; border-radius: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 11px; color: var(--hint); margin-bottom: 5px; text-transform: uppercase; }
+        input { width: 100%; border: none; background: var(--sec-bg); padding: 12px; border-radius: 10px; color: var(--text); box-sizing: border-box; }
+
+        .btn { background: var(--accent-grad); color: white; border: none; width: 100%; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div class="card">EUROBRIDGE PREMIUM</div>
 
-    <div class="form-group">
-        <label>ВАШЕ ИМЯ</label>
-        <input type="text" id="name" placeholder="Введите имя...">
+<header>
+    <h1>EuroBridge Premium</h1>
+    <p>Твой доступ к мировым платежам за 4 часа</p>
+</header>
+
+<div class="section-title">Выберите тариф</div>
+<div class="tariffs-container">
+    <div class="tariff-card">
+        <div class="tariff-name">Standard</div>
+        <div class="tariff-price">9 000 ₽</div>
+        <ul class="tariff-features">
+            <li>Карта на ваш загран</li>
+            <li>Apple / Google Pay</li>
+            <li>Поддержка 24/7</li>
+        </ul>
+        <button class="btn" onclick="scrollToOrder('Standard')">Выбрать</button>
     </div>
-
-    <div class="form-group">
-        <label>ТАРИФ</label>
-        <select id="tariff">
-            <option value="9000">Standard — 9 000 ₽</option>
-            <option value="12000">Expert — 12 000 ₽</option>
-            <option value="15000">VIP — 15 000 ₽</option>
-        </select>
+    <div class="tariff-card active">
+        <div class="tariff-name">Expert</div>
+        <div class="tariff-price">12 000 ₽</div>
+        <ul class="tariff-features">
+            <li>Всё из Standard</li>
+            <li>Гайд по IBKR / Binance</li>
+            <li>Приоритетный выпуск</li>
+        </ul>
+        <button class="btn" onclick="scrollToOrder('Expert')">Выбрать</button>
     </div>
+    <div class="tariff-card">
+        <div class="tariff-name">VIP</div>
+        <div class="tariff-price">15 000 ₽</div>
+        <ul class="tariff-features">
+            <li>Всё из Expert</li>
+            <li>Настройка антифрода</li>
+            <li>Личный консьерж</li>
+        </ul>
+        <button class="btn" onclick="scrollToOrder('VIP')">Выбрать</button>
+    </div>
+</div>
 
-    <button class="btn" onclick="send()">ЗАКАЗАТЬ КАРТУ</button>
+<div class="section-title">Частые вопросы</div>
+<div class="faq-item">
+    <div class="faq-question" onclick="toggleFaq(this)">Нужен ли визит в банк? <span>+</span></div>
+    <div class="faq-answer">Нет, всё оформляется полностью дистанционно через ваш загранпаспорт.</div>
+</div>
+<div class="faq-item">
+    <div class="faq-question" onclick="toggleFaq(this)">Как пополнять карту? <span>+</span></div>
+    <div class="faq-answer">Через криптобиржи (P2P) или через удобные сервисы-мосты с карты РФ.</div>
+</div>
 
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
+<div class="section-title">Отзывы</div>
+<div class="review-card">
+    "Сделали карту за 3 часа, уже оплатил подписки и авиабилеты. Рекомендую!"
+    <span class="review-author">@alex_k</span>
+</div>
 
-        function send() {
-            let n = document.getElementById('name').value;
-            let t = document.getElementById('tariff');
-            if(!n) { alert("Введите имя!"); return; }
+<div class="order-form" id="order-section">
+    <div class="section-title" style="padding:0; margin-bottom:10px;">Оформление заявки</div>
+    <div class="input-group">
+        <label>ФИО (как в загране)</label>
+        <input type="text" id="name" placeholder="IVAN IVANOV">
+    </div>
+    <div class="input-group">
+        <label>Выбранный тариф</label>
+        <input type="text" id="tariff-display" readonly value="Выберите выше">
+    </div>
+    <button class="btn" onclick="sendData()">Отправить заявку</button>
+</div>
 
-            let result = {
-                name: n,
-                tariff: t.options[t.selectedIndex].text,
-                price: t.value
-            };
-            tg.sendData(JSON.stringify(result));
+<script>
+    let tg = window.Telegram.WebApp;
+    tg.expand();
+    let selectedTariff = "";
+
+    function toggleFaq(el) {
+        let ans = el.nextElementSibling;
+        ans.style.display = (ans.style.display === "block") ? "none" : "block";
+    }
+
+    function scrollToOrder(name) {
+        selectedTariff = name;
+        document.getElementById('tariff-display').value = name;
+        document.getElementById('order-section').scrollIntoView({behavior: "smooth"});
+    }
+
+    function sendData() {
+        let name = document.getElementById('name').value;
+        if(!name || !selectedTariff) {
+            tg.showAlert("Пожалуйста, введите имя и выберите тариф!");
+            return;
         }
-    </script>
+        let data = {
+            name: name,
+            tariff: selectedTariff,
+            price: (selectedTariff === 'Standard' ? '9000' : selectedTariff === 'Expert' ? '12000' : '15000')
+        };
+        tg.sendData(JSON.stringify(data));
+    }
+</script>
+
 </body>
 </html>
