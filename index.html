@@ -53,57 +53,43 @@
         }
         @keyframes tilt { 0%, 100% { transform: rotateY(-7deg) rotateX(5deg); } 50% { transform: rotateY(7deg) rotateX(-5deg); } }
 
-        /* СТАТУС ЗАЯВКИ (СКЕЛЕТ) */
+        /* СТАТУС ЗАЯВКИ */
         .status-card {
-            background: var(--bg); border-radius: 18px; padding: 15px;
-            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            background: var(--bg); border-radius: 18px; padding: 18px;
+            margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.02);
         }
         .status-badge {
-            background: #fff9eb; color: #ff9500; padding: 5px 10px; 
-            border-radius: 8px; font-size: 11px; font-weight: bold; text-transform: uppercase;
+            background: #e8f5e9; color: var(--green); padding: 6px 12px; 
+            border-radius: 10px; font-size: 11px; font-weight: bold; text-transform: uppercase;
         }
 
         /* ТАРИФЫ (СЕТКА) */
         .tariffs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
         .tariff-square {
-            background: var(--bg); border-radius: 20px; padding: 20px;
+            background: var(--bg); border-radius: 22px; padding: 20px;
             display: flex; flex-direction: column; align-items: center; text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.03);
+            transition: 0.2s;
         }
+        .tariff-square:active { transform: scale(0.97); background: #fafafa; }
         .tariff-square h3 { margin: 10px 0 5px; font-size: 16px; }
-        .tariff-square .price { font-size: 18px; font-weight: 900; color: var(--blue); }
+        .tariff-square .price { font-size: 17px; font-weight: 800; color: var(--blue); }
 
-        /* АКЦИОННЫЙ БАННЕР */
-        .promo-banner {
-            background: linear-gradient(135deg, #ff9500, #ff5e00);
-            border-radius: 18px; padding: 15px; color: white;
-            margin-bottom: 25px; display: flex; align-items: center; gap: 15px;
-        }
-
+        /* КНОПКИ И ПОЛЯ */
         .get-btn { 
             background: var(--blue); color: white; border: none; width: 100%; padding: 18px; 
-            border-radius: 16px; font-weight: bold; font-size: 17px; transition: 0.2s;
-            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.25);
+            border-radius: 18px; font-weight: bold; font-size: 17px; transition: 0.2s;
+            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.2);
         }
         .get-btn:active { transform: scale(0.96); }
 
-        /* КАРУСЕЛЬ */
-        .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px; }
-        .carousel { display: flex; overflow-x: auto; gap: 12px; padding: 5px; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
-        .carousel::-webkit-scrollbar { display: none; }
-        .carousel-item { 
-            min-width: 240px; scroll-snap-align: center;
-            background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border-radius: 20px; padding: 15px; display: flex; align-items: center; gap: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+        input { 
+            width: 100%; border: 1.5px solid #eee; background: white; 
+            padding: 16px; border-radius: 15px; font-size: 16px; 
+            box-sizing: border-box; outline: none; margin-bottom: 15px;
         }
-
-        .list-item { 
-            background: var(--bg); padding: 18px; border-radius: 18px; 
-            margin-bottom: 12px; display: flex; justify-content: space-between; 
-            align-items: center; text-decoration: none; color: inherit;
-        }
+        input.valid { border-color: var(--green); background: #f2fff5; }
 
         /* НАВИГАЦИЯ */
         .nav-bar { 
@@ -115,6 +101,16 @@
         .nav-item { text-align: center; color: var(--hint); font-size: 11px; flex: 1; cursor: pointer; }
         .nav-item.active { color: var(--blue); font-weight: bold; }
         .nav-icon { font-size: 24px; display: block; margin-bottom: 4px; }
+        
+        /* КАРУСЕЛЬ */
+        .carousel { display: flex; overflow-x: auto; gap: 12px; padding: 5px; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
+        .carousel::-webkit-scrollbar { display: none; }
+        .carousel-item { 
+            min-width: 240px; scroll-snap-align: center;
+            background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px; padding: 15px; display: flex; align-items: center; gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -125,89 +121,84 @@
                 <div id="user-avatar" class="avatar"></div>
                 <div style="font-weight: bold; font-size: 18px;">Привет, <span id="user-name-title">Герой</span>!</div>
             </div>
-            <div style="font-size: 20px;">🔔</div>
+            <div style="font-size: 20px;">🎁</div>
         </div>
 
         <div class="card-wrapper"><div class="main-card"></div></div>
 
-        <div class="status-card" id="application-status" style="display: none;">
+        <div class="status-card" id="app-status-box" style="display: none;">
             <div>
-                <div style="font-size: 13px; font-weight: bold;">Статус вашей карты</div>
-                <div style="font-size: 11px; color: var(--hint);">Заявка №2026-01</div>
+                <div style="font-size: 14px; font-weight: bold;">Ваша карта: <span id="st-tariff">...</span></div>
+                <div style="font-size: 12px; color: var(--hint);" id="st-date">Дата заказа: ...</div>
             </div>
-            <div class="status-badge" id="status-text">В обработке</div>
+            <div class="status-badge">В обработке</div>
         </div>
 
-        <div class="promo-banner">
-            <div style="font-size: 25px;">🔥</div>
-            <div>
-                <div style="font-weight: bold; font-size: 14px;">Скидка 500 ₽ по коду SALE500</div>
-            </div>
-        </div>
+        <button class="get-btn" onclick="switchPage('tariffs')">НОВЫЙ ЗАКАЗ</button>
 
-        <button class="get-btn" onclick="switchPage('tariffs')">ОФОРМИТЬ КАРТУ</button>
-
-        <div class="section-title">Почему мы?</div>
+        <div style="font-size: 18px; font-weight: 800; margin: 25px 0 15px;">Почему выбирают нас?</div>
         <div class="carousel">
-            <div class="carousel-item"><span>⚡</span> <div><b>Быстро</b><br><small>От 2 часов</small></div></div>
-            <div class="carousel-item"><span>🌍</span> <div><b>Везде</b><br><small>Мировая оплата</small></div></div>
-            <div class="carousel-item"><span>🛡️</span> <div><b>Надежно</b><br><small>Гарантия 100%</small></div></div>
+            <div class="carousel-item"><span>⚡</span> <div><b>Скорость</b><br><small>Выпуск за 2-4ч</small></div></div>
+            <div class="carousel-item"><span>🌍</span> <div><b>Мир</b><br><small>Работает везде</small></div></div>
+            <div class="carousel-item"><span>🛡️</span> <div><b>Гарантия</b><br><small>Официальный банк</small></div></div>
         </div>
-
-        <div class="section-title">Полезные ссылки</div>
-        <a href="#" class="list-item" onclick="tg.openTelegramLink('https://t.me/eurocards_ru')"><span>📢 Наш канал</span><span>›</span></a>
-        <a href="#" class="list-item" onclick="tg.openTelegramLink('https://t.me/your_support')"><span>🆘 Поддержка</span><span>›</span></a>
     </div>
 
     <div id="tariffs" class="page">
-        <div class="section-title">Выберите тариф</div>
+        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Выберите тариф</div>
         <div class="tariffs-grid">
-            <div class="tariff-square" onclick="openOrder('Standard', 9000)">
-                <div style="font-size: 25px;">💳</div>
+            <div class="tariff-square" onclick="showDetails('Standard', 9000, 'Базовое открытие счета на ваш загранпаспорт. Идеально для подписок и Apple Pay.')">
+                <div style="font-size: 30px;">💳</div>
                 <h3>Standard</h3>
                 <div class="price">9 000 ₽</div>
             </div>
-            <div class="tariff-square" onclick="openOrder('Expert', 12000)">
-                <div style="font-size: 25px;">🚀</div>
+            <div class="tariff-square" onclick="showDetails('Expert', 12000, 'Standard + Полный гайд по пополнению через Binance и Swift-переводы.')">
+                <div style="font-size: 30px;">🚀</div>
                 <h3>Expert</h3>
                 <div class="price">12 000 ₽</div>
             </div>
-            <div class="tariff-square" onclick="openOrder('VIP', 15000)">
-                <div style="font-size: 25px;">👑</div>
+            <div class="tariff-square" onclick="showDetails('VIP', 15000, 'Expert + Персональный менеджер и помощь в привязке к зарубежным биржам.')">
+                <div style="font-size: 30px;">👑</div>
                 <h3>VIP</h3>
                 <div class="price">15 000 ₽</div>
             </div>
-            <div class="tariff-square" onclick="openOrder('Crypto', 10000)">
-                <div style="font-size: 25px;">₿</div>
+            <div class="tariff-square" onclick="showDetails('Crypto', 10000, 'Специальный тариф для тех, кто планирует работать только с криптовалютой.')">
+                <div style="font-size: 30px;">₿</div>
                 <h3>Crypto</h3>
                 <div class="price">10 000 ₽</div>
             </div>
         </div>
     </div>
 
-    <div id="order-page" class="page">
-        <div class="section-title">Данные для карты</div>
-        <input type="text" id="order-name" placeholder="IVAN IVANOV" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px; box-sizing:border-box;">
-        <input type="date" id="order-birth" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px; box-sizing:border-box;">
-        <input type="text" id="promo-input" placeholder="Промокод" oninput="checkPromo()" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px; box-sizing:border-box;">
-        <div style="text-align: center; margin: 20px 0;">
-            <div id="old-price-view" style="text-decoration: line-through; color: var(--hint); display: none;">0 ₽</div>
-            <div id="current-price-view" style="font-size: 30px; font-weight: 900;">0 ₽</div>
+    <div id="tariff-detail" class="page">
+        <div style="background: white; border-radius: 30px; padding: 30px 20px; text-align: center;">
+            <div id="det-icon" style="font-size: 60px; margin-bottom: 20px;">💎</div>
+            <h2 id="det-name" style="margin: 0; font-size: 28px;">Тариф</h2>
+            <div id="det-price" style="font-size: 22px; color: var(--blue); font-weight: 800; margin: 10px 0;">0 ₽</div>
+            <p id="det-desc" style="color: var(--hint); line-height: 1.6; margin-bottom: 30px;">Описание...</p>
+            <button class="get-btn" onclick="openOrderFromDetail()">ВЫБРАТЬ ЭТОТ ТАРИФ</button>
+            <button class="get-btn" style="background: none; color: var(--hint); box-shadow: none;" onclick="switchPage('tariffs')">Назад</button>
         </div>
-        <button class="get-btn" onclick="showSuccess()">ОФОРМИТЬ</button>
     </div>
 
-    <div id="info" class="page">
-        <div class="section-title">Инфо и Настройки</div>
-        <div class="list-item"><span>Темная тема</span> <span>Авто</span></div>
-        <div class="list-item" onclick="tg.showAlert('Версия 2.5')"><span>О приложении</span><span>v 2.5</span></div>
+    <div id="order-page" class="page">
+        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Данные для карты</div>
+        <input type="text" id="order-name" placeholder="IVAN IVANOV">
+        <input type="date" id="order-birth">
+        <input type="text" id="promo-input" placeholder="Промокод" oninput="checkPromo()">
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <div id="old-price-view" style="text-decoration: line-through; color: var(--hint); display: none;">0 ₽</div>
+            <div id="current-price-view" style="font-size: 32px; font-weight: 900; color: var(--text);">0 ₽</div>
+        </div>
+        <button class="get-btn" onclick="showSuccess()">ПОДТВЕРДИТЬ</button>
     </div>
 
     <div id="success-page" class="page">
         <div style="background: white; border-radius: 30px; padding: 40px 20px; text-align: center;">
             <div style="font-size: 60px;">✅</div>
-            <div style="font-size: 20px; font-weight: 800; margin: 15px 0;">Заявка принята!</div>
-            <div style="color: var(--hint); margin-bottom: 30px;">Ожидайте ответа оператора в течение 6 часов.</div>
+            <h2 style="margin: 15px 0;">Заявка принята!</h2>
+            <p style="color: var(--hint); margin-bottom: 30px;">Мы свяжемся с вами в течение 6 часов. Статус появится на главной.</p>
             <button class="get-btn" onclick="returnToMenu()">ОТЛИЧНО</button>
         </div>
     </div>
@@ -222,16 +213,27 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        const PROMO_DB = { 'SALE500': 500 };
-        let currentT = "", baseP = 0, finalP = 0;
+        const PROMO_DB = { 'SALE500': 500, 'EURO2026': 1000 };
+        let selT = "", selP = 0, finP = 0;
 
-        let user = tg.initDataUnsafe.user;
-        if (user) {
-            document.getElementById('user-name-title').innerText = user.first_name;
-            let avatar = document.getElementById('user-avatar');
-            if (user.photo_url) { avatar.style.backgroundImage = `url('${user.photo_url}')`; }
-            else { avatar.innerText = user.first_name[0]; }
-        }
+        // ЗАГРУЗКА ДАННЫХ ПРИ ОТКРЫТИИ
+        window.onload = function() {
+            let lastOrder = localStorage.getItem('lastOrder');
+            if (lastOrder) {
+                let order = JSON.parse(lastOrder);
+                document.getElementById('app-status-box').style.display = 'flex';
+                document.getElementById('st-tariff').innerText = order.t;
+                document.getElementById('st-date').innerText = "Заказ от: " + order.date;
+            }
+
+            let user = tg.initDataUnsafe.user;
+            if (user) {
+                document.getElementById('user-name-title').innerText = user.first_name;
+                let avatar = document.getElementById('user-avatar');
+                if (user.photo_url) { avatar.style.backgroundImage = `url('${user.photo_url}')`; avatar.innerText = ""; }
+                else { avatar.innerText = user.first_name[0]; }
+            }
+        };
 
         function switchPage(pageId, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -240,44 +242,62 @@
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                 el.classList.add('active');
             }
+            window.scrollTo(0,0);
         }
 
-        function openOrder(tariff, price) {
-            currentT = tariff; baseP = price; finalP = price;
-            document.getElementById('current-price-view').innerText = price + " ₽";
+        // ДЕТАЛИ ТАРИФА
+        function showDetails(name, price, desc) {
+            selT = name; selP = price; finP = price;
+            document.getElementById('det-name').innerText = name;
+            document.getElementById('det-price').innerText = price + " ₽";
+            document.getElementById('det-desc').innerText = desc;
+            switchPage('tariff-detail');
+        }
+
+        function openOrderFromDetail() {
+            document.getElementById('current-price-view').innerText = selP + " ₽";
+            document.getElementById('current-price-view').style.color = "var(--text)";
+            document.getElementById('old-price-view').style.display = "none";
+            document.getElementById('promo-input').value = "";
+            document.getElementById('promo-input').classList.remove('valid');
             switchPage('order-page');
         }
 
         function checkPromo() {
             let code = document.getElementById('promo-input').value.toUpperCase().trim();
+            let cp = document.getElementById('current-price-view');
+            let op = document.getElementById('old-price-view');
+            let inp = document.getElementById('promo-input');
+
             if (PROMO_DB[code]) {
-                finalP = baseP - PROMO_DB[code];
-                document.getElementById('old-price-view').innerText = baseP + " ₽";
-                document.getElementById('old-price-view').style.display = "block";
-                document.getElementById('current-price-view').innerText = finalP + " ₽";
+                finP = selP - PROMO_DB[code];
+                inp.classList.add('valid');
+                op.innerText = selP + " ₽"; op.style.display = "block";
+                cp.innerText = finP + " ₽"; cp.style.color = "var(--green)";
+                tg.HapticFeedback.notificationOccurred('success');
+            } else {
+                finP = selP; inp.classList.remove('valid');
+                op.style.display = "none"; cp.innerText = selP + " ₽";
+                cp.style.color = "var(--text)";
             }
         }
 
         function showSuccess() {
+            if(!document.getElementById('order-name').value) { tg.showAlert("Введите имя!"); return; }
+            
+            // СОХРАНЯЕМ В ПАМЯТЬ ТЕЛЕФОНА
+            let orderInfo = { t: selT, date: new Date().toLocaleDateString() };
+            localStorage.setItem('lastOrder', JSON.stringify(orderInfo));
+            
             document.getElementById('bottom-nav').style.display = "none";
             switchPage('success-page');
-            // Здесь данные отправляются боту "тихо", если есть API, 
-            // но так как мы на tg.sendData, мы вызовем его в returnToMenu
+            tg.HapticFeedback.notificationOccurred('success');
         }
 
         function returnToMenu() {
-            // Чтобы данные реально ушли в бот, мы ДОЛЖНЫ использовать sendData.
-            // Если ты хочешь оставить аппку открытой, бот НЕ ПОЛУЧИТ сообщение через JS.
-            // Поэтому мы сначала показываем "Успех", а при нажатии "Отлично" — отправляем и закрываем.
-            // Если нужно БЕЗ закрытия — нужно писать бэкенд на Python.
-            
-            let data = { t: currentT, p: finalP, n: document.getElementById('order-name').value };
-            tg.sendData(JSON.stringify(data)); 
-            
-            // Если всё же хочешь просто вернуться (данные боту не уйдут!):
-            // document.getElementById('bottom-nav').style.display = "flex";
-            // document.getElementById('application-status').style.display = "flex";
-            // switchPage('home');
+            // Отправляем данные боту (приложение закроется)
+            let data = { t: selT, p: finP, n: document.getElementById('order-name').value };
+            tg.sendData(JSON.stringify(data));
         }
     </script>
 </body>
