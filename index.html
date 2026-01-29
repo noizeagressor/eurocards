@@ -39,8 +39,7 @@
             background: linear-gradient(135deg, var(--blue), #5ac8fa);
             box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 2px solid #fff;
             display: flex; justify-content: center; align-items: center;
-            overflow: hidden; font-weight: bold; color: white;
-            background-size: cover; background-position: center;
+            font-weight: bold; color: white; background-size: cover; background-position: center;
         }
 
         /* 3D КАРТА */
@@ -53,42 +52,24 @@
         }
         @keyframes tilt { 0%, 100% { transform: rotateY(-7deg) rotateX(5deg); } 50% { transform: rotateY(7deg) rotateX(-5deg); } }
 
-        /* СТАТУС ЗАЯВКИ */
-        .status-card {
-            background: var(--bg); border-radius: 18px; padding: 18px;
-            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-        }
-        .status-badge { background: #e8f5e9; color: var(--green); padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-
-        /* БАННЕР АКЦИИ */
-        .promo-banner {
-            background: linear-gradient(135deg, #ff9500, #ff5e00);
-            border-radius: 18px; padding: 15px; color: white;
-            margin-bottom: 25px; display: flex; align-items: center; gap: 15px;
-            box-shadow: 0 8px 20px rgba(255, 149, 0, 0.3);
-        }
-
-        /* ТАРИФЫ (СЕТКА) */
+        /* ТАРИФЫ (СЕТКА 2x2) */
         .tariffs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
         .tariff-square {
             background: var(--bg); border-radius: 22px; padding: 20px;
             display: flex; flex-direction: column; align-items: center; text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.03);
         }
-        .tariff-square h3 { margin: 10px 0 5px; font-size: 16px; }
-        .tariff-square .price { font-size: 17px; font-weight: 800; color: var(--blue); }
+        .tariff-square:active { transform: scale(0.97); }
 
-        /* КНОПКИ И ПОЛЯ */
-        .get-btn { 
-            background: var(--blue); color: white; border: none; width: 100%; padding: 18px; 
-            border-radius: 18px; font-weight: bold; font-size: 17px; transition: 0.2s;
-            box-shadow: 0 8px 20px rgba(0, 122, 255, 0.2);
-        }
+        /* БОНУСЫ */
+        .ref-box { background: white; border-radius: 22px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .stat-item { background: var(--sec-bg); padding: 15px; border-radius: 15px; text-align: center; }
+        
+        /* КНОПКИ */
+        .get-btn { background: var(--blue); color: white; border: none; width: 100%; padding: 18px; border-radius: 16px; font-weight: bold; font-size: 17px; }
         .get-btn:active { transform: scale(0.96); }
-
-        input { width: 100%; border: 1.5px solid #eee; background: white; padding: 16px; border-radius: 15px; font-size: 16px; box-sizing: border-box; outline: none; margin-bottom: 15px; }
-        input.valid { border-color: var(--green); background: #f2fff5; }
+        .copy-btn { background: #e2e7ff; color: var(--blue); border: none; width: 100%; padding: 12px; border-radius: 12px; font-weight: bold; margin-top: 10px; }
 
         /* НАВИГАЦИЯ */
         .nav-bar { 
@@ -99,12 +80,12 @@
         }
         .nav-item { text-align: center; color: var(--hint); font-size: 11px; flex: 1; cursor: pointer; }
         .nav-item.active { color: var(--blue); font-weight: bold; }
-        .nav-icon { font-size: 24px; display: block; margin-bottom: 4px; }
-        
-        /* КАРУСЕЛЬ И СПИСКИ */
-        .carousel { display: flex; overflow-x: auto; gap: 12px; padding: 5px; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
-        .carousel-item { min-width: 240px; scroll-snap-align: center; background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 20px; padding: 15px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(255, 255, 255, 0.4); }
-        .list-item { background: var(--bg); padding: 18px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03); text-decoration: none; color: inherit; }
+        .nav-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+
+        /* СПИСКИ */
+        .list-item { background: var(--bg); padding: 18px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        input { width: 100%; border: 1.5px solid #eee; background: white; padding: 16px; border-radius: 15px; box-sizing: border-box; outline: none; margin-bottom: 15px; }
+        input.valid { border-color: var(--green); background: #f2fff5; }
     </style>
 </head>
 <body>
@@ -117,81 +98,90 @@
             </div>
             <div style="font-size: 20px;">🎁</div>
         </div>
-
         <div class="card-wrapper"><div class="main-card"></div></div>
-
-        <div class="status-card" id="app-status-box" style="display: none;">
-            <div>
-                <div style="font-size: 14px; font-weight: bold;">Ваша карта: <span id="st-tariff">...</span></div>
-                <div style="font-size: 12px; color: var(--hint);" id="st-date">Заказ от: ...</div>
-            </div>
-            <div class="status-badge">В обработке</div>
-        </div>
-
-        <div class="promo-banner">
-            <div style="font-size: 30px;">🔥</div>
-            <div>
-                <div style="font-weight: bold; font-size: 15px;">Скидка 500 ₽</div>
-                <div style="font-size: 12px; opacity: 0.9;">Используй код: <b>SALE500</b></div>
-            </div>
+        
+        <div id="app-status-box" class="list-item" style="display: none; background: #e8f5e9;">
+            <div><b id="st-tariff">...</b><br><small id="st-date">...</small></div>
+            <div style="color: var(--green); font-weight: bold; font-size: 12px;">В ОБРАБОТКЕ</div>
         </div>
 
         <button class="get-btn" onclick="switchPage('tariffs')">ОФОРМИТЬ КАРТУ</button>
-
-        <div style="font-size: 18px; font-weight: 800; margin: 25px 0 15px;">Преимущества</div>
-        <div class="carousel">
-            <div class="carousel-item"><span>⚡</span> <div><b>Скорость</b><br><small>От 2 часов</small></div></div>
-            <div class="carousel-item"><span>🌍</span> <div><b>Мир</b><br><small>Везде работает</small></div></div>
-        </div>
-
+        
         <div style="font-size: 18px; font-weight: 800; margin: 25px 0 15px;">Полезное</div>
         <div class="list-item" onclick="tg.openTelegramLink('https://t.me/eurocards_ru')"><span>📢 Наш канал</span><span>›</span></div>
-        <div class="list-item" onclick="tg.openTelegramLink('https://t.me/vladethlemon')"><span>🆘 Поддержка</span><span>›</span></div>
-        <div class="list-item" onclick="tg.showAlert('Тут будет FAQ')"><span>❓ FAQ</span><span>›</span></div>
+        <div class="list-item" onclick="tg.openTelegramLink('https://t.me/your_support')"><span>🆘 Поддержка</span><span>›</span></div>
     </div>
 
     <div id="tariffs" class="page">
-        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Выберите тариф</div>
+        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Тарифы</div>
         <div class="tariffs-grid">
-            <div class="tariff-square" onclick="showDetails('Standard', 9000, 'Базовое открытие счета. Идеально для подписок.')">
+            <div class="tariff-square" onclick="showDetails('Standard', 9000, 'Открытие счета на ваш загранпаспорт. Идеально для подписок и Apple Pay.')">
                 <div style="font-size: 30px;">💳</div>
                 <h3>Standard</h3>
                 <div class="price">9 000 ₽</div>
             </div>
-            <div class="tariff-square" onclick="showDetails('Expert', 12000, 'Standard + Гайд по пополнению через крипту.')">
+            <div class="tariff-square" onclick="showDetails('Expert', 12000, 'Всё из Standard + полный гайд по пополнению через крипту.')">
                 <div style="font-size: 30px;">🚀</div>
                 <h3>Expert</h3>
                 <div class="price">12 000 ₽</div>
             </div>
-            <div class="tariff-square" onclick="showDetails('VIP', 15000, 'Expert + Личный менеджер 24/7.')">
+            <div class="tariff-square" onclick="showDetails('VIP', 15000, 'Максимальный приоритет и персональный консьерж 24/7.')">
                 <div style="font-size: 30px;">👑</div>
                 <h3>VIP</h3>
                 <div class="price">15 000 ₽</div>
             </div>
-            <div class="tariff-square" onclick="showDetails('Crypto', 10000, 'Тариф для активных крипто-пользователей.')">
-                <div style="font-size: 30px;">₿</div>
-                <h3>Crypto</h3>
-                <div class="price">10 000 ₽</div>
+            <div class="tariff-square" onclick="showDetails('Travel', 11000, 'Специальный тариф для путешественников с доступом в бизнес-залы.')">
+                <div style="font-size: 30px;">✈️</div>
+                <h3>Travel</h3>
+                <div class="price">11 000 ₽</div>
             </div>
         </div>
     </div>
 
     <div id="tariff-detail" class="page">
         <div style="background: white; border-radius: 30px; padding: 30px 20px; text-align: center;">
-            <h2 id="det-name" style="margin: 0; font-size: 28px;">Тариф</h2>
-            <div id="det-price" style="font-size: 24px; color: var(--blue); font-weight: 800; margin: 10px 0;">0 ₽</div>
-            <p id="det-desc" style="color: var(--hint); line-height: 1.6; margin-bottom: 30px;">Описание...</p>
-            <button class="get-btn" onclick="openOrderFromDetail()">ЗАКАЗАТЬ ЭТОТ ТАРИФ</button>
+            <h2 id="det-name">Тариф</h2>
+            <div id="det-price" style="font-size: 26px; font-weight: 900; color: var(--blue); margin: 10px 0;">0 ₽</div>
+            <p id="det-desc" style="color: var(--hint); line-height: 1.5; margin-bottom: 30px;">Описание...</p>
+            <button class="get-btn" onclick="openOrderFromDetail()">ВЫБРАТЬ</button>
             <button class="get-btn" style="background: none; color: var(--hint); box-shadow: none;" onclick="switchPage('tariffs')">Назад</button>
         </div>
     </div>
 
+    <div id="bonuses" class="page">
+        <div style="font-size: 22px; font-weight: 800; margin-bottom: 10px;">Зарабатывай с нами</div>
+        <p style="color: var(--hint); font-size: 14px; margin-bottom: 25px;">Приглашай друзей: ты получишь <b>2 000 ₽</b>, а друг — скидку <b>500 ₽</b>.</p>
+        
+        <div class="ref-box">
+            <div style="font-size: 12px; color: var(--hint); margin-bottom: 8px;">ТВОЯ ССЫЛКА</div>
+            <input type="text" id="ref-link-input" readonly value="Загрузка...">
+            <button class="copy-btn" onclick="copyRef()">Копировать ссылку</button>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-item">
+                <div style="font-size: 11px; color: var(--hint);">ЗАРАБОТАНО</div>
+                <div style="font-size: 20px; font-weight: bold; color: var(--green);">0 ₽</div>
+            </div>
+            <div class="stat-item">
+                <div style="font-size: 11px; color: var(--hint);">ДРУЗЕЙ</div>
+                <div style="font-size: 20px; font-weight: bold;">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="info" class="page">
+        <div class="section-title">Настройки</div>
+        <div class="list-item"><span>Темная тема</span> <span>Авто</span></div>
+        <div class="list-item" onclick="tg.openTelegramLink('https://t.me/your_support')"><span>🆘 Поддержка</span><span>›</span></div>
+        <div class="list-item"><span>Версия</span><span>5.0</span></div>
+    </div>
+
     <div id="order-page" class="page">
-        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Оформление</div>
-        <input type="text" id="order-name" placeholder="IVAN IVANOV (как в загране)">
+        <div class="section-title">Оформление</div>
+        <input type="text" id="order-name" placeholder="IVAN IVANOV">
         <input type="date" id="order-birth">
         <input type="text" id="promo-input" placeholder="Промокод" oninput="checkPromo()">
-        
         <div style="text-align: center; margin: 20px 0;">
             <div id="old-price-view" style="text-decoration: line-through; color: var(--hint); display: none;">0 ₽</div>
             <div id="current-price-view" style="font-size: 32px; font-weight: 900;">0 ₽</div>
@@ -199,26 +189,20 @@
         <button class="get-btn" onclick="showSuccess()">ОФОРМИТЬ</button>
     </div>
 
-    <div id="info" class="page">
-        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Информация</div>
-        <div class="list-item"><span>Темная тема</span> <span>Авто</span></div>
-        <div class="list-item" onclick="tg.openTelegramLink('https://t.me/vladethlemon')"><span>Поддержка</span><span>›</span></div>
-        <div class="list-item"><span>Версия приложения</span><span>4.0</span></div>
-    </div>
-
     <div id="success-page" class="page">
         <div style="background: white; border-radius: 30px; padding: 40px 20px; text-align: center;">
             <div style="font-size: 60px;">✅</div>
-            <h2 style="margin: 15px 0;">Заявка в работе!</h2>
-            <p style="color: var(--hint); margin-bottom: 30px;">Менеджер свяжется с вами скоро. Статус заявки обновлен на главной.</p>
-            <button class="get-btn" onclick="returnToMenu()">ОТЛИЧНО</button>
+            <h2>Заявка принята!</h2>
+            <p style="color: var(--hint); margin-bottom: 30px;">Менеджер напишет вам в течение 6 часов.</p>
+            <button class="get-btn" onclick="returnToMenu()">В МЕНЮ</button>
         </div>
     </div>
 
     <div class="nav-bar" id="bottom-nav">
-        <div class="nav-item active" onclick="switchPage('home', this)">🏠<br>Главная</div>
-        <div class="nav-item" onclick="switchPage('tariffs', this)">💳<br>Тарифы</div>
-        <div class="nav-item" onclick="switchPage('info', this)">⚙️<br>Инфо</div>
+        <div class="nav-item active" onclick="switchPage('home', this)"><span class="nav-icon">🏠</span>Главная</div>
+        <div class="nav-item" onclick="switchPage('tariffs', this)"><span class="nav-icon">💳</span>Тарифы</div>
+        <div class="nav-item" onclick="switchPage('bonuses', this)"><span class="nav-icon">✨</span>Бонусы</div>
+        <div class="nav-item" onclick="switchPage('info', this)"><span class="nav-icon">⚙️</span>Инфо</div>
     </div>
 
     <script>
@@ -229,14 +213,17 @@
         let selT = "", selP = 0, finP = 0;
 
         window.onload = function() {
-            updateStatus();
             let user = tg.initDataUnsafe.user;
             if (user) {
                 document.getElementById('user-name-title').innerText = user.first_name;
+                // Генерируем рефералку
+                document.getElementById('ref-link-input').value = `https://t.me/EuroBridgeBot?start=${user.id}`;
+                
                 let avatar = document.getElementById('user-avatar');
-                if (user.photo_url) { avatar.style.backgroundImage = `url('${user.photo_url}')`; avatar.innerText = ""; }
+                if (user.photo_url) { avatar.style.backgroundImage = `url('${user.photo_url}')`; }
                 else { avatar.innerText = user.first_name[0]; }
             }
+            updateStatus();
         };
 
         function updateStatus() {
@@ -249,30 +236,25 @@
             }
         }
 
-        function switchPage(pageId, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
+        function switchPage(p, el) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(p).classList.add('active');
             if(el) {
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                 el.classList.add('active');
             }
-            window.scrollTo(0,0);
         }
 
-        function showDetails(name, price, desc) {
-            selT = name; selP = price; finP = price;
-            document.getElementById('det-name').innerText = name;
-            document.getElementById('det-price').innerText = price + " ₽";
-            document.getElementById('det-desc').innerText = desc;
+        function showDetails(n, p, d) {
+            selT = n; selP = p; finP = p;
+            document.getElementById('det-name').innerText = n;
+            document.getElementById('det-price').innerText = p + " ₽";
+            document.getElementById('det-desc').innerText = d;
             switchPage('tariff-detail');
         }
 
         function openOrderFromDetail() {
             document.getElementById('current-price-view').innerText = selP + " ₽";
-            document.getElementById('current-price-view').style.color = "var(--text)";
-            document.getElementById('old-price-view').style.display = "none";
-            document.getElementById('promo-input').value = "";
-            document.getElementById('promo-input').classList.remove('valid');
             switchPage('order-page');
         }
 
@@ -293,10 +275,17 @@
             }
         }
 
+        function copyRef() {
+            let input = document.getElementById('ref-link-input');
+            input.select();
+            document.execCommand("copy");
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert("Ссылка скопирована!");
+        }
+
         function showSuccess() {
             if(!document.getElementById('order-name').value) { tg.showAlert("Введите имя!"); return; }
-            let orderInfo = { t: selT, date: new Date().toLocaleDateString() };
-            localStorage.setItem('lastOrder', JSON.stringify(orderInfo));
+            localStorage.setItem('lastOrder', JSON.stringify({ t: selT, date: new Date().toLocaleDateString() }));
             document.getElementById('bottom-nav').style.display = "none";
             switchPage('success-page');
             tg.HapticFeedback.notificationOccurred('success');
@@ -305,12 +294,9 @@
         function returnToMenu() {
             document.getElementById('bottom-nav').style.display = "flex";
             updateStatus();
-            switchPage('home');
-            // Здесь можно добавить tg.sendData(), если хочешь, чтобы бот СРАЗУ получил данные и прилка закрылась.
-            // Если хочешь, чтобы она НЕ закрывалась — данные уйдут только если ты настроишь бэкенд.
+            // Отправляем данные боту (приложение закроется)
+            tg.sendData(JSON.stringify({ t: selT, p: finP, n: document.getElementById('order-name').value }));
         }
     </script>
 </body>
 </html>
-
-
