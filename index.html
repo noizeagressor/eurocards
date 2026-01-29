@@ -53,15 +53,34 @@
         }
         @keyframes tilt { 0%, 100% { transform: rotateY(-7deg) rotateX(5deg); } 50% { transform: rotateY(7deg) rotateX(-5deg); } }
 
+        /* СТАТУС ЗАЯВКИ (СКЕЛЕТ) */
+        .status-card {
+            background: var(--bg); border-radius: 18px; padding: 15px;
+            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+        .status-badge {
+            background: #fff9eb; color: #ff9500; padding: 5px 10px; 
+            border-radius: 8px; font-size: 11px; font-weight: bold; text-transform: uppercase;
+        }
+
+        /* ТАРИФЫ (СЕТКА) */
+        .tariffs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+        .tariff-square {
+            background: var(--bg); border-radius: 20px; padding: 20px;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02);
+        }
+        .tariff-square h3 { margin: 10px 0 5px; font-size: 16px; }
+        .tariff-square .price { font-size: 18px; font-weight: 900; color: var(--blue); }
+
         /* АКЦИОННЫЙ БАННЕР */
         .promo-banner {
             background: linear-gradient(135deg, #ff9500, #ff5e00);
             border-radius: 18px; padding: 15px; color: white;
             margin-bottom: 25px; display: flex; align-items: center; gap: 15px;
-            box-shadow: 0 8px 20px rgba(255, 149, 0, 0.3);
         }
 
-        /* КНОПКИ */
         .get-btn { 
             background: var(--blue); color: white; border: none; width: 100%; padding: 18px; 
             border-radius: 16px; font-weight: bold; font-size: 17px; transition: 0.2s;
@@ -70,22 +89,20 @@
         .get-btn:active { transform: scale(0.96); }
 
         /* КАРУСЕЛЬ */
-        .section-title { font-size: 20px; font-weight: 800; margin: 25px 0 15px; }
-        .carousel { display: flex; overflow-x: auto; gap: 15px; padding: 5px; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
+        .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px; }
+        .carousel { display: flex; overflow-x: auto; gap: 12px; padding: 5px; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory; }
         .carousel::-webkit-scrollbar { display: none; }
         .carousel-item { 
-            min-width: 260px; scroll-snap-align: center;
+            min-width: 240px; scroll-snap-align: center;
             background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border-radius: 22px; padding: 20px; display: flex; align-items: center; gap: 12px;
+            border-radius: 20px; padding: 15px; display: flex; align-items: center; gap: 10px;
             border: 1px solid rgba(255, 255, 255, 0.4);
         }
 
-        /* СПИСКИ */
         .list-item { 
             background: var(--bg); padding: 18px; border-radius: 18px; 
             margin-bottom: 12px; display: flex; justify-content: space-between; 
-            align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            text-decoration: none; color: inherit;
+            align-items: center; text-decoration: none; color: inherit;
         }
 
         /* НАВИГАЦИЯ */
@@ -108,121 +125,106 @@
                 <div id="user-avatar" class="avatar"></div>
                 <div style="font-weight: bold; font-size: 18px;">Привет, <span id="user-name-title">Герой</span>!</div>
             </div>
-            <div style="font-size: 22px;">🎁</div>
+            <div style="font-size: 20px;">🔔</div>
         </div>
 
         <div class="card-wrapper"><div class="main-card"></div></div>
 
-        <div class="promo-banner">
-            <div style="font-size: 30px;">🔥</div>
+        <div class="status-card" id="application-status" style="display: none;">
             <div>
-                <div style="font-weight: bold; font-size: 15px;">Акция: Скидка 500 ₽</div>
-                <div style="font-size: 12px; opacity: 0.9;">Используй промокод <b>SALE500</b></div>
+                <div style="font-size: 13px; font-weight: bold;">Статус вашей карты</div>
+                <div style="font-size: 11px; color: var(--hint);">Заявка №2026-01</div>
+            </div>
+            <div class="status-badge" id="status-text">В обработке</div>
+        </div>
+
+        <div class="promo-banner">
+            <div style="font-size: 25px;">🔥</div>
+            <div>
+                <div style="font-weight: bold; font-size: 14px;">Скидка 500 ₽ по коду SALE500</div>
             </div>
         </div>
 
         <button class="get-btn" onclick="switchPage('tariffs')">ОФОРМИТЬ КАРТУ</button>
 
-        <div class="section-title">Преимущества</div>
+        <div class="section-title">Почему мы?</div>
         <div class="carousel">
-            <div class="carousel-item">
-                <div style="font-size: 30px;">⚡</div>
-                <div><div style="font-weight: bold;">Скорость</div><div style="font-size: 12px; opacity: 0.7;">От 2 часов</div></div>
-            </div>
-            <div class="carousel-item">
-                <div style="font-size: 30px;">🌍</div>
-                <div><div style="font-weight: bold;">Весь мир</div><div style="font-size: 12px; opacity: 0.7;">Любые покупки</div></div>
-            </div>
+            <div class="carousel-item"><span>⚡</span> <div><b>Быстро</b><br><small>От 2 часов</small></div></div>
+            <div class="carousel-item"><span>🌍</span> <div><b>Везде</b><br><small>Мировая оплата</small></div></div>
+            <div class="carousel-item"><span>🛡️</span> <div><b>Надежно</b><br><small>Гарантия 100%</small></div></div>
         </div>
 
         <div class="section-title">Полезные ссылки</div>
-        <a href="#" class="list-item" onclick="tg.openTelegramLink('https://t.me/eurocards_ru')">
-            <span>📢 Наш канал</span><span style="color: #ccc;">›</span>
-        </a>
-        <a href="#" class="list-item" onclick="tg.openTelegramLink('https://t.me/your_support')">
-            <span>🆘 Поддержка</span><span style="color: #ccc;">›</span>
-        </a>
+        <a href="#" class="list-item" onclick="tg.openTelegramLink('https://t.me/eurocards_ru')"><span>📢 Наш канал</span><span>›</span></a>
+        <a href="#" class="list-item" onclick="tg.openTelegramLink('https://t.me/your_support')"><span>🆘 Поддержка</span><span>›</span></a>
     </div>
 
     <div id="tariffs" class="page">
-        <div class="section-title">Тарифы</div>
-        <div class="list-item" style="flex-direction: column; align-items: flex-start; gap: 10px;">
-            <div style="color: var(--blue); font-weight: bold;">Standard</div>
-            <div style="font-size: 26px; font-weight: 900;">9 000 ₽</div>
-            <button class="get-btn" onclick="openOrder('Standard', 9000)">ВЫБРАТЬ</button>
-        </div>
-        <div class="list-item" style="flex-direction: column; align-items: flex-start; gap: 10px;">
-            <div style="color: var(--orange); font-weight: bold;">Expert</div>
-            <div style="font-size: 26px; font-weight: 900;">12 000 ₽</div>
-            <button class="get-btn" style="background: var(--orange);" onclick="openOrder('Expert', 12000)">ВЫБРАТЬ</button>
+        <div class="section-title">Выберите тариф</div>
+        <div class="tariffs-grid">
+            <div class="tariff-square" onclick="openOrder('Standard', 9000)">
+                <div style="font-size: 25px;">💳</div>
+                <h3>Standard</h3>
+                <div class="price">9 000 ₽</div>
+            </div>
+            <div class="tariff-square" onclick="openOrder('Expert', 12000)">
+                <div style="font-size: 25px;">🚀</div>
+                <h3>Expert</h3>
+                <div class="price">12 000 ₽</div>
+            </div>
+            <div class="tariff-square" onclick="openOrder('VIP', 15000)">
+                <div style="font-size: 25px;">👑</div>
+                <h3>VIP</h3>
+                <div class="price">15 000 ₽</div>
+            </div>
+            <div class="tariff-square" onclick="openOrder('Crypto', 10000)">
+                <div style="font-size: 25px;">₿</div>
+                <h3>Crypto</h3>
+                <div class="price">10 000 ₽</div>
+            </div>
         </div>
     </div>
 
     <div id="order-page" class="page">
         <div class="section-title">Данные для карты</div>
-        <div style="margin-bottom: 20px;">
-            <label style="font-size: 12px; color: var(--hint);">NAME & SURNAME (EN)</label>
-            <input type="text" id="order-name" placeholder="IVAN IVANOV" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-top:5px; box-sizing:border-box;">
-        </div>
-        <div style="margin-bottom: 20px;">
-            <label style="font-size: 12px; color: var(--hint);">BIRTHDAY</label>
-            <input type="date" id="order-birth" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-top:5px; box-sizing:border-box;">
-        </div>
-        <div style="margin-bottom: 20px;">
-            <label style="font-size: 12px; color: var(--hint);">PROMO CODE</label>
-            <input type="text" id="promo-input" placeholder="Код..." oninput="checkPromo()" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-top:5px; box-sizing:border-box;">
-        </div>
-
+        <input type="text" id="order-name" placeholder="IVAN IVANOV" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px; box-sizing:border-box;">
+        <input type="date" id="order-birth" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px; box-sizing:border-box;">
+        <input type="text" id="promo-input" placeholder="Промокод" oninput="checkPromo()" style="width:100%; padding:15px; border-radius:12px; border:1px solid #ddd; margin-bottom:15px; box-sizing:border-box;">
         <div style="text-align: center; margin: 20px 0;">
             <div id="old-price-view" style="text-decoration: line-through; color: var(--hint); display: none;">0 ₽</div>
-            <div id="current-price-view" style="font-size: 32px; font-weight: 900;">0 ₽</div>
+            <div id="current-price-view" style="font-size: 30px; font-weight: 900;">0 ₽</div>
         </div>
-        <button class="get-btn" onclick="showSuccess()">ПОДТВЕРДИТЬ</button>
+        <button class="get-btn" onclick="showSuccess()">ОФОРМИТЬ</button>
     </div>
 
     <div id="info" class="page">
-        <div class="section-title">Настройки и инфо</div>
-        <div class="list-item">
-            <span>Темная тема</span>
-            <input type="checkbox" style="width: 40px;" onclick="tg.showAlert('Тема меняется автоматически в настройках Telegram')">
-        </div>
-        <div class="list-item" onclick="tg.openTelegramLink('https://t.me/your_support')">
-            <span>Связаться с админом</span><span>›</span>
-        </div>
-        <div class="list-item" onclick="tg.showAlert('Версия 2.0. Дизайн by Gemini')">
-            <span>О приложении</span><span>v 2.0</span>
-        </div>
+        <div class="section-title">Инфо и Настройки</div>
+        <div class="list-item"><span>Темная тема</span> <span>Авто</span></div>
+        <div class="list-item" onclick="tg.showAlert('Версия 2.5')"><span>О приложении</span><span>v 2.5</span></div>
     </div>
 
     <div id="success-page" class="page">
         <div style="background: white; border-radius: 30px; padding: 40px 20px; text-align: center;">
             <div style="font-size: 60px;">✅</div>
-            <div style="font-size: 22px; font-weight: 800; margin: 15px 0;">Заявка в пути!</div>
+            <div style="font-size: 20px; font-weight: 800; margin: 15px 0;">Заявка принята!</div>
             <div style="color: var(--hint); margin-bottom: 30px;">Ожидайте ответа оператора в течение 6 часов.</div>
-            <button class="get-btn" onclick="finalSubmit()">ПОНЯТНО</button>
+            <button class="get-btn" onclick="returnToMenu()">ОТЛИЧНО</button>
         </div>
     </div>
 
     <div class="nav-bar" id="bottom-nav">
-        <div class="nav-item active" onclick="switchPage('home', this)">
-            <span class="nav-icon">🏠</span>Главная
-        </div>
-        <div class="nav-item" onclick="switchPage('tariffs', this)">
-            <span class="nav-icon">💳</span>Тарифы
-        </div>
-        <div class="nav-item" onclick="switchPage('info', this)">
-            <span class="nav-icon">⚙️</span>Инфо
-        </div>
+        <div class="nav-item active" onclick="switchPage('home', this)">🏠<br>Главная</div>
+        <div class="nav-item" onclick="switchPage('tariffs', this)">💳<br>Тарифы</div>
+        <div class="nav-item" onclick="switchPage('info', this)">⚙️<br>Инфо</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        const PROMO_DB = { 'SALE500': 500, 'EURO2026': 1000 };
+        const PROMO_DB = { 'SALE500': 500 };
         let currentT = "", baseP = 0, finalP = 0;
 
-        // АВАТАРКА И ИМЯ
         let user = tg.initDataUnsafe.user;
         if (user) {
             document.getElementById('user-name-title').innerText = user.first_name;
@@ -238,7 +240,6 @@
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                 el.classList.add('active');
             }
-            window.scrollTo(0,0);
         }
 
         function openOrder(tariff, price) {
@@ -249,31 +250,34 @@
 
         function checkPromo() {
             let code = document.getElementById('promo-input').value.toUpperCase().trim();
-            let cp = document.getElementById('current-price-view');
-            let op = document.getElementById('old-price-view');
             if (PROMO_DB[code]) {
                 finalP = baseP - PROMO_DB[code];
-                op.innerText = baseP + " ₽"; op.style.display = "block";
-                cp.innerText = finalP + " ₽"; cp.style.color = "var(--green)";
-            } else {
-                finalP = baseP; op.style.display = "none";
-                cp.innerText = baseP + " ₽"; cp.style.color = "var(--text)";
+                document.getElementById('old-price-view').innerText = baseP + " ₽";
+                document.getElementById('old-price-view').style.display = "block";
+                document.getElementById('current-price-view').innerText = finalP + " ₽";
             }
         }
 
         function showSuccess() {
-            if(!document.getElementById('order-name').value) { tg.showAlert("Введите имя!"); return; }
             document.getElementById('bottom-nav').style.display = "none";
             switchPage('success-page');
+            // Здесь данные отправляются боту "тихо", если есть API, 
+            // но так как мы на tg.sendData, мы вызовем его в returnToMenu
         }
 
-        function finalSubmit() {
-            let data = {
-                t: currentT, p: finalP, 
-                n: document.getElementById('order-name').value,
-                b: document.getElementById('order-birth').value
-            };
-            tg.sendData(JSON.stringify(data));
+        function returnToMenu() {
+            // Чтобы данные реально ушли в бот, мы ДОЛЖНЫ использовать sendData.
+            // Если ты хочешь оставить аппку открытой, бот НЕ ПОЛУЧИТ сообщение через JS.
+            // Поэтому мы сначала показываем "Успех", а при нажатии "Отлично" — отправляем и закрываем.
+            // Если нужно БЕЗ закрытия — нужно писать бэкенд на Python.
+            
+            let data = { t: currentT, p: finalP, n: document.getElementById('order-name').value };
+            tg.sendData(JSON.stringify(data)); 
+            
+            // Если всё же хочешь просто вернуться (данные боту не уйдут!):
+            // document.getElementById('bottom-nav').style.display = "flex";
+            // document.getElementById('application-status').style.display = "flex";
+            // switchPage('home');
         }
     </script>
 </body>
