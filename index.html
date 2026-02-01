@@ -140,105 +140,134 @@
         <div class="tab-item" onclick="switchP('profile', this)"><i data-lucide="user"></i><span>Кабинет</span></div>
     </nav>
 
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-        lucide.createIcons();
+<script>
+    let tg = window.Telegram.WebApp;
+    tg.ready(); // Критично для iPhone
+    tg.expand();
+    lucide.createIcons();
 
-        let cur = { name: '', price: 0, final: 0 };
-        const DB = {
-            'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Apple Pay включен' },
-            'Duo Safe': { p: 14000, b: '• 2 Банка сразу<br>• Скидка 50% на второй' },
-            'Business Prime': { p: 19900, b: '• Duo Safe + Поддержка 24/7' },
-            'Infinite Elite': { p: 39900, b: '• 3 Банка + PayPal Pro' },
-            'PayPal': { p: 4900, b: '• Верифицированный аккаунт' },
-            'Wise': { p: 20000, b: '• Личный счет Wise (IBAN)' },
-            'Revolut': { p: 20000, b: '• Личный счет Revolut' }
-        };
+    let cur = { name: '', price: 0, final: 0 };
+    const DB = {
+        'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Apple Pay включен' },
+        'Duo Safe': { p: 14000, b: '• 2 Банка сразу<br>• Скидка 50% на второй' },
+        'Business Prime': { p: 19900, b: '• Duo Safe + Поддержка 24/7' },
+        'Infinite Elite': { p: 39900, b: '• 3 Банка + PayPal Pro' },
+        'PayPal': { p: 4900, b: '• Верифицированный аккаунт' },
+        'Wise': { p: 20000, b: '• Личный счет Wise (IBAN)' },
+        'Revolut': { p: 20000, b: '• Личный счет Revolut' }
+    };
 
-        // ФИКС ДАННЫХ: Ждем и проверяем
-        function initUser() {
-            const u = tg.initDataUnsafe.user;
-            if (u) {
-                const name = u.first_name || "Клиент";
-                if(document.getElementById('u-name')) document.getElementById('u-name').innerText = name;
-                if(document.getElementById('cab-name')) document.getElementById('cab-name').innerText = name;
-                if(document.getElementById('ref-link')) document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${u.id}`;
-                if (u.photo_url) {
-                    document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
-                    document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
+    // 1. УЛЬТРА-ПОДГРУЗКА (TG + URL параметры)
+    function initUser() {
+        let u = tg.initDataUnsafe.user;
+        
+        // Если TG тормозит, берем из ссылки (которую прислал бот)
+        if (!u) {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('name')) {
+                u = {
+                    first_name: params.get('name'),
+                    id: params.get('id')
+                };
+            }
+        }
+
+        if (u) {
+            const name = u.first_name || "Клиент";
+            // Имя на главной и в кабинете
+            if(document.getElementById('u-name')) document.getElementById('u-name').innerText = name;
+            if(document.getElementById('cab-name')) document.getElementById('cab-name').innerText = name;
+            if(document.getElementById('ref-link')) document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${u.id}`;
+            
+            if (u.photo_url) {
+                if(document.getElementById('avatar-main')) document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
+                if(document.getElementById('avatar-cab')) document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
+            } else {
+                const av = document.getElementById('avatar-main');
+                if(av) {
+                    av.innerText = name[0].toUpperCase();
+                    av.style.display = "flex"; av.style.alignItems = "center"; av.style.justifyContent = "center";
                 }
-                return true;
             }
-            return false;
         }
+    }
 
-        let attempts = 0;
-        const loadInterval = setInterval(() => {
-            if (initUser() || attempts > 50) clearInterval(loadInterval);
-            attempts++;
-        }, 100);
+    initUser();
+    setTimeout(initUser, 500); // Страховочный повтор
 
-        document.addEventListener('keypress', (e) => { if (e.which == 13) document.activeElement.blur(); });
+    // 2. ФУНКЦИИ ИНТЕРФЕЙСА (Без изменений)
+    function switchP(id, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
+        tg.HapticFeedback.impactOccurred('medium'); window.scrollTo(0,0);
+    }
 
-        function switchP(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if(el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
-            tg.HapticFeedback.impactOccurred('medium');
+    function showSheet(n) {
+        const t = DB[n]; cur = { name: n, price: t.p, final: t.p };
+        document.getElementById('sh-name').innerText = n;
+        document.getElementById('sh-price').innerText = t.p.toLocaleString() + ' ₽';
+        document.getElementById('sh-bullets').innerHTML = t.b;
+        document.getElementById('overlay').style.display = 'block';
+        setTimeout(() => { document.getElementById('overlay').style.opacity = '1'; document.getElementById('sheet').classList.add('active'); }, 10);
+        tg.HapticFeedback.impactOccurred('medium');
+    }
+
+    function closeSheet() {
+        document.getElementById('sheet').classList.remove('active');
+        document.getElementById('overlay').style.opacity = '0';
+        setTimeout(() => document.getElementById('overlay').style.display = 'none', 300);
+    }
+
+    function goToForm() { closeSheet(); recalc(); switchP('order_form'); }
+
+    function recalc() {
+        const pr = document.getElementById('order_promo');
+        const code = pr.value.toUpperCase().trim();
+        let fin = cur.price;
+        if(code === 'SALE500') {
+            fin -= 500; pr.classList.add('valid');
+            document.getElementById('old_price').innerText = cur.price + ' ₽';
+            document.getElementById('old_price').style.display = 'block';
+            tg.HapticFeedback.notificationOccurred('success');
+            setTimeout(() => pr.blur(), 500);
         }
+        cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
+    }
 
-        function showSheet(n) {
-            const t = DB[n]; cur = { name: n, price: t.p, final: t.p };
-            document.getElementById('sh-name').innerText = n;
-            document.getElementById('sh-price').innerText = t.p.toLocaleString() + ' ₽';
-            document.getElementById('sh-bullets').innerHTML = t.b;
-            document.getElementById('overlay').style.display = 'block';
-            setTimeout(() => { document.getElementById('overlay').style.opacity = '1'; document.getElementById('sheet').classList.add('active'); }, 10);
-            tg.HapticFeedback.impactOccurred('medium');
-        }
+    // 3. НОВЫЙ МЕХАНИЗМ ОТПРАВКИ (DEEP LINK)
+    function confirmOrder() {
+        const f = document.getElementById('order_fio').value;
+        const d = document.getElementById('order_date').value;
+        if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
 
-        function closeSheet() {
-            document.getElementById('sheet').classList.remove('active');
-            document.getElementById('overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('overlay').style.display = 'none', 300);
-        }
+        tg.HapticFeedback.notificationOccurred('success');
+        
+        // Чистим название тарифа от пробелов для ссылки
+        const tariffName = cur.name.replace(/\s+/g, '');
+        const finalPrice = cur.final;
+        
+        // !!! ВАЖНО: ЗАМЕНИ НА USERNAME СВОЕГО БОТА НИЖЕ !!!
+        const botUsername = "eurocardsapp_bot"; 
+        
+        const deepLink = `https://t.me/${botUsername}?start=ORDER_${tariffName}_${finalPrice}`;
 
-        function goToForm() { closeSheet(); recalc(); switchP('order_form'); }
+        // Открываем ссылку - это закроет аппку и отправит команду боту
+        tg.openTelegramLink(deepLink);
+    }
 
-        function recalc() {
-            const pr = document.getElementById('order_promo');
-            const code = pr.value.toUpperCase().trim();
-            let fin = cur.price;
-            if(code === 'SALE500') {
-                fin -= 500; pr.classList.add('valid');
-                document.getElementById('old_price').innerText = cur.price + ' ₽';
-                document.getElementById('old_price').style.display = 'block';
-                tg.HapticFeedback.notificationOccurred('success');
-            }
-            cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
-        }
+    function copyL() {
+        navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
+        tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!");
+    }
 
-        function confirmOrder() {
-            const f = document.getElementById('order_fio').value;
-            const d = document.getElementById('order_date').value;
-            if(!f || !d) { tg.showAlert("Заполните все данные!"); return; }
-            const res = { fio: f, birth: d, tariff: cur.name, price: cur.final, promo: document.getElementById('order_promo').value || "Нет" };
-            switchP('success_screen');
-            // Важно: sendData закрывает приложение мгновенно
-            setTimeout(() => { tg.sendData(JSON.stringify(res)); }, 1000);
-        }
+    function toggleFaq(el) {
+        let a = el.querySelector('.faq-a');
+        a.style.display = a.style.display === 'block' ? 'none' : 'block';
+    }
 
-        function copyL() {
-            navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
-            tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!");
-        }
-
-        function toggleFaq(el) {
-            let a = el.querySelector('.faq-a');
-            a.style.display = a.style.display === 'block' ? 'none' : 'block';
-        }
-    </script>
+    // Хак для скрытия клавы на iPhone
+    document.addEventListener('keypress', (e) => { if (e.which == 13) document.activeElement.blur(); });
+</script>
 </body>
 </html>
