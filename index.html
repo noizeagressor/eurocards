@@ -158,90 +158,135 @@
         <div class="tab-item" onclick="switchP('profile', this)"><i data-lucide="user"></i><span>Кабинет</span></div>
     </nav>
 
-    <script>
-        let tg = window.Telegram.WebApp; tg.expand(); lucide.createIcons();
-        let cur = { name: '', price: 0, final: 0 };
-        const DB = {
-            'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Apple Pay включен' },
-            'Duo Safe': { p: 14000, b: '• 2 Банка сразу<br>• Скидка 50% на второй' },
-            'Business Prime': { p: 19900, b: '• Duo Safe + Поддержка 24/7' },
-            'Infinite Elite': { p: 39900, b: '• 3 Банка + PayPal Pro' },
-            'PayPal': { p: 4900, b: '• Верифицированный аккаунт' }
-        };
+<script>
+    let tg = window.Telegram.WebApp;
+    
+    // 1. Сообщаем Telegram, что мы готовы (критично для iPhone)
+    tg.ready();
+    tg.expand();
+    lucide.createIcons();
 
-        // СКРЫТИЕ КЛАВИАТУРЫ
-        document.addEventListener('keypress', (e) => { if (e.which == 13) document.activeElement.blur(); });
+    let cur = { name: '', price: 0, final: 0 };
+    const DB = {
+        'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Apple Pay включен' },
+        'Duo Safe': { p: 14000, b: '• 2 Банка сразу<br>• Скидка 50% на второй' },
+        'Business Prime': { p: 19900, b: '• Duo Safe + Поддержка 24/7' },
+        'Infinite Elite': { p: 39900, b: '• 3 Банка + PayPal Pro' },
+        'PayPal': { p: 4900, b: '• Верифицированный аккаунт' }
+    };
 
-        function switchP(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if(el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
-            tg.HapticFeedback.impactOccurred('medium');
-        }
+    // Скрытие клавиатуры
+    document.addEventListener('keypress', (e) => { if (e.which == 13) document.activeElement.blur(); });
 
-        function toggleFaq(el) {
-            let a = el.querySelector('.faq-a'); a.style.display = a.style.display === 'block' ? 'none' : 'block';
-            tg.HapticFeedback.impactOccurred('light');
-        }
-
-        function showSheet(n) {
-            const t = DB[n]; cur = { name: n, price: t.p, final: t.p };
-            document.getElementById('sh-name').innerText = n;
-            document.getElementById('sh-price').innerText = t.p.toLocaleString() + ' ₽';
-            document.getElementById('sh-bullets').innerHTML = t.b;
-            document.getElementById('overlay').style.display = 'block';
-            setTimeout(() => { document.getElementById('overlay').style.opacity = '1'; document.getElementById('sheet').classList.add('active'); }, 10);
-            tg.HapticFeedback.impactOccurred('medium');
-        }
-
-        function closeSheet() {
-            document.getElementById('sheet').classList.remove('active');
-            document.getElementById('overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('overlay').style.display = 'none', 300);
-        }
-
-        function goToForm() { closeSheet(); recalc(); switchP('order_form'); }
-
-        function recalc() {
-            const pr = document.getElementById('order_promo');
-            const code = pr.value.toUpperCase().trim();
-            let fin = cur.price;
-            if(code === 'SALE500') {
-                fin -= 500; pr.classList.add('valid'); pr.classList.remove('invalid');
-                document.getElementById('old_price').innerText = cur.price + ' ₽';
-                document.getElementById('old_price').style.display = 'block';
-                setTimeout(() => pr.blur(), 500);
-                tg.HapticFeedback.notificationOccurred('success');
-            } else if(code.length > 0) { pr.classList.add('invalid'); pr.classList.remove('valid'); }
-            cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
-        }
-
-        function confirmOrder() {
-            const f = document.getElementById('order_fio').value;
-            const d = document.getElementById('order_date').value;
-            if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
-            tg.HapticFeedback.notificationOccurred('success');
-            const res = { fio: f, birth: d, tariff: cur.name, price: cur.final, promo: document.getElementById('order_promo').value || "Нет" };
-            switchP('success_screen');
-            tg.sendData(JSON.stringify(res)); // ОТПРАВКА В БОТ
-        }
-
-        function copyL() {
-            navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
-            tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!");
-        }
-
-        window.onload = () => {
-            const u = tg.initDataUnsafe.user;
-            if(u) {
-                document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${u.id}`;
-                document.getElementById('cab-name').innerText = u.first_name;
-                if(u.photo_url) {
-                    document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
-                    document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
+    // 2. Улучшенная подгрузка данных пользователя
+    function initApp() {
+        const u = tg.initDataUnsafe.user;
+        
+        if (u) {
+            const firstName = u.first_name || "Клиент";
+            // Заполняем все поля
+            if(document.getElementById('u-name')) document.getElementById('u-name').innerText = firstName;
+            if(document.getElementById('cab-name')) document.getElementById('cab-name').innerText = firstName;
+            if(document.getElementById('ref-link')) document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${u.id}`;
+            
+            if (u.photo_url) {
+                document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
+                document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
+            } else {
+                const av = document.getElementById('avatar-main');
+                if(av) {
+                    av.innerText = firstName[0];
+                    av.style.display = "flex";
+                    av.style.alignItems = "center";
+                    av.style.justifyContent = "center";
+                    av.style.background = "var(--glass)";
                 }
             }
         }
-    </script>
+    }
+
+    // Запускаем сразу и через 300мс для страховки
+    initApp();
+    setTimeout(initApp, 300);
+
+    function switchP(id, el) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
+        tg.HapticFeedback.impactOccurred('medium'); window.scrollTo(0,0);
+    }
+
+    function showSheet(n) {
+        const t = DB[n]; cur = { name: n, price: t.p, final: t.p };
+        document.getElementById('sh-name').innerText = n;
+        document.getElementById('sh-price').innerText = t.p.toLocaleString() + ' ₽';
+        document.getElementById('sh-bullets').innerHTML = t.b;
+        document.getElementById('overlay').style.display = 'block';
+        setTimeout(() => { document.getElementById('overlay').style.opacity = '1'; document.getElementById('sheet').classList.add('active'); }, 10);
+        tg.HapticFeedback.impactOccurred('medium');
+    }
+
+    function closeSheet() {
+        document.getElementById('sheet').classList.remove('active');
+        document.getElementById('overlay').style.opacity = '0';
+        setTimeout(() => document.getElementById('overlay').style.display = 'none', 300);
+    }
+
+    function goToForm() { closeSheet(); recalc(); switchP('order_form'); }
+
+    function recalc() {
+        const pr = document.getElementById('order_promo');
+        const code = pr.value.toUpperCase().trim();
+        let fin = cur.price;
+        if(code === 'SALE500') {
+            fin -= 500; pr.classList.add('valid'); pr.classList.remove('invalid');
+            document.getElementById('old_price').innerText = cur.price + ' ₽';
+            document.getElementById('old_price').style.display = 'block';
+            setTimeout(() => pr.blur(), 500);
+            tg.HapticFeedback.notificationOccurred('success');
+        } else if(code.length > 0) { pr.classList.add('invalid'); pr.classList.remove('valid'); }
+        cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
+    }
+
+    // 3. ГЛАВНЫЙ ФИКС: Отправка заказа с задержкой
+    function confirmOrder() {
+        const f = document.getElementById('order_fio').value;
+        const d = document.getElementById('order_date').value;
+        if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
+
+        tg.HapticFeedback.notificationOccurred('success');
+        
+        // Показываем экран успеха
+        switchP('success_screen');
+
+        const result = {
+            fio: f,
+            birth: d,
+            tariff: cur.name,
+            price: cur.final,
+            promo: document.getElementById('order_promo').value || "Нет"
+        };
+
+        // Ждем 2 секунды, чтобы юзер увидел галочку "Успешно", а потом шлем данные
+        setTimeout(() => {
+            // Если запущено через серую кнопку - данные уйдут и приложение закроется
+            // Если через фиолетовую - ничего не произойдет (это ограничение ТГ)
+            tg.sendData(JSON.stringify(result));
+            
+            // Для фиолетовой кнопки: если приложение НЕ закрылось через 100мс, 
+            // значит sendData не работает, и мы просто оставляем юзера на экране успеха.
+        }, 2000);
+    }
+
+    function copyL() {
+        navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
+        tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!");
+    }
+
+    function toggleFaq(el) {
+        let a = el.querySelector('.faq-a'); a.style.display = a.style.display === 'block' ? 'none' : 'block';
+        tg.HapticFeedback.impactOccurred('light');
+    }
+</script>
 </body>
 </html>
