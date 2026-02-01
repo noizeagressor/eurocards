@@ -236,25 +236,27 @@
     }
 
     // 3. НОВЫЙ МЕХАНИЗМ ОТПРАВКИ (DEEP LINK)
-    function confirmOrder() {
-        const f = document.getElementById('order_fio').value;
-        const d = document.getElementById('order_date').value;
-        if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
+function confirmOrder() {
+    const f = document.getElementById('order_fio').value.trim();
+    const d = document.getElementById('order_date').value;
+    if(!f || !d) { tg.showAlert("Заполните ФИО и дату рождения!"); return; }
 
-        tg.HapticFeedback.notificationOccurred('success');
-        
-        // Чистим название тарифа от пробелов для ссылки
-        const tariffName = cur.name.replace(/\s+/g, '');
-        const finalPrice = cur.final;
-        
-        // !!! ВАЖНО: ЗАМЕНИ НА USERNAME СВОЕГО БОТА НИЖЕ !!!
-        const botUsername = "eurocardsapp_bot"; 
-        
-        const deepLink = `https://t.me/${botUsername}?start=ORDER_${tariffName}_${finalPrice}`;
+    tg.HapticFeedback.notificationOccurred('success');
+    
+    // Подготовка данных (убираем пробелы в тарифе, ФИО оставляем как есть)
+    const tariffName = cur.name.replace(/\s+/g, '');
+    const price = cur.final;
+    
+    // Формируем строку данных: Тариф|Цена|ФИО|Дата
+    // Используем encodeURIComponent чтобы кириллица не сломала ссылку
+    const orderData = `${tariffName}|${price}|${f}|${d}`;
+    const botUsername = "eurocardsapp_bot"; // Твой юзернейм
+    
+    // Deep Link с префиксом O_ (Order)
+    const deepLink = `https://t.me/${botUsername}?start=O_${encodeURIComponent(orderData)}`;
 
-        // Открываем ссылку - это закроет аппку и отправит команду боту
-        tg.openTelegramLink(deepLink);
-    }
+    tg.openTelegramLink(deepLink);
+}
 
     function copyL() {
         navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
