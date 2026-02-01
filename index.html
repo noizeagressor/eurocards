@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EuroCards Premium</title>
+    <title>EuroCards Zen Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -12,16 +12,14 @@
             --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1);
             --accent-blue: #38bdf8; --text-main: #f8fafc; --text-secondary: #94a3b8;
             /* Gradients */
-            --g-std: linear-gradient(145deg, #334155, #1e293b);
-            --g-duo: linear-gradient(145deg, #1e3a8a, #0f172a);
-            --g-prm: linear-gradient(145deg, #064e3b, #022c22);
-            --g-elt: linear-gradient(145deg, #171717, #000000);
-            --g-pay: linear-gradient(145deg, #003087, #009cde);
-            --g-bank: linear-gradient(145deg, #27272a, #09090b);
+            --g-std: linear-gradient(145deg, #334155, #1e293b); --g-duo: linear-gradient(145deg, #1e3a8a, #0f172a);
+            --g-prm: linear-gradient(145deg, #064e3b, #022c22); --g-elt: linear-gradient(145deg, #171717, #000000);
+            --g-pay: linear-gradient(145deg, #003087, #009cde); --g-bank: linear-gradient(145deg, #27272a, #09090b);
         }
 
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--zen-dark); margin: 0; padding: 0; color: var(--text-main); -webkit-font-smoothing: antialiased; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--zen-dark); margin: 0; padding: 0; color: var(--text-main); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
         .zen-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 0%, var(--zen-blue) 0%, var(--zen-dark) 100%); z-index: -2; }
+        
         .page { display: none; padding: 20px 20px 140px; animation: slideUp 0.4s ease; }
         .page.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -37,19 +35,21 @@
         .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
 
         /* FORM */
-        input { width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; outline: none; }
-        input[type="date"] { color-scheme: dark; }
-        input.valid { border-color: #22c55e; }
-        input.invalid { border-color: #ef4444; }
+        input { width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input[type="date"] { color-scheme: dark; padding: 0 15px; }
+        input.valid { border-color: #22c55e; background: rgba(34, 197, 94, 0.05); }
+        input.invalid { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
+
         .btn-main { background: #fff; color: #000; border: none; width: 100%; height: 60px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; }
 
         /* TABS */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 0.5px solid var(--glass-border); display: flex; justify-content: space-around; padding-top: 12px; z-index: 1000; }
         .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); flex: 1; font-size: 10px; font-weight: 700; text-transform: uppercase; }
         .tab-item.active { color: var(--accent-blue); }
-        
-        /* CABINET */
+
+        /* CABINET / FAQ */
         .faq-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; margin-bottom: 12px; padding: 18px; }
+        .faq-a { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-top: 10px; display: none; }
 
         /* SHEET */
         .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; opacity: 0; transition: 0.3s; }
@@ -65,6 +65,7 @@
             <b style="font-size:24px;">EuroCards</b>
             <div id="avatar-main" style="width:36px; height:36px; border-radius:50%; background:var(--glass); border:1px solid var(--glass-border); background-size:cover;"></div>
         </div>
+
         <div class="tile-grid">
             <div class="tile" style="background: var(--g-std)" onclick="showSheet('Essential')">
                 <div class="t1">Essential</div><div class="t2">Base Access</div>
@@ -72,12 +73,12 @@
                 <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="background: var(--g-duo)" onclick="showSheet('Duo Safe')">
-                <div class="t1">Duo Safe</div><div class="t2">Double Protection</div>
+                <div class="t1">Duo Safe</div><div class="t2">Double Power</div>
                 <div style="display:flex; align-items:baseline; gap:3px;"><div class="val">14000</div><div class="unit">₽</div></div>
                 <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="background: var(--g-prm)" onclick="showSheet('Business Prime')">
-                <div class="t1">Business</div><div class="t2">Elite Support</div>
+                <div class="t1">Business</div><div class="t2">Max Support</div>
                 <div style="display:flex; align-items:baseline; gap:3px;"><div class="val">19900</div><div class="unit">₽</div></div>
                 <div class="plus-btn">+</div>
             </div>
@@ -90,6 +91,14 @@
                 <div class="t1">PayPal Pro</div><div class="t2">Verified Account</div>
                 <div style="display:flex; align-items:baseline; gap:3px;"><div class="val">4900</div><div class="unit">₽</div></div>
                 <div class="plus-btn">+</div>
+            </div>
+            <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Wise')">
+                <div class="t1">Wise</div><div class="t2">Personal Account</div>
+                <div class="val">20000</div><div class="plus-btn">+</div>
+            </div>
+            <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Revolut')">
+                <div class="t1">Revolut</div><div class="t2">Digital Bank</div>
+                <div class="val">20000</div><div class="plus-btn">+</div>
             </div>
         </div>
     </div>
@@ -113,31 +122,30 @@
     <div id="profile" class="page">
         <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
             <div id="avatar-cab" style="width:60px; height:60px; border-radius:50%; background:var(--glass); border:1px solid var(--glass-border); background-size:cover;"></div>
-            <div><b id="cab-name" style="font-size:20px;">Клиент</b><br><small style="color:var(--text-secondary)">Личный кабинет</small></div>
+            <div><b id="cab-name">Клиент</b><br><small style="color:var(--text-secondary)">Личный кабинет</small></div>
         </div>
         <h3>FAQ</h3>
-        <div class="faq-item" onclick="toggleFaq(this)"><b>Документы?</b><div class="faq-a" style="display:none; margin-top:10px; opacity:0.7">Только загранпаспорт.</div></div>
-        <div class="faq-item" onclick="toggleFaq(this)"><b>Как пополнять?</b><div class="faq-a" style="display:none; margin-top:10px; opacity:0.7">Через P2P (Крипта/Рубли).</div></div>
-        <button class="btn-main" style="background:var(--glass); color:#fff; border:1px solid var(--glass-border);" onclick="tg.openTelegramLink('https://t.me/your_support')">Связаться с нами</button>
+        <div class="faq-item" onclick="toggleFaq(this)"><b>Какие нужны документы?</b><div class="faq-a">Только загранпаспорт.</div></div>
+        <div class="faq-item" onclick="toggleFaq(this)"><b>Как пополнять счет?</b><div class="faq-a">Через P2P (Крипта/Рубли).</div></div>
+        <button class="btn-main" style="background:var(--glass); color:#fff; border:1px solid var(--glass-border);" onclick="tg.openTelegramLink('https://t.me/your_support')">Поддержка</button>
     </div>
 
     <div id="order_form" class="page">
         <h2>Оформление</h2>
-        <input type="text" id="order_fio" placeholder="ИМЯ ФАМИЛИЯ (ЗАГРАН)" enterkeyhint="done">
-        <input type="date" id="order_date" enterkeyhint="done">
+        <input type="text" id="order_fio" placeholder="ИМЯ ФАМИЛИЯ" enterkeyhint="done">
+        <input type="date" id="order_date">
         <input type="text" id="order_promo" placeholder="ПРОМОКОД" oninput="recalc()" enterkeyhint="done">
         <div style="text-align:center; margin:30px 0;">
             <div id="old_price" style="text-decoration:line-through; opacity:0.4; display:none;">0 ₽</div>
             <div id="final_price" style="font-size:48px; font-weight:900;">0 ₽</div>
         </div>
-        <button class="btn-main" onclick="confirmOrder()">ПОДТВЕРДИТЬ</button>
+        <button class="btn-main" onclick="confirmOrder()">ОПЛАТИТЬ</button>
     </div>
 
     <div id="success_screen" class="page">
         <div style="text-align:center; padding-top:60px;">
             <i data-lucide="check-circle" style="width:60px; height:60px; color:#22c55e; margin-bottom:20px;"></i>
             <h2>Заявка принята!</h2>
-            <p style="color:var(--text-secondary)">Мы свяжемся с вами в течение 24 часов.</p>
             <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ОТЛИЧНО</button>
         </div>
     </div>
@@ -158,135 +166,101 @@
         <div class="tab-item" onclick="switchP('profile', this)"><i data-lucide="user"></i><span>Кабинет</span></div>
     </nav>
 
-<script>
-    let tg = window.Telegram.WebApp;
-    
-    // 1. Сообщаем Telegram, что мы готовы (критично для iPhone)
-    tg.ready();
-    tg.expand();
-    lucide.createIcons();
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        lucide.createIcons();
 
-    let cur = { name: '', price: 0, final: 0 };
-    const DB = {
-        'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Apple Pay включен' },
-        'Duo Safe': { p: 14000, b: '• 2 Банка сразу<br>• Скидка 50% на второй' },
-        'Business Prime': { p: 19900, b: '• Duo Safe + Поддержка 24/7' },
-        'Infinite Elite': { p: 39900, b: '• 3 Банка + PayPal Pro' },
-        'PayPal': { p: 4900, b: '• Верифицированный аккаунт' }
-    };
-
-    // Скрытие клавиатуры
-    document.addEventListener('keypress', (e) => { if (e.which == 13) document.activeElement.blur(); });
-
-    // 2. Улучшенная подгрузка данных пользователя
-    function initApp() {
-        const u = tg.initDataUnsafe.user;
-        
-        if (u) {
-            const firstName = u.first_name || "Клиент";
-            // Заполняем все поля
-            if(document.getElementById('u-name')) document.getElementById('u-name').innerText = firstName;
-            if(document.getElementById('cab-name')) document.getElementById('cab-name').innerText = firstName;
-            if(document.getElementById('ref-link')) document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${u.id}`;
-            
-            if (u.photo_url) {
-                document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
-                document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
-            } else {
-                const av = document.getElementById('avatar-main');
-                if(av) {
-                    av.innerText = firstName[0];
-                    av.style.display = "flex";
-                    av.style.alignItems = "center";
-                    av.style.justifyContent = "center";
-                    av.style.background = "var(--glass)";
-                }
-            }
-        }
-    }
-
-    // Запускаем сразу и через 300мс для страховки
-    initApp();
-    setTimeout(initApp, 300);
-
-    function switchP(id, el) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        if(el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
-        tg.HapticFeedback.impactOccurred('medium'); window.scrollTo(0,0);
-    }
-
-    function showSheet(n) {
-        const t = DB[n]; cur = { name: n, price: t.p, final: t.p };
-        document.getElementById('sh-name').innerText = n;
-        document.getElementById('sh-price').innerText = t.p.toLocaleString() + ' ₽';
-        document.getElementById('sh-bullets').innerHTML = t.b;
-        document.getElementById('overlay').style.display = 'block';
-        setTimeout(() => { document.getElementById('overlay').style.opacity = '1'; document.getElementById('sheet').classList.add('active'); }, 10);
-        tg.HapticFeedback.impactOccurred('medium');
-    }
-
-    function closeSheet() {
-        document.getElementById('sheet').classList.remove('active');
-        document.getElementById('overlay').style.opacity = '0';
-        setTimeout(() => document.getElementById('overlay').style.display = 'none', 300);
-    }
-
-    function goToForm() { closeSheet(); recalc(); switchP('order_form'); }
-
-    function recalc() {
-        const pr = document.getElementById('order_promo');
-        const code = pr.value.toUpperCase().trim();
-        let fin = cur.price;
-        if(code === 'SALE500') {
-            fin -= 500; pr.classList.add('valid'); pr.classList.remove('invalid');
-            document.getElementById('old_price').innerText = cur.price + ' ₽';
-            document.getElementById('old_price').style.display = 'block';
-            setTimeout(() => pr.blur(), 500);
-            tg.HapticFeedback.notificationOccurred('success');
-        } else if(code.length > 0) { pr.classList.add('invalid'); pr.classList.remove('valid'); }
-        cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
-    }
-
-    // 3. ГЛАВНЫЙ ФИКС: Отправка заказа с задержкой
-    function confirmOrder() {
-        const f = document.getElementById('order_fio').value;
-        const d = document.getElementById('order_date').value;
-        if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
-
-        tg.HapticFeedback.notificationOccurred('success');
-        
-        // Показываем экран успеха
-        switchP('success_screen');
-
-        const result = {
-            fio: f,
-            birth: d,
-            tariff: cur.name,
-            price: cur.final,
-            promo: document.getElementById('order_promo').value || "Нет"
+        let cur = { name: '', price: 0, final: 0 };
+        const DB = {
+            'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Apple Pay включен' },
+            'Duo Safe': { p: 14000, b: '• 2 Банка сразу<br>• Скидка 50% на второй' },
+            'Business Prime': { p: 19900, b: '• Duo Safe + Поддержка 24/7' },
+            'Infinite Elite': { p: 39900, b: '• 3 Банка + PayPal Pro' },
+            'PayPal': { p: 4900, b: '• Верифицированный аккаунт' },
+            'Wise': { p: 20000, b: '• Личный счет Wise (IBAN)' },
+            'Revolut': { p: 20000, b: '• Личный счет Revolut' }
         };
 
-        // Ждем 2 секунды, чтобы юзер увидел галочку "Успешно", а потом шлем данные
-        setTimeout(() => {
-            // Если запущено через серую кнопку - данные уйдут и приложение закроется
-            // Если через фиолетовую - ничего не произойдет (это ограничение ТГ)
-            tg.sendData(JSON.stringify(result));
-            
-            // Для фиолетовой кнопки: если приложение НЕ закрылось через 100мс, 
-            // значит sendData не работает, и мы просто оставляем юзера на экране успеха.
-        }, 2000);
-    }
+        // ТЯЖЕЛАЯ АРТИЛЛЕРИЯ ДЛЯ ПОДГРУЗКИ ДАННЫХ
+        let attempts = 0;
+        const loadInterval = setInterval(() => {
+            const u = tg.initDataUnsafe.user;
+            attempts++;
+            if (u) {
+                const name = u.first_name || "Клиент";
+                document.getElementById('cab-name').innerText = name;
+                document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${u.id}`;
+                if (u.photo_url) {
+                    document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
+                    document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
+                }
+                clearInterval(loadInterval);
+            }
+            if (attempts > 30) clearInterval(loadInterval); // Стоп через 3 сек
+        }, 100);
 
-    function copyL() {
-        navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
-        tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!");
-    }
+        document.addEventListener('keypress', (e) => { if (e.which == 13) document.activeElement.blur(); });
 
-    function toggleFaq(el) {
-        let a = el.querySelector('.faq-a'); a.style.display = a.style.display === 'block' ? 'none' : 'block';
-        tg.HapticFeedback.impactOccurred('light');
-    }
-</script>
+        function switchP(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function showSheet(n) {
+            const t = DB[n]; cur = { name: n, price: t.p, final: t.p };
+            document.getElementById('sh-name').innerText = n;
+            document.getElementById('sh-price').innerText = t.p.toLocaleString() + ' ₽';
+            document.getElementById('sh-bullets').innerHTML = t.b;
+            document.getElementById('overlay').style.display = 'block';
+            setTimeout(() => { document.getElementById('overlay').style.opacity = '1'; document.getElementById('sheet').classList.add('active'); }, 10);
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function closeSheet() {
+            document.getElementById('sheet').classList.remove('active');
+            document.getElementById('overlay').style.opacity = '0';
+            setTimeout(() => document.getElementById('overlay').style.display = 'none', 300);
+        }
+
+        function goToForm() { closeSheet(); recalc(); switchP('order_form'); }
+
+        function recalc() {
+            const pr = document.getElementById('order_promo');
+            const code = pr.value.toUpperCase().trim();
+            let fin = cur.price;
+            if(code === 'SALE500') {
+                fin -= 500; pr.classList.add('valid'); pr.classList.remove('invalid');
+                document.getElementById('old_price').innerText = cur.price + ' ₽';
+                document.getElementById('old_price').style.display = 'block';
+                tg.HapticFeedback.notificationOccurred('success');
+                setTimeout(() => pr.blur(), 500);
+            } else if(code.length > 0) { pr.classList.add('invalid'); pr.classList.remove('valid'); }
+            cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
+        }
+
+        function confirmOrder() {
+            const f = document.getElementById('order_fio').value;
+            const d = document.getElementById('order_date').value;
+            if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
+            tg.HapticFeedback.notificationOccurred('success');
+            const res = { fio: f, birth: d, tariff: cur.name, price: cur.final, promo: document.getElementById('order_promo').value || "Нет" };
+            switchP('success_screen');
+            setTimeout(() => { tg.sendData(JSON.stringify(res)); }, 1500);
+        }
+
+        function copyL() {
+            navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
+            tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!");
+        }
+
+        function toggleFaq(el) {
+            let a = el.querySelector('.faq-a');
+            a.style.display = a.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
 </body>
 </html>
