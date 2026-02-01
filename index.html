@@ -3,328 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>EuroBridge Premium</title>
+    <title>EuroCards Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --blue: #007aff;
-            --green: #34c759;
-            --orange: #ff9500;
-            --bg: #ffffff;
-            --sec-bg: #f2f2f7;
-            --text: #000000;
-            --hint: #8e8e93;
-            --glass: rgba(255, 255, 255, 0.5);
+            --accent: #1a1a1a;
+            --soft-bg: #f8f9fc;
+            --text-main: #1c1c1e;
+            --text-hint: #8e8e93;
+            --glass: rgba(255, 255, 255, 0.8);
+            --card-grad: linear-gradient(135deg, #2c2c2e 0%, #000000 100%);
+            --green: #248a3d;
         }
 
         body { 
-            font-family: -apple-system, sans-serif; 
-            background: linear-gradient(180deg, #f0f2f8 0%, #e2e7ff 100%);
-            background-attachment: fixed;
-            min-height: 100vh;
-            margin: 0; padding: 0; 
-            color: var(--text);
-            overflow-x: hidden;
+            font-family: -apple-system, system-ui, sans-serif;
+            background: #ffffff; margin: 0; padding: 0;
+            color: var(--text-main); -webkit-tap-highlight-color: transparent;
         }
 
-        .page { display: none; padding: 20px; padding-bottom: 140px; animation: fadeIn 0.3s ease-out; }
+        .page { display: none; padding: 20px; padding-bottom: 120px; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* ШАПКА */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .user-block { display: flex; align-items: center; gap: 12px; }
-        .avatar { 
-            width: 44px; height: 44px; border-radius: 50%; 
-            background: linear-gradient(135deg, var(--blue), #5ac8fa);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 2px solid #fff;
-            display: flex; justify-content: center; align-items: center;
-            font-weight: bold; color: white; background-size: cover; background-position: center;
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-top: 10px; }
+        .avatar { width: 44px; height: 44px; border-radius: 14px; background: var(--soft-bg); display: flex; justify-content: center; align-items: center; font-weight: bold; background-size: cover; border: 1px solid rgba(0,0,0,0.05); }
 
-        /* 3D КАРТА */
-        .card-wrapper { perspective: 1200px; margin: 10px 0 25px; display: flex; justify-content: center; }
+        /* ПРЕМИУМ КАРТА */
+        .card-wrapper { perspective: 1000px; margin-bottom: 30px; }
         .main-card { 
-            position: relative; width: 100%; max-width: 340px; height: 190px;
-            background: url('card.png') center/cover no-repeat; 
-            border-radius: 22px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            transform-style: preserve-3d; animation: tilt 8s infinite ease-in-out;
+            width: 100%; height: 190px; background: var(--card-grad); border-radius: 24px;
+            padding: 25px; box-sizing: border-box; color: white; position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.1);
         }
-        @keyframes tilt { 0%, 100% { transform: rotateY(-7deg) rotateX(5deg); } 50% { transform: rotateY(7deg) rotateX(-5deg); } }
 
-        /* АВТО-СЛАЙДЕР */
+        /* СЛАЙДЕР БАННЕРОВ */
         .slider-container { position: relative; margin-bottom: 25px; }
-        .banner-slider { display: flex; overflow-x: auto; gap: 10px; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: 20px; }
+        .banner-slider { display: flex; overflow-x: auto; gap: 12px; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: 20px; }
         .banner-slider::-webkit-scrollbar { display: none; }
         .banner-item { 
-            min-width: 100%; scroll-snap-align: start; background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border-radius: 20px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.4);
+            min-width: 100%; scroll-snap-align: start; background: var(--soft-bg);
+            border-radius: 20px; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
         }
-        .banner-content h3 { margin: 0; font-size: 16px; font-weight: 800; }
-        .banner-content p { margin: 5px 0 12px; font-size: 12px; color: var(--hint); }
-        .banner-btn { background: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; font-size: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .dots { display: flex; justify-content: center; gap: 5px; margin-top: 10px; }
-        .dot { width: 6px; height: 6px; background: #ccc; border-radius: 50%; transition: 0.3s; }
-        .dot.active { width: 15px; background: var(--blue); border-radius: 10px; }
-
-        /* FAQ СТИЛИ */
-        .faq-category-card {
-            background: white; border: 1.5px solid #eee; border-radius: 16px; padding: 20px; margin-bottom: 15px; transition: 0.2s;
-        }
-        .faq-category-card:active { transform: scale(0.98); background: #fafafa; }
-        .faq-category-card h3 { margin: 0 0 5px; font-size: 16px; color: var(--blue); text-decoration: underline; }
-        .faq-category-card p { margin: 0; font-size: 13px; color: var(--hint); line-height: 1.4; }
-        .faq-content { background: white; border-radius: 20px; padding: 25px; line-height: 1.6; font-size: 14px; }
-        .faq-content ol { padding-left: 20px; }
-        .faq-content li { margin-bottom: 10px; }
 
         /* ТАРИФЫ */
-        .tariffs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
-        .tariff-square {
-            background: var(--bg); border-radius: 22px; padding: 20px;
-            display: flex; flex-direction: column; align-items: center; text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.03);
-        }
-        .tariff-square:active { transform: scale(0.97); }
-        .tariff-square .price { font-size: 18px; font-weight: 900; color: var(--blue); margin-top: 5px; }
+        .tariffs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .tariff-card { background: #ffffff; border-radius: 22px; padding: 20px; text-align: center; border: 1px solid #f0f0f0; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+        .tariff-card:active { transform: scale(0.96); background: var(--soft-bg); }
+        .price { font-size: 18px; font-weight: 800; color: var(--accent); margin-top: 8px; }
 
-        /* БОНУСЫ */
-        .ref-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
-        .ref-stat-card { background: var(--bg); border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: 1px solid #eee; }
-        .ref-stat-card small { color: var(--hint); font-size: 11px; display: block; margin-bottom: 5px; text-transform: uppercase; }
-        .ref-stat-card .val { font-size: 22px; font-weight: 900; }
-        .withdraw-btn { background: #e2f0ff; color: var(--blue); border: none; padding: 8px 12px; border-radius: 10px; font-size: 12px; margin-top: 10px; font-weight: bold; width: 100%; }
-        .ref-box { background: white; border-radius: 18px; padding: 15px; margin-top: 20px; border: 1px solid #eee; }
-        .step-list { margin-top: 30px; }
-        .step-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .step-num { background: white; width: 32px; height: 32px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-
-        /* КНОПКИ */
-        .get-btn { background: var(--blue); color: white; border: none; width: 100%; padding: 18px; border-radius: 16px; font-weight: bold; font-size: 17px; box-shadow: 0 8px 20px rgba(0, 122, 255, 0.2); }
-        .get-btn:active { transform: scale(0.96); }
-        input { width: 100%; border: 1.5px solid #eee; background: white; padding: 16px; border-radius: 15px; box-sizing: border-box; outline: none; margin-bottom: 15px; font-size: 16px; transition: 0.3s; }
-        input.valid { border-color: var(--green) !important; background: #f2fff5 !important; }
-
+        /* СПИСКИ И КНОПКИ */
+        .list-item { background: #ffffff; padding: 18px; border-radius: 20px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f2f2f2; }
+        .primary-btn { background: var(--accent); color: white; border: none; width: 100%; padding: 18px; border-radius: 18px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        
         /* НАВИГАЦИЯ */
         .nav-bar { 
-            position: fixed; bottom: 0; width: 100%; background: rgba(255, 255, 255, 0.85); 
+            position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.85); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-top: 0.5px solid rgba(0,0,0,0.08); display: flex; justify-content: space-around; 
-            padding: 10px 0 35px; z-index: 1000;
+            display: flex; justify-content: space-around; padding: 12px 0 34px; border-top: 0.5px solid #eee;
         }
-        .nav-item { text-align: center; color: var(--hint); font-size: 11px; flex: 1; cursor: pointer; }
-        .nav-item.active { color: var(--blue); font-weight: bold; }
-        .nav-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+        .nav-item { text-align: center; color: var(--text-hint); font-size: 10px; flex: 1; }
+        .nav-item.active { color: var(--accent); font-weight: 700; }
+        .nav-icon { font-size: 20px; display: block; margin-bottom: 4px; }
 
-        .list-item { background: var(--bg); padding: 18px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        /* FAQ */
+        .faq-content { line-height: 1.6; font-size: 14px; color: #444; }
+        
+        input { width: 100%; padding: 16px; border-radius: 14px; border: 1px solid #eee; margin-bottom: 12px; box-sizing: border-box; font-size: 16px; background: var(--soft-bg); }
+        input:focus { border-color: var(--accent); outline: none; background: #fff; }
     </style>
 </head>
 <body>
 
     <div id="home" class="page active">
         <div class="header">
-            <div class="user-block">
-                <div id="user-avatar" class="avatar"></div>
-                <div style="font-weight: bold; font-size: 18px;">Привет, <span id="user-name-title">Герой</span>!</div>
+            <div class="user-block" style="display:flex; align-items:center; gap:12px;">
+                <div id="user-avatar" class="avatar">?</div>
+                <div><small style="color:var(--text-hint)">EuroCards Premium</small><br><b><span id="user-name-title">Герой</span></b></div>
             </div>
-            <div style="font-size: 20px;">🎁</div>
+            <div style="font-size: 20px;" onclick="switchPage('bonuses')">💎</div>
         </div>
 
-        <div class="card-wrapper"><div class="main-card"></div></div>
+        <div class="card-wrapper"><div class="main-card"><div style="font-weight:800; letter-spacing:1px;">EuroCards</div><div style="margin-top:70px; font-family:monospace; letter-spacing:2px; font-size:18px;">•••• •••• •••• 2026</div></div></div>
 
-        <div style="font-size: 18px; font-weight: 800; margin-bottom: 15px;">Полезно знать</div>
         <div class="slider-container">
             <div class="banner-slider" id="mainSlider">
-                <div class="banner-item" onclick="switchPage('tariffs')">
-                    <div class="banner-content"><h3>Тарифы</h3><p>Условия открытия карт</p><button class="banner-btn">Выбрать</button></div>
-                    <div style="font-size: 40px;">💳</div>
-                </div>
-                <div class="banner-item" onclick="switchPage('bonuses')">
-                    <div class="banner-content"><h3>Бонусы</h3><p>Получай 2 000 ₽ за друга</p><button class="banner-btn">Узнать</button></div>
-                    <div style="font-size: 40px;">✨</div>
-                </div>
-                <div class="banner-item" onclick="switchPage('faq-categories')">
-                    <div class="banner-content"><h3>Поддержка</h3><p>Есть вопросы? Пишите!</p><button class="banner-btn">FAQ</button></div>
-                    <div style="font-size: 40px;">🆘</div>
-                </div>
-            </div>
-            <div class="dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
-        </div>
-
-        <div class="promo-banner">
-            <div style="font-size: 25px;">🔥</div>
-            <div>
-                <div style="font-weight: bold; font-size: 14px;">Акция: Скидка 500 ₽</div>
-                <div style="font-size: 12px; opacity: 0.9;">Используй промокод: <b>SALE500</b></div>
+                <div class="banner-item" onclick="switchPage('tariffs')"><div><h3>Тарифы</h3><p style="font-size:12px; color:var(--text-hint)">Карты Европы от 9 900 ₽</p></div><div style="font-size:30px;">💳</div></div>
+                <div class="banner-item" onclick="switchPage('bonuses')"><div><h3>Бонусы</h3><p style="font-size:12px; color:var(--text-hint)">2 000 ₽ за каждого друга</p></div><div style="font-size:30px;">✨</div></div>
+                <div class="banner-item" onclick="switchPage('faq-categories')"><div><h3>FAQ</h3><p style="font-size:12px; color:var(--text-hint)">Ответы на все вопросы</p></div><div style="font-size:30px;">🆘</div></div>
             </div>
         </div>
 
-        <div id="app-status-box" class="list-item" style="display: none; background: #e8f5e9; border: 1px solid var(--green);">
-            <div><b id="st-tariff">...</b><br><small id="st-date">...</small></div>
-            <div style="color: var(--green); font-weight: bold; font-size: 12px;">В ОБРАБОТКЕ</div>
+        <div id="app-status-box" class="list-item" style="display: none; background: #f0fdf4; border: 1px solid var(--green);">
+            <div><b id="st-tariff">...</b><br><small id="st-date" style="color:var(--text-hint)">...</small></div>
+            <div style="color: var(--green); font-weight: 700; font-size: 12px;">В ОБРАБОТКЕ</div>
         </div>
 
-        <button class="get-btn" onclick="switchPage('tariffs')">ОФОРМИТЬ КАРТУ</button>
-        
-        <div style="font-size: 18px; font-weight: 800; margin: 25px 0 15px;">Разделы</div>
-        <div class="list-item" onclick="tg.openTelegramLink('https://t.me/eurocards_ru')"><div><b>Наш Telegram-канал</b><br><small style="color:var(--hint)">Новости и обновления</small></div><span>›</span></div>
-        <div class="list-item" onclick="tg.openTelegramLink('https://t.me/your_support')"><div><b>Поддержка</b><br><small style="color:var(--hint)">Помощь 24/7</small></div><span>›</span></div>
-        <div class="list-item" onclick="switchPage('faq-categories')"><div><b>FAQ</b><br><small style="color:var(--hint)">Частые вопросы</small></div><span>›</span></div>
+        <button class="primary-btn" onclick="switchPage('tariffs')">ОФОРМИТЬ КАРТУ</button>
+
+        <div style="margin-top: 30px; font-weight: 800; margin-bottom: 15px;">Разделы</div>
+        <div class="list-item" onclick="tg.openTelegramLink('https://t.me/eurocards_ru')"><div><b>Канал EuroCards</b><br><small style="color:var(--text-hint)">Новости и лайфхаки</small></div><span>›</span></div>
+        <div class="list-item" onclick="tg.openTelegramLink('https://t.me/your_support')"><div><b>Поддержка</b><br><small style="color:var(--text-hint)">Помощь 24/7</small></div><span>›</span></div>
     </div>
 
     <div id="tariffs" class="page">
-        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Тарифы</div>
+        <h2 style="margin-bottom:20px;">Тарифы</h2>
         <div class="tariffs-grid">
-            <div class="tariff-square" onclick="showDetails('Standard', 9000, 'Базовое открытие счета на ваш загранпаспорт. Идеально для Apple Pay.')">
-                <div style="font-size: 30px;">💳</div>
-                <h3>Standard</h3>
-                <div class="price">9 000 ₽</div>
-            </div>
-            <div class="tariff-square" onclick="showDetails('Expert', 12000, 'Всё из Standard + полный гайд по пополнению через криптобиржи.')">
-                <div style="font-size: 30px;">🚀</div>
-                <h3>Expert</h3>
-                <div class="price">12 000 ₽</div>
-            </div>
-            <div class="tariff-square" onclick="showDetails('VIP', 15000, 'Максимальный приоритет и персональное сопровождение 24/7.')">
-                <div style="font-size: 30px;">👑</div>
-                <h3>VIP</h3>
-                <div class="price">15 000 ₽</div>
-            </div>
-            <div class="tariff-square" onclick="showDetails('Travel', 11000, 'Специальный тариф для частых поездок и оплат за границей.')">
-                <div style="font-size: 30px;">✈️</div>
-                <h3>Travel</h3>
-                <div class="price">11 000 ₽</div>
-            </div>
+            <div class="tariff-card" onclick="showDetails('Standard', 9900, 'Личная карта на ваш загранпаспорт. Apple Pay включен.')"><h3>Standard</h3><div class="price">9 900 ₽</div></div>
+            <div class="tariff-card" onclick="selectTariff('Expert', 12900, 'Standard + гайд по P2P и криптобиржам.')"><h3>Expert</h3><div class="price">12 900 ₽</div></div>
+            <div class="tariff-card" onclick="selectTariff('Travel', 11900, 'Карта с выгодной конвертацией для путешествий.')"><h3>Travel</h3><div class="price">11 900 ₽</div></div>
+            <div class="tariff-card" onclick="selectTariff('VIP', 19900, 'Приоритетный выпуск и персональный менеджер.')"><h3>VIP</h3><div class="price">19 900 ₽</div></div>
         </div>
-    </div>
-
-    <div id="faq-categories" class="page">
-        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Помощь</div>
-        <div class="faq-category-card" onclick="openFaqAnswer('Общие вопросы')">
-            <h3>Общие вопросы</h3>
-            <p>Ответы на часто задаваемые вопросы по работе сервиса и карт.</p>
-        </div>
-        <div class="faq-category-card" onclick="openFaqAnswer('Ошибки и решения')">
-            <h3>Ошибки и решения</h3>
-            <p>Ошибки при оплате, верификации и входе. Причины и решения.</p>
-        </div>
-        <div class="faq-category-card" onclick="openFaqAnswer('Запрещенные категории')">
-            <h3>Запрещенные категории</h3>
-            <p>Список видов деятельности, запрещенных для использования карт.</p>
-        </div>
-        <button class="get-btn" style="background: none; color: var(--hint); box-shadow: none;" onclick="switchPage('home')">Назад</button>
-    </div>
-
-    <div id="faq-answer-page" class="page">
-        <div id="faq-answer-title" style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">Заголовок</div>
-        <div class="faq-content" id="faq-answer-text"></div>
-        <button class="get-btn" style="margin-top: 20px;" onclick="switchPage('faq-categories')">К вопросам</button>
     </div>
 
     <div id="tariff-detail" class="page">
-        <div style="background: white; border-radius: 30px; padding: 30px 20px; text-align: center;">
-            <h2 id="det-name" style="margin:0; font-size: 28px;">Тариф</h2>
-            <div id="det-price" style="font-size: 26px; font-weight: 900; color: var(--blue); margin: 10px 0;">0 ₽</div>
-            <p id="det-desc" style="color: var(--hint); line-height: 1.5; margin-bottom: 30px;">Описание...</p>
-            <button class="get-btn" onclick="openOrderFromDetail()">ЗАКАЗАТЬ КАРТУ</button>
-            <button class="get-btn" style="background: none; color: var(--hint); box-shadow: none;" onclick="switchPage('tariffs')">Назад к списку</button>
+        <div style="text-align:center; padding-top:20px;">
+            <h1 id="det-name">Тариф</h1>
+            <div id="det-price" style="font-size:32px; font-weight:900; margin:20px 0;">0 ₽</div>
+            <p id="det-desc" style="color:var(--text-hint); margin-bottom:40px;"></p>
+            <button class="primary-btn" onclick="openOrderFromDetail()">ПРОДОЛЖИТЬ</button>
+            <p style="margin-top:20px; color:var(--text-hint);" onclick="switchPage('tariffs')">Вернуться назад</p>
         </div>
-    </div>
-
-    <div id="bonuses" class="page">
-        <div style="font-size: 24px; font-weight: 900; margin-bottom: 10px;">Реферальная программа</div>
-        <p style="color: var(--hint); font-size: 13px; line-height: 1.4;">Приглашай друзей: ты получишь <b>2 000 ₽</b>, а друг — скидку <b>500 ₽</b> на первую карту.</p>
-        <div class="ref-stats-grid">
-            <div class="ref-stat-card">
-                <small>Зачислено</small><div class="val">0 ₽</div>
-                <button class="withdraw-btn" onclick="tg.showAlert('Вывод доступен от 5 000 ₽')">Вывести</button>
-            </div>
-            <div class="ref-stat-card">
-                <small>Приглашенных</small><div class="val">0</div>
-                <div style="font-size: 11px; margin-top: 15px; color: var(--hint)">1 друг = 2 000 ₽</div>
-            </div>
-        </div>
-        <div class="ref-box">
-            <small style="color: var(--hint); font-size: 11px; text-transform: uppercase;">Твоя ссылка</small>
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap: 10px;">
-                <div id="ref-text" style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--blue);">Загрузка...</div>
-                <div onclick="copyRef()" style="cursor:pointer; font-size: 20px;">📋</div>
-            </div>
-        </div>
-        <div class="step-list">
-            <div style="font-weight: 800; margin-bottom: 15px;">Как это работает?</div>
-            <div class="step-item"><div class="step-num">1</div><div style="font-size: 13px;">Отправь ссылку другу</div></div>
-            <div class="step-item"><div class="step-num">2</div><div style="font-size: 13px;">Друг оформляет любую карту</div></div>
-            <div class="step-item"><div class="step-num">3</div><div style="font-size: 13px;">Ты получаешь 2 000 ₽ на баланс</div></div>
-        </div>
-    </div>
-
-    <div id="info" class="page">
-        <div style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Настройки и инфо</div>
-        <div class="list-item"><span>Темная тема</span> <span>Авто</span></div>
-        <div class="list-item" onclick="tg.openTelegramLink('https://t.me/your_support')"><span>🆘 Поддержка</span><span>›</span></div>
-        <div class="list-item" onclick="tg.showAlert('Версия 5.2.0')"><span>О приложении</span><span>v 5.2.0</span></div>
-        <div class="list-item" onclick="switchPage('home')"><span>🏠 На главную</span><span>›</span></div>
     </div>
 
     <div id="order-page" class="page">
-        <div class="section-title">Оформление</div>
-        <input type="text" id="order-name" placeholder="IVAN IVANOV (как в загране)">
-        <input type="date" id="order-birth">
-        <input type="text" id="promo-input" placeholder="Промокод" oninput="checkPromo()">
-        <div style="text-align: center; margin: 20px 0;">
-            <div id="old-price-view" style="text-decoration: line-through; color: var(--hint); display: none;">0 ₽</div>
-            <div id="current-price-view" style="font-size: 32px; font-weight: 900;">0 ₽</div>
+        <h2>Оформление</h2>
+        <input type="text" id="order-name" placeholder="ИМЯ ФАМИЛИЯ (как в загране)">
+        <input type="text" id="promo-input" placeholder="Промокод (если есть)" oninput="checkPromo()">
+        <div style="text-align: center; margin: 30px 0;">
+            <div id="old-price-view" style="text-decoration: line-through; color: var(--text-hint); display: none;">0 ₽</div>
+            <div id="current-price-view" style="font-size: 36px; font-weight: 900;">0 ₽</div>
         </div>
-        <button class="get-btn" onclick="showSuccess()">ОФОРМИТЬ</button>
+        <button class="primary-btn" onclick="showSuccess()">ПОДТВЕРДИТЬ ЗАКАЗ</button>
+    </div>
+
+    <div id="faq-categories" class="page">
+        <h2>Помощь</h2>
+        <div class="list-item" onclick="openFaqAnswer('Общие вопросы')"><b>Общие вопросы</b><span>›</span></div>
+        <div class="list-item" onclick="openFaqAnswer('Ошибки оплаты')"><b>Ошибки и решения</b><span>›</span></div>
+        <div class="list-item" onclick="openFaqAnswer('Лимиты')"><b>Лимиты и правила</b><span>›</span></div>
+    </div>
+
+    <div id="faq-answer-page" class="page">
+        <h3 id="faq-title">Заголовок</h3>
+        <div id="faq-text" class="faq-content"></div>
+        <button class="primary-btn" style="background:var(--soft-bg); color:var(--accent); margin-top:30px;" onclick="switchPage('faq-categories')">Назад</button>
+    </div>
+
+    <div id="bonuses" class="page">
+        <h2>Бонусы</h2>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:25px;">
+            <div style="background:var(--soft-bg); padding:20px; border-radius:20px;">
+                <small style="color:var(--text-hint)">БАЛАНС</small><div style="font-size:24px; font-weight:800;">0 ₽</div>
+            </div>
+            <div style="background:var(--soft-bg); padding:20px; border-radius:20px;">
+                <small style="color:var(--text-hint)">ДРУЗЬЯ</small><div style="font-size:24px; font-weight:800;">0</div>
+            </div>
+        </div>
+        <div class="list-item" style="flex-direction:column; align-items:flex-start; gap:10px;">
+            <small style="color:var(--text-hint)">ВАША ССЫЛКА</small>
+            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                <code id="ref-link" style="color:var(--accent); font-size:12px;">loading...</code>
+                <b onclick="copyRef()">КОПИРОВАТЬ</b>
+            </div>
+        </div>
     </div>
 
     <div id="success-page" class="page">
-        <div style="background: white; border-radius: 30px; padding: 40px 20px; text-align: center;">
-            <div style="font-size: 60px;">✅</div>
-            <h2>Заявка принята!</h2>
-            <p style="color: var(--hint); margin-bottom: 30px;">Менеджер свяжется с вами в течение 6 часов. Статус обновлен на главной.</p>
-            <button class="get-btn" onclick="returnToMenu()">ОТЛИЧНО</button>
+        <div style="text-align:center; padding-top:50px;">
+            <div style="font-size:80px;">✅</div>
+            <h2>Готово!</h2>
+            <p style="color:var(--text-hint)">Заявка отправлена. Мы напишем вам в Telegram в ближайшее время.</p>
+            <button class="primary-btn" onclick="returnToMenu()">НА ГЛАВНУЮ</button>
         </div>
     </div>
 
     <div class="nav-bar" id="bottom-nav">
         <div class="nav-item active" onclick="switchPage('home', this)"><span class="nav-icon">🏠</span>Главная</div>
-        <div class="nav-item" onclick="switchPage('tariffs', this)"><span class="nav-icon">💳</span>Тарифы</div>
-        <div class="nav-item" onclick="switchPage('bonuses', this)"><span class="nav-icon">✨</span>Бонусы</div>
-        <div class="nav-item" onclick="switchPage('info', this)"><span class="nav-icon">⚙️</span>Инфо</div>
+        <div class="nav-item" onclick="switchPage('tariffs', this)"><span class="nav-icon">💳</span>Карты</div>
+        <div class="nav-item" onclick="switchPage('bonuses', this)"><span class="nav-icon">💎</span>Бонусы</div>
+        <div class="nav-item" onclick="switchPage('faq-categories', this)"><span class="nav-icon">⚙️</span>Помощь</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
+        tg.headerColor = '#ffffff';
 
         const PROMO_DB = { 'SALE500': 500, 'EURO2026': 1000 };
         const FAQ_DATA = {
-            'Запрещенные категории': `
-                <p>Следующие виды деятельности запрещены для использования нашими картами:</p>
-                <ol>
-                    <li>Индустрия для взрослых (18+);</li>
-                    <li>Денежные переводы и обмен валют;</li>
-                    <li>Финансовые пирамиды и схемы Понци;</li>
-                    <li>Торговля оружием и боеприпасами;</li>
-                    <li>Онлайн-казино и азартные игры;</li>
-                    <li>Прямая покупка криптовалюты (на биржах);</li>
-                </ol>
-                <p>Нарушение этих правил может привести к блокировке карты банком без возврата средств.</p>
-            `,
-            'Общие вопросы': `
-                <p><b>EuroBridge</b> — это сервис по выпуску виртуальных европейских карт Visa/Mastercard для жителей РФ.</p>
-                <p>Наши карты позволяют оплачивать зарубежные подписки (iCloud, Spotify, Netflix), совершать покупки в магазинах и бронировать отели по всему миру.</p>
-            `,
-            'Ошибки и решения': `
-                <p>Если ваша оплата не проходит:</p>
-                <ul>
-                    <li>Убедитесь, что на балансе достаточно средств с учетом комиссии сервиса (обычно 1-2%);</li>
-                    <li>Проверьте, не входит ли магазин в список запрещенных категорий;</li>
-                    <li>При оплате используйте VPN той страны, в которой выпущена карта (мы сообщим её при выдаче).</li>
-                </ul>
-            `
+            'Общие вопросы': '<p>EuroCards — это сервис выпуска европейских карт. Срок готовности — 24 часа. Работает Apple Pay.</p>',
+            'Ошибки оплаты': '<p>Если оплата не проходит, проверьте VPN. Мы рекомендуем использовать VPN страны выпуска карты.</p>',
+            'Лимиты': '<p>Стандартный лимит на снятие наличных — до 2000€ в месяц. Лимиты на онлайн-оплаты зависят от банка.</p>'
         };
 
         let selT = "", selP = 0, finP = 0;
@@ -333,52 +204,36 @@
             let user = tg.initDataUnsafe.user;
             if (user) {
                 document.getElementById('user-name-title').innerText = user.first_name;
-                document.getElementById('ref-text').innerText = `https://t.me/EuroBridgeBot?start=${user.id}`;
-                let avatar = document.getElementById('user-avatar');
-                if (user.photo_url) { avatar.style.backgroundImage = `url('${user.photo_url}')`; avatar.innerText = ""; }
-                else { avatar.innerText = user.first_name ? user.first_name[0] : "?"; }
+                document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${user.id}`;
+                if (user.photo_url) {
+                    let av = document.getElementById('user-avatar');
+                    av.style.backgroundImage = `url('${user.photo_url}')`;
+                    av.innerText = "";
+                }
             }
             updateStatus();
             startSlider();
         };
 
-        function startSlider() {
-            const slider = document.getElementById('mainSlider');
-            const dots = document.querySelectorAll('.dot');
-            let step = 0;
-            if(!slider) return;
-            setInterval(() => {
-                step = (step + 1) % dots.length;
-                slider.scrollTo({ left: slider.offsetWidth * step, behavior: 'smooth' });
-                dots.forEach((d, i) => d.classList.toggle('active', i === step));
-            }, 4000);
-        }
-
-        function updateStatus() {
-            let lastOrder = localStorage.getItem('lastOrder');
-            if (lastOrder) {
-                let order = JSON.parse(lastOrder);
-                document.getElementById('app-status-box').style.display = 'flex';
-                document.getElementById('st-tariff').innerText = order.t;
-                document.getElementById('st-date').innerText = "Заказ от: " + order.date;
-            }
-        }
-
         function switchPage(p, el) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            const target = document.getElementById(p);
-            if(target) target.classList.add('active');
-            if(el) {
+            document.getElementById(p).classList.add('active');
+            if (el) {
                 document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
                 el.classList.add('active');
             }
             window.scrollTo(0,0);
+            tg.HapticFeedback.impactOccurred('light');
         }
 
-        function openFaqAnswer(title) {
-            document.getElementById('faq-answer-title').innerText = title;
-            document.getElementById('faq-answer-text').innerHTML = FAQ_DATA[title] || "Описание скоро появится...";
-            switchPage('faq-answer-page');
+        function startSlider() {
+            const slider = document.getElementById('mainSlider');
+            if(!slider) return;
+            let step = 0;
+            setInterval(() => {
+                step = (step + 1) % 3;
+                slider.scrollTo({ left: slider.offsetWidth * step, behavior: 'smooth' });
+            }, 4000);
         }
 
         function showDetails(n, p, d) {
@@ -391,10 +246,6 @@
 
         function openOrderFromDetail() {
             document.getElementById('current-price-view').innerText = selP + " ₽";
-            document.getElementById('current-price-view').style.color = "var(--text)";
-            document.getElementById('old-price-view').style.display = "none";
-            document.getElementById('promo-input').value = "";
-            document.getElementById('promo-input').classList.remove('valid');
             switchPage('order-page');
         }
 
@@ -402,44 +253,49 @@
             let code = document.getElementById('promo-input').value.toUpperCase().trim();
             let cp = document.getElementById('current-price-view');
             let op = document.getElementById('old-price-view');
-            let inp = document.getElementById('promo-input');
             if (PROMO_DB[code]) {
                 finP = selP - PROMO_DB[code];
-                inp.classList.add('valid');
                 op.innerText = selP + " ₽"; op.style.display = "block";
-                cp.innerText = finP + " ₽"; cp.style.color = "var(--green)";
+                cp.innerText = finP + " ₽"; cp.style.color = "#248a3d";
                 tg.HapticFeedback.notificationOccurred('success');
             } else {
-                finP = selP; inp.classList.remove('valid');
-                op.style.display = "none"; cp.innerText = selP + " ₽"; cp.style.color = "var(--text)";
+                finP = selP; op.style.display = "none"; cp.innerText = selP + " ₽"; cp.style.color = "var(--accent)";
             }
         }
 
+        function openFaqAnswer(title) {
+            document.getElementById('faq-title').innerText = title;
+            document.getElementById('faq-text').innerHTML = FAQ_DATA[title] || "Загрузка...";
+            switchPage('faq-answer-page');
+        }
+
         function copyRef() {
-            const link = document.getElementById('ref-text').innerText;
-            const el = document.createElement('textarea');
-            el.value = link;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            tg.HapticFeedback.notificationOccurred('success');
+            let link = document.getElementById('ref-link').innerText;
+            navigator.clipboard.writeText(link);
             tg.showAlert("Ссылка скопирована!");
         }
 
         function showSuccess() {
             if(!document.getElementById('order-name').value) { tg.showAlert("Введите имя!"); return; }
             localStorage.setItem('lastOrder', JSON.stringify({ t: selT, date: new Date().toLocaleDateString() }));
-            document.getElementById('bottom-nav').style.display = "none";
             switchPage('success-page');
-            tg.HapticFeedback.notificationOccurred('success');
+            document.getElementById('bottom-nav').style.display = "none";
         }
 
         function returnToMenu() {
             document.getElementById('bottom-nav').style.display = "flex";
             updateStatus();
-            tg.sendData(JSON.stringify({ t: selT, p: finP, n: document.getElementById('order-name').value }));
             switchPage('home');
+        }
+
+        function updateStatus() {
+            let last = localStorage.getItem('lastOrder');
+            if(last) {
+                let order = JSON.parse(last);
+                document.getElementById('app-status-box').style.display = 'flex';
+                document.getElementById('st-tariff').innerText = order.t;
+                document.getElementById('st-date').innerText = "Оформлено: " + order.date;
+            }
         }
     </script>
 </body>
