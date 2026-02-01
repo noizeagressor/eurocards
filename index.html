@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EuroCards Zen Premium</title>
+    <title>EuroCards Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -12,12 +12,15 @@
             --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1);
             --accent-blue: #38bdf8; --text-main: #f8fafc; --text-secondary: #94a3b8;
             /* Gradients */
-            --g-std: linear-gradient(145deg, #334155, #1e293b); --g-duo: linear-gradient(145deg, #1e3a8a, #0f172a);
-            --g-prm: linear-gradient(145deg, #312e81, #1e1b4b); --g-elt: linear-gradient(145deg, #171717, #000000);
-            --g-pay: linear-gradient(145deg, #003087, #009cde); --g-bank: linear-gradient(145deg, #27272a, #09090b);
+            --g-std: linear-gradient(145deg, #334155, #1e293b);
+            --g-duo: linear-gradient(145deg, #1e3a8a, #0f172a);
+            --g-prm: linear-gradient(145deg, #064e3b, #022c22);
+            --g-elt: linear-gradient(145deg, #171717, #000000);
+            --g-pay: linear-gradient(145deg, #003087, #009cde);
+            --g-bank: linear-gradient(145deg, #27272a, #09090b);
         }
 
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--zen-dark); margin: 0; padding: 0; color: var(--text-main); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--zen-dark); margin: 0; padding: 0; color: var(--text-main); -webkit-font-smoothing: antialiased; }
         .zen-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 0%, var(--zen-blue) 0%, var(--zen-dark) 100%); z-index: -2; }
         .page { display: none; padding: 20px 20px 140px; animation: slideUp 0.4s ease; }
         .page.active { display: block; }
@@ -25,31 +28,28 @@
 
         /* TILES */
         .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .tile { aspect-ratio: 1 / 1; border-radius: 28px; padding: 22px; position: relative; border: 1px solid var(--glass-border); display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; overflow: hidden; }
+        .tile { aspect-ratio: 1 / 1; border-radius: 28px; padding: 22px; position: relative; border: 1px solid var(--glass-border); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; transition: 0.3s; }
+        .tile:active { transform: scale(0.96); opacity: 0.9; }
         .t1 { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
         .t2 { font-size: 13px; font-weight: 500; margin-top: 2px; }
         .val { font-size: 24px; font-weight: 800; }
         .unit { font-size: 14px; opacity: 0.6; }
-        .tile-icon { position: absolute; top: 22px; right: 22px; opacity: 0.8; }
-        .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* INPUTS */
-        input { width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        /* FORM */
+        input { width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; outline: none; }
         input[type="date"] { color-scheme: dark; }
-        input.valid { border-color: #22c55e; background: rgba(34, 197, 94, 0.05); }
-        input.invalid { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
-
+        input.valid { border-color: #22c55e; }
+        input.invalid { border-color: #ef4444; }
         .btn-main { background: #fff; color: #000; border: none; width: 100%; height: 60px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; }
 
-        /* CABINET */
-        .faq-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; margin-bottom: 12px; }
-        .faq-q { padding: 18px; font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
-        .faq-a { padding: 0 18px 18px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; display: none; }
-
-        /* TAB BAR */
+        /* TABS */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 0.5px solid var(--glass-border); display: flex; justify-content: space-around; padding-top: 12px; z-index: 1000; }
         .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); flex: 1; font-size: 10px; font-weight: 700; text-transform: uppercase; }
         .tab-item.active { color: var(--accent-blue); }
+        
+        /* CABINET */
+        .faq-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; margin-bottom: 12px; padding: 18px; }
 
         /* SHEET */
         .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; opacity: 0; transition: 0.3s; }
@@ -62,39 +62,33 @@
 
     <div id="home" class="page active">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <b style="font-size:24px; letter-spacing:-0.5px;">EuroCards</b>
+            <b style="font-size:24px;">EuroCards</b>
             <div id="avatar-main" style="width:36px; height:36px; border-radius:50%; background:var(--glass); border:1px solid var(--glass-border); background-size:cover;"></div>
         </div>
-
         <div class="tile-grid">
             <div class="tile" style="background: var(--g-std)" onclick="showSheet('Essential')">
-                <div class="tile-top-left"><div class="t1">Essential</div><div class="t2">Base Access</div></div>
-                <div class="val-block"><div class="val">9500</div><div class="unit">₽</div></div>
-                <i data-lucide="credit-card" class="tile-icon"></i>
+                <div class="t1">Essential</div><div class="t2">Base Access</div>
+                <div style="display:flex; align-items:baseline; gap:3px;"><div class="val">9500</div><div class="unit">₽</div></div>
                 <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="background: var(--g-duo)" onclick="showSheet('Duo Safe')">
-                <div class="tile-top-left"><div class="t1">Duo Safe</div><div class="t2">2 Banks + 50% Off</div></div>
-                <div class="val-block"><div class="val">14000</div><div class="unit">₽</div></div>
-                <i data-lucide="layers" class="tile-icon"></i>
+                <div class="t1">Duo Safe</div><div class="t2">Double Protection</div>
+                <div style="display:flex; align-items:baseline; gap:3px;"><div class="val">14000</div><div class="unit">₽</div></div>
                 <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="background: var(--g-prm)" onclick="showSheet('Business Prime')">
-                <div class="tile-top-left"><div class="t1">Business</div><div class="t2">Elite Support</div></div>
-                <div class="val-block"><div class="val">19900</div><div class="unit">₽</div></div>
-                <i data-lucide="shield-check" class="tile-icon"></i>
+                <div class="t1">Business</div><div class="t2">Elite Support</div>
+                <div style="display:flex; align-items:baseline; gap:3px;"><div class="val">19900</div><div class="unit">₽</div></div>
                 <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="background: var(--g-elt)" onclick="showSheet('Infinite Elite')">
-                <div class="tile-top-left"><div class="t1">Infinite</div><div class="t2">Elite Bundle</div></div>
-                <div class="val-block"><div class="val">39900</div><div class="unit">₽</div></div>
-                <i data-lucide="crown" class="tile-icon"></i>
+                <div class="t1">Infinite</div><div class="t2">Elite Bundle</div>
+                <div style="display:flex; align-items:baseline; gap:3px;"><div class="val">39900</div><div class="unit">₽</div></div>
                 <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="grid-column: span 2; aspect-ratio: 2.3/1; background: var(--g-pay)" onclick="showSheet('PayPal')">
-                <div class="tile-top-left"><div class="t1">PayPal</div><div class="t2">Verified Account</div></div>
-                <div class="val-block"><div class="val">4900</div><div class="unit">₽</div></div>
-                <i data-lucide="wallet" class="tile-icon"></i>
+                <div class="t1">PayPal Pro</div><div class="t2">Verified Account</div>
+                <div style="display:flex; align-items:baseline; gap:3px;"><div class="val">4900</div><div class="unit">₽</div></div>
                 <div class="plus-btn">+</div>
             </div>
         </div>
@@ -102,7 +96,7 @@
 
     <div id="cards" class="page">
         <h2>Мои заказы</h2>
-        <div id="order-status" style="text-align:center; padding-top:80px; opacity:0.3;"><i data-lucide="package" style="width:60px; height:60px; margin-bottom:20px;"></i><p>Заказов пока нет</p></div>
+        <div style="text-align:center; padding-top:80px; opacity:0.3;"><i data-lucide="package" style="width:60px; height:60px; margin-bottom:20px;"></i><p>Заказов пока нет</p></div>
     </div>
 
     <div id="bonuses" class="page">
@@ -121,41 +115,39 @@
             <div id="avatar-cab" style="width:60px; height:60px; border-radius:50%; background:var(--glass); border:1px solid var(--glass-border); background-size:cover;"></div>
             <div><b id="cab-name" style="font-size:20px;">Клиент</b><br><small style="color:var(--text-secondary)">Личный кабинет</small></div>
         </div>
-        <h3 style="margin-bottom:15px;">FAQ</h3>
-        <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Документы? <i data-lucide="chevron-down" style="width:16px;"></i></div><div class="faq-a">Только загранпаспорт.</div></div>
-        <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Пополнение? <i data-lucide="chevron-down" style="width:16px;"></i></div><div class="faq-a">Через P2P (Крипта/Рубли).</div></div>
-        <button class="btn-main" style="background:var(--glass); color:#fff; border:1px solid var(--glass-border);" onclick="tg.openTelegramLink('https://t.me/your_support')">Поддержка</button>
+        <h3>FAQ</h3>
+        <div class="faq-item" onclick="toggleFaq(this)"><b>Документы?</b><div class="faq-a" style="display:none; margin-top:10px; opacity:0.7">Только загранпаспорт.</div></div>
+        <div class="faq-item" onclick="toggleFaq(this)"><b>Как пополнять?</b><div class="faq-a" style="display:none; margin-top:10px; opacity:0.7">Через P2P (Крипта/Рубли).</div></div>
+        <button class="btn-main" style="background:var(--glass); color:#fff; border:1px solid var(--glass-border);" onclick="tg.openTelegramLink('https://t.me/your_support')">Связаться с нами</button>
     </div>
 
     <div id="order_form" class="page">
-        <div style="font-size:28px; font-weight:900; margin-bottom:30px;">Оформление</div>
-        <input type="text" id="order_fio" placeholder="ИМЯ ФАМИЛИЯ" enterkeyhint="done">
+        <h2>Оформление</h2>
+        <input type="text" id="order_fio" placeholder="ИМЯ ФАМИЛИЯ (ЗАГРАН)" enterkeyhint="done">
         <input type="date" id="order_date" enterkeyhint="done">
         <input type="text" id="order_promo" placeholder="ПРОМОКОД" oninput="recalc()" enterkeyhint="done">
-        
-        <div style="text-align:center; margin:40px 0;">
+        <div style="text-align:center; margin:30px 0;">
             <div id="old_price" style="text-decoration:line-through; opacity:0.4; display:none;">0 ₽</div>
             <div id="final_price" style="font-size:48px; font-weight:900;">0 ₽</div>
-            <div id="sel_name" style="color:var(--accent-blue); font-weight:700; margin-top:5px; text-transform:uppercase; font-size:12px;"></div>
         </div>
-        <button class="btn-main" onclick="confirmOrder()">ОПЛАТИТЬ ЗАКАЗ</button>
+        <button class="btn-main" onclick="confirmOrder()">ПОДТВЕРДИТЬ</button>
     </div>
 
     <div id="success_screen" class="page">
         <div style="text-align:center; padding-top:60px;">
             <i data-lucide="check-circle" style="width:60px; height:60px; color:#22c55e; margin-bottom:20px;"></i>
-            <h2 style="font-size:28px; font-weight:900;">Успешно!</h2>
-            <p style="color:var(--text-secondary); padding:0 20px;">Заявка отправлена. Ожидайте ответа в течение 24 часов.</p>
-            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">НА ГЛАВНУЮ</button>
+            <h2>Заявка принята!</h2>
+            <p style="color:var(--text-secondary)">Мы свяжемся с вами в течение 24 часов.</p>
+            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ОТЛИЧНО</button>
         </div>
     </div>
 
     <div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
     <div class="sheet" id="sheet">
         <div style="width:40px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin:-16px auto 25px;"></div>
-        <h2 id="sh-name" style="font-size:32px; margin:0;">Тариф</h2>
+        <h2 id="sh-name">Тариф</h2>
         <p id="sh-price" style="font-size:24px; font-weight:800; color:var(--accent-blue); margin:10px 0 30px;">0 ₽</p>
-        <div id="sh-bullets" style="color:var(--text-secondary); font-size:14px; line-height:1.8; margin-bottom:40px;"></div>
+        <div id="sh-bullets" style="color:var(--text-secondary); font-size:14px; line-height:1.7; margin-bottom:40px;"></div>
         <button class="btn-main" onclick="goToForm()">ПРОДОЛЖИТЬ</button>
     </div>
 
@@ -177,21 +169,18 @@
             'PayPal': { p: 4900, b: '• Верифицированный аккаунт' }
         };
 
-        // ХАК ДЛЯ СКРЫТИЯ КЛАВИАТУРЫ
-        document.addEventListener('keypress', function(e) {
-            if (e.which == 13) { document.activeElement.blur(); }
-        });
+        // СКРЫТИЕ КЛАВИАТУРЫ
+        document.addEventListener('keypress', (e) => { if (e.which == 13) document.activeElement.blur(); });
 
         function switchP(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             if(el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
-            tg.HapticFeedback.impactOccurred('medium'); window.scrollTo(0,0);
+            tg.HapticFeedback.impactOccurred('medium');
         }
 
         function toggleFaq(el) {
-            let a = el.querySelector('.faq-a');
-            a.style.display = a.style.display === 'block' ? 'none' : 'block';
+            let a = el.querySelector('.faq-a'); a.style.display = a.style.display === 'block' ? 'none' : 'block';
             tg.HapticFeedback.impactOccurred('light');
         }
 
@@ -211,7 +200,7 @@
             setTimeout(() => document.getElementById('overlay').style.display = 'none', 300);
         }
 
-        function goToForm() { closeSheet(); document.getElementById('sel_name').innerText = cur.name; recalc(); switchP('order_form'); }
+        function goToForm() { closeSheet(); recalc(); switchP('order_form'); }
 
         function recalc() {
             const pr = document.getElementById('order_promo');
@@ -221,8 +210,7 @@
                 fin -= 500; pr.classList.add('valid'); pr.classList.remove('invalid');
                 document.getElementById('old_price').innerText = cur.price + ' ₽';
                 document.getElementById('old_price').style.display = 'block';
-                // Скрываем клавиатуру при успехе
-                setTimeout(() => { pr.blur(); }, 500);
+                setTimeout(() => pr.blur(), 500);
                 tg.HapticFeedback.notificationOccurred('success');
             } else if(code.length > 0) { pr.classList.add('invalid'); pr.classList.remove('valid'); }
             cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
@@ -233,18 +221,9 @@
             const d = document.getElementById('order_date').value;
             if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
             tg.HapticFeedback.notificationOccurred('success');
-            
-            // Пакет данных для бота
-            const result = {
-                fio: f,
-                birth: d,
-                tariff: cur.name,
-                price: cur.final,
-                promo: document.getElementById('order_promo').value || "Нет"
-            };
-            
+            const res = { fio: f, birth: d, tariff: cur.name, price: cur.final, promo: document.getElementById('order_promo').value || "Нет" };
             switchP('success_screen');
-            tg.sendData(JSON.stringify(result)); // ЭТО ОТПРАВИТ ДАННЫЕ В БОТА
+            tg.sendData(JSON.stringify(res)); // ОТПРАВКА В БОТ
         }
 
         function copyL() {
