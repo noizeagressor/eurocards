@@ -36,47 +36,48 @@
         .page.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* TILES (PROMPT LOGIC) */
+        /* TILES */
         .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .tile {
             aspect-ratio: 1 / 1; border-radius: 28px; padding: 22px; position: relative;
             border: 1px solid var(--glass-border);
             display: flex; flex-direction: column; justify-content: space-between;
-            transition: 0.3s; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: 0.3s; overflow: hidden;
         }
         .tile:active { transform: scale(0.96); opacity: 0.9; }
-        .tile::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(255,255,255,0.05), transparent); pointer-events: none; }
-
         .t1 { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-        .t2 { font-size: 13px; font-weight: 500; margin-top: 2px; color: #fff; }
+        .t2 { font-size: 13px; font-weight: 500; margin-top: 2px; }
         .val-block { display: flex; align-items: baseline; gap: 3px; }
         .val { font-size: 24px; font-weight: 800; }
         .unit { font-size: 14px; opacity: 0.6; }
         .tile-icon { position: absolute; top: 22px; right: 22px; opacity: 0.8; }
         .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* SHEET & FORM */
-        .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; opacity: 0; transition: 0.3s; }
-        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #1a1f2e; border-radius: 32px 32px 0 0; padding: 32px 24px 60px; box-sizing: border-box; z-index: 2001; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); border-top: 1px solid var(--glass-border); }
-        .sheet.active { bottom: 0; }
-        
+        /* FORM FIX */
         input { 
             width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
             border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; outline: none; transition: 0.3s;
         }
-        input.valid { border-color: #22c55e; box-shadow: 0 0 15px rgba(34, 197, 94, 0.2); background: rgba(34, 197, 94, 0.05); }
-        input.invalid { border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.05); }
+        input[type="date"] { padding: 0 15px; display: block; width: 100%; appearance: none; -webkit-appearance: none; }
+        input.valid { border-color: #22c55e; background: rgba(34, 197, 94, 0.05); }
+        input.invalid { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
 
         .btn-main { background: #fff; color: #000; border: none; width: 100%; height: 60px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; }
+
+        /* CABINET / FAQ */
+        .faq-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; margin-bottom: 12px; }
+        .faq-q { padding: 18px; font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .faq-a { padding: 0 18px 18px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; display: none; }
 
         /* TAB BAR */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 0.5px solid var(--glass-border); display: flex; justify-content: space-around; padding-top: 12px; z-index: 1000; }
         .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); flex: 1; font-size: 10px; font-weight: 700; text-transform: uppercase; }
         .tab-item.active { color: var(--accent-blue); }
 
-        /* BONUSES */
-        .stat-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 25px; margin-bottom: 15px; }
-        .ref-box { background: rgba(0,0,0,0.3); border-radius: 16px; padding: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); }
+        /* SHEET */
+        .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; opacity: 0; transition: 0.3s; }
+        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #1a1f2e; border-radius: 32px 32px 0 0; padding: 32px 24px 60px; box-sizing: border-box; z-index: 2001; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); border-top: 1px solid var(--glass-border); }
+        .sheet.active { bottom: 0; }
     </style>
 </head>
 <body>
@@ -85,13 +86,13 @@
     <div id="home" class="page active">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
             <b style="font-size:24px; letter-spacing:-0.5px;">EuroCards</b>
-            <div id="avatar" style="width:36px; height:36px; border-radius:50%; background:var(--glass); border:1px solid var(--glass-border);"></div>
+            <div id="avatar-main" style="width:36px; height:36px; border-radius:50%; background:var(--glass); border:1px solid var(--glass-border); background-size:cover;"></div>
         </div>
 
         <div class="tile-grid">
             <div class="tile" style="background: var(--g-std)" onclick="showSheet('Essential')">
                 <div class="tile-top-left"><div class="t1">Essential</div><div class="t2">Base Access</div></div>
-                <div class="val-block"><div class="val">9500</div><div class="unit">₽</div></div>
+                <div class="tile-bottom-left"><div class="val">9500</div><div class="unit">₽</div></div>
                 <i data-lucide="credit-card" class="tile-icon"></i>
                 <div class="plus-btn">+</div>
             </div>
@@ -113,16 +114,12 @@
                 <i data-lucide="crown" class="tile-icon"></i>
                 <div class="plus-btn">+</div>
             </div>
-            
-            <div style="grid-column: span 2; margin: 15px 0 5px; color: var(--text-secondary); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;">Дополнительные услуги</div>
-            
             <div class="tile" style="grid-column: span 2; aspect-ratio: 2.3/1; background: var(--g-pay)" onclick="showSheet('PayPal')">
                 <div class="tile-top-left"><div class="t1">PayPal</div><div class="t2">Personal Verified</div></div>
                 <div class="val-block"><div class="val">4900</div><div class="unit">₽</div></div>
                 <i data-lucide="wallet" class="tile-icon"></i>
                 <div class="plus-btn">+</div>
             </div>
-
             <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Wise')">
                 <div class="tile-top-left"><div class="t1">Wise</div><div class="t2">Personal Account</div></div>
                 <div class="val-block"><div class="val">20000</div><div class="unit">₽</div></div>
@@ -140,7 +137,7 @@
 
     <div id="cards" class="page">
         <h2 style="font-weight:800;">Мои заказы</h2>
-        <div style="text-align:center; padding-top:80px; opacity:0.3;">
+        <div id="order-list-empty" style="text-align:center; padding-top:80px; opacity:0.3;">
             <i data-lucide="package" style="width:60px; height:60px; margin-bottom:20px;"></i>
             <p>Заказов пока нет</p>
         </div>
@@ -148,15 +145,38 @@
 
     <div id="bonuses" class="page">
         <h2 style="font-weight:800;">Бонусы</h2>
-        <div class="stat-card">
+        <div style="background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 25px; margin-bottom: 15px;">
             <small style="opacity:0.6; font-weight:700;">БАЛАНС</small>
             <div style="font-size:38px; font-weight:900; margin:10px 0;">0 ₽</div>
             <button class="btn-main" style="height:50px; font-size:14px;" onclick="tg.showAlert('Вывод от 5000 ₽')">Вывести</button>
         </div>
-        <div class="ref-box">
+        <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border);">
             <code id="ref-link" style="color:var(--accent-blue); font-size:12px;">...</code>
             <i data-lucide="copy" style="width:18px; cursor:pointer;" onclick="copyL()"></i>
         </div>
+    </div>
+
+    <div id="profile" class="page">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
+            <div id="avatar-cab" style="width:60px; height:60px; border-radius:50%; background:var(--glass); border:1px solid var(--glass-border); background-size:cover;"></div>
+            <div><b id="cab-name" style="font-size:20px;">Клиент</b><br><small style="color:var(--text-secondary)">Личный кабинет</small></div>
+        </div>
+
+        <h3 style="margin-bottom:15px;">Помощь и FAQ</h3>
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">Какие нужны документы? <i data-lucide="chevron-down" style="width:16px;"></i></div>
+            <div class="faq-a">Требуется только заграничный паспорт. Никаких дополнительных справок и доверенностей.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">Как пополнять счет? <i data-lucide="chevron-down" style="width:16px;"></i></div>
+            <div class="faq-a">Через P2P: отправляете рубли, получаете USDT на бирже и мгновенно меняете на Евро/Доллары в своем банке.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">Срок действия карты? <i data-lucide="chevron-down" style="width:16px;"></i></div>
+            <div class="faq-a">Карта действует 3 года. Перевыпуск в приложении банка — бесплатный.</div>
+        </div>
+
+        <button class="btn-main" style="margin-top:20px; background:var(--glass); color:#fff; border:1px solid var(--glass-border);" onclick="tg.openTelegramLink('https://t.me/your_support')">Связаться с поддержкой</button>
     </div>
 
     <div id="order_form" class="page">
@@ -173,6 +193,17 @@
         <button class="btn-main" onclick="confirmOrder()">ОПЛАТИТЬ ЗАКАЗ</button>
     </div>
 
+    <div id="success_screen" class="page">
+        <div style="text-align:center; padding-top:60px;">
+            <div style="width:100px; height:100px; background:rgba(34, 197, 94, 0.1); border-radius:50%; display:flex; justify-content:center; align-items:center; margin:0 auto 30px;">
+                <i data-lucide="check-circle" style="width:60px; height:60px; color:#22c55e;"></i>
+            </div>
+            <h2 style="font-size:28px; font-weight:900; margin-bottom:15px;">Успешно!</h2>
+            <p style="color:var(--text-secondary); line-height:1.6; padding:0 20px;">Заявка отправлена. Ожидайте ответа специалиста в течение 24 часов.</p>
+            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ВЕРНУТЬСЯ НА ГЛАВНУЮ</button>
+        </div>
+    </div>
+
     <div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
     <div class="sheet" id="sheet">
         <div style="width:40px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin:-16px auto 25px;"></div>
@@ -186,24 +217,38 @@
         <div class="tab-item active" onclick="switchP('home', this)"><i data-lucide="home"></i><span>Главная</span></div>
         <div class="tab-item" onclick="switchP('cards', this)"><i data-lucide="layers"></i><span>Заказы</span></div>
         <div class="tab-item" onclick="switchP('bonuses', this)"><i data-lucide="sparkles"></i><span>Бонусы</span></div>
-        <div class="tab-item" onclick="tg.openTelegramLink('https://t.me/your_support')"><i data-lucide="message-circle"></i><span>Связь</span></div>
+        <div class="tab-item" onclick="switchP('profile', this)"><i data-lucide="user"></i><span>Кабинет</span></div>
     </nav>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        lucide.createIcons();
-
+        let tg = window.Telegram.WebApp; tg.expand(); lucide.createIcons();
         let cur = { name: '', price: 0, final: 0 };
         const DB = {
-            'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Skrill/Neteller на выбор<br>• Apple & Google Pay<br>• Именной IBAN счет' },
-            'Duo Safe': { p: 14000, b: '• 2 Банка (Skrill + Neteller)<br>• Скидка 50% на второй банк<br>• Двойные лимиты<br>• Гарантия оплаты' },
-            'Business Prime': { p: 19900, b: '• Duo Safe + Поддержка 24/7<br>• Помощь при блокировках<br>• Приоритетный выпуск' },
-            'Infinite Elite': { p: 39900, b: '• 3 Банка (Wise/Revolut)<br>• PayPal Pro в подарок<br>• Доступ к SWIFT/SEPA' },
-            'PayPal': { p: 4900, b: '• Личный верифицированный аккаунт<br>• На ваши данные<br>• Гарантия на вход' },
-            'Wise': { p: 20000, b: '• Личный счет Wise (Бельгия)<br>• Полноценный IBAN<br>• Работает со всеми биржами' },
-            'Revolut': { p: 20000, b: '• Личный счет Revolut<br>• Идеально для жизни в Европе<br>• Поддержка всех валют' }
+            'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Skrill/Neteller на выбор<br>• Apple Pay включен' },
+            'Duo Safe': { p: 14000, b: '• 2 Банка сразу<br>• Скидка 50% на второй банк<br>• Двойные лимиты' },
+            'Business Prime': { p: 19900, b: '• Duo Safe + Поддержка 24/7<br>• Помощь при блокировках' },
+            'Infinite Elite': { p: 39900, b: '• 3 Банка (Wise/Revolut)<br>• PayPal Pro в подарок' },
+            'PayPal': { p: 4900, b: '• Личный верифицированный аккаунт' },
+            'Wise': { p: 20000, b: '• Личный счет Wise (IBAN)' },
+            'Revolut': { p: 20000, b: '• Личный счет Revolut' }
         };
+
+        function switchP(id, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(el) {
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                el.classList.add('active');
+            }
+            tg.HapticFeedback.impactOccurred('medium'); window.scrollTo(0,0);
+        }
+
+        function toggleFaq(el) {
+            let a = el.querySelector('.faq-a');
+            let isOpen = a.style.display === 'block';
+            a.style.display = isOpen ? 'none' : 'block';
+            tg.HapticFeedback.impactOccurred('light');
+        }
 
         function showSheet(n) {
             const t = DB[n]; cur = { name: n, price: t.p, final: t.p };
@@ -222,66 +267,45 @@
         }
 
         function goToForm() {
-            closeSheet();
-            document.getElementById('sel_name').innerText = cur.name;
-            recalc();
-            switchP('order_form');
+            closeSheet(); document.getElementById('sel_name').innerText = cur.name; recalc(); switchP('order_form');
         }
 
         function recalc() {
-            const promo = document.getElementById('order_promo');
-            const code = promo.value.toUpperCase().trim();
-            let final = cur.price;
-            
+            const pr = document.getElementById('order_promo');
+            const code = pr.value.toUpperCase().trim();
+            let fin = cur.price;
             if(code === 'SALE500') {
-                final -= 500;
+                fin -= 500; pr.classList.add('valid'); pr.classList.remove('invalid');
                 document.getElementById('old_price').innerText = cur.price + ' ₽';
                 document.getElementById('old_price').style.display = 'block';
-                promo.classList.add('valid');
-                promo.classList.remove('invalid');
                 if(code.length === 7) tg.HapticFeedback.notificationOccurred('success');
-            } else if(code.length > 0) {
-                promo.classList.add('invalid');
-                promo.classList.remove('valid');
-                document.getElementById('old_price').style.display = 'none';
-            } else {
-                promo.classList.remove('valid', 'invalid');
-                document.getElementById('old_price').style.display = 'none';
-            }
-            cur.final = final;
-            document.getElementById('final_price').innerText = final.toLocaleString() + ' ₽';
-        }
-
-        function switchP(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            if(el) {
-                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-                el.classList.add('active');
-                tg.HapticFeedback.impactOccurred('medium');
-            }
-            window.scrollTo(0,0);
+            } else if(code.length > 0) { pr.classList.add('invalid'); pr.classList.remove('valid'); }
+            cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
         }
 
         function confirmOrder() {
             const f = document.getElementById('order_fio').value;
             const d = document.getElementById('order_date').value;
             if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
+            tg.HapticFeedback.notificationOccurred('success');
+            switchP('success_screen');
             tg.sendData(JSON.stringify({action: "ORDER", tariff: cur.name, price: cur.final, fio: f, birth: d}));
-            tg.close();
         }
 
         function copyL() {
             navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert("Скопировано!");
+            tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!");
         }
 
         window.onload = () => {
             const u = tg.initDataUnsafe.user;
             if(u) {
                 document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${u.id}`;
-                if(u.photo_url) document.getElementById('avatar').style.backgroundImage = `url('${u.photo_url}')`;
+                document.getElementById('cab-name').innerText = u.first_name;
+                if(u.photo_url) {
+                    document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
+                    document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
+                }
             }
         }
     </script>
