@@ -2,219 +2,225 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>EuroCards Premium</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>EuroCards Zen Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg-black: #000000;
-            --text-white: #ffffff;
-            --text-grey: #a1a1a6;
-            --glass-white: rgba(255, 255, 255, 0.08);
-            /* Цвета тарифов по твоему промпту */
-            --color-std: #4a5568;
-            --color-exp: #007aff;
-            --color-trv: #34c759;
-            --color-vip: #5856d6;
-            --color-pay: #af52de;
+            --zen-dark: #0f172a;
+            --zen-blue: #1e293b;
+            --glass: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --accent-blue: #38bdf8;
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
         }
 
         body { 
-            font-family: -apple-system, system-ui, sans-serif;
-            background: var(--bg-black); margin: 0; padding: 0; color: var(--text-white);
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--zen-dark); margin: 0; padding: 0; color: var(--text-main);
+            min-height: 100vh; overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        .page { display: none; padding: 20px; padding-bottom: 140px; animation: fadeIn 0.4s ease; }
+        /* ZEN BACKGROUND ELEMENTS */
+        .zen-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 0%, var(--zen-blue) 0%, var(--zen-dark) 100%);
+            z-index: -2;
+        }
+        .zen-stone {
+            position: fixed; width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, transparent 70%);
+            filter: blur(60px); z-index: -1; border-radius: 50%;
+        }
+
+        /* LAYOUT */
+        .page { display: none; padding: 20px 20px 140px; animation: slideUp 0.4s ease-out; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ШАПКА */
+        /* HEADER */
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .user-block { display: flex; align-items: center; gap: 12px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #222; border: 1px solid #333; }
+        .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--glass); border: 1px solid var(--glass-border); background-size: cover; }
 
-        /* ФИКС КАРТЫ */
-        .card-container { width: 100%; display: flex; justify-content: center; margin-bottom: 30px; }
-        .premium-card {
-            width: 100%; max-width: 350px; aspect-ratio: 1.58 / 1;
-            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
-            border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
-            position: relative; padding: 25px; box-sizing: border-box;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        /* HERO CARD (FIXED) */
+        .card-container { width: 100%; margin-bottom: 30px; }
+        .hero-card {
+            width: 100%; aspect-ratio: 1.6 / 1; border-radius: 24px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); padding: 25px; box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
 
-        /* ТВОИ ПЛАШКИ-ТАЙЛЫ (ПРОМПТ-STYLE) */
-        .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        
+        /* TILES (PROMPT LOGIC) */
+        .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .tile {
-            aspect-ratio: 1/1; border-radius: 28px; position: relative; padding: 20px;
-            box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column;
-            justify-content: space-between; border: 1px solid rgba(255,255,255,0.1);
-            transition: transform 0.2s ease;
+            aspect-ratio: 1 / 1; border-radius: 28px; padding: 20px; position: relative;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; flex-direction: column; justify-content: space-between;
+            transition: all 0.2s ease; overflow: hidden;
         }
-        .tile:active { transform: scale(0.95); }
+        .tile:active { transform: scale(0.96); background: rgba(255,255,255,0.1); }
         
-        /* Эффект свечения и градиента внутри плашки */
-        .tile::before {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
-        }
+        .tile-top-left .t1 { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
+        .tile-top-left .t2 { font-size: 13px; font-weight: 500; margin-top: 2px; color: var(--text-main); }
+        
+        .tile-bottom-left { display: flex; align-items: baseline; gap: 3px; }
+        .tile-bottom-left .val { font-size: 26px; font-weight: 800; color: var(--text-main); }
+        .tile-bottom-left .unit { font-size: 14px; font-weight: 500; color: var(--text-secondary); }
 
-        .t1 { font-size: 10px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.5px; }
-        .t2 { font-size: 13px; font-weight: 500; margin-top: 2px; }
-        .val-block { display: flex; align-items: baseline; gap: 4px; }
-        .val { font-size: 24px; font-weight: 800; }
-        .unit { font-size: 14px; opacity: 0.7; }
-        
-        .tile-icon { position: absolute; top: 18px; right: 18px; opacity: 0.9; }
+        .tile-icon { position: absolute; top: 18px; right: 18px; color: var(--text-main); opacity: 0.9; }
         
         .plus-btn {
-            position: absolute; bottom: 18px; right: 18px;
-            width: 32px; height: 32px; border-radius: 50%;
-            background: rgba(255,255,255,0.2); backdrop-filter: blur(5px);
-            display: flex; justify-content: center; align-items: center; font-size: 18px;
+            position: absolute; bottom: 18px; right: 18px; width: 30px; height: 30px;
+            background: rgba(255,255,255,0.15); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 20px; font-weight: 300; border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* СТИЛИ ТАРИФОВ */
-        .bg-std { background: linear-gradient(145deg, #2c2c2e, #1c1c1e); }
-        .bg-exp { background: linear-gradient(145deg, #007aff, #003e80); }
-        .bg-trv { background: linear-gradient(145deg, #34c759, #1a632d); }
-        .bg-vip { background: linear-gradient(145deg, #5856d6, #2d2b6b); }
-        .bg-pay { background: linear-gradient(145deg, #af52de, #5e2a7a); }
+        /* SPECIAL WIDE TILE (PAYPAL) */
+        .tile-wide { grid-column: span 2; aspect-ratio: 2.1 / 1; }
 
-        /* НАВИГАЦИЯ (APPLE STYLE) */
+        /* TAB BAR (FIXED) */
         .tab-bar {
-            position: fixed; bottom: 0; width: 100%; height: 90px;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
-            display: flex; justify-content: space-around; padding-top: 10px;
-            border-top: 0.5px solid rgba(255,255,255,0.1); z-index: 100;
+            position: fixed; bottom: 0; width: 100%; height: 85px;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border-top: 0.5px solid var(--glass-border);
+            display: flex; justify-content: space-around; align-items: flex-start;
+            padding-top: 12px; z-index: 1000; box-sizing: border-box;
         }
-        .tab-item { color: #8e8e93; font-size: 10px; text-align: center; flex: 1; }
-        .tab-item.active { color: #fff; }
-        .tab-item i { display: block; margin: 0 auto 5px; stroke-width: 1.5; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); flex: 1; text-decoration: none; }
+        .tab-item.active { color: var(--accent-blue); }
+        .tab-item i { width: 24px; height: 24px; margin-bottom: 5px; stroke-width: 2; }
+        .tab-item span { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
 
-        /* БОНУСЫ (РЕФЕРАЛКА) */
-        .stat-card { background: #1c1c1e; border-radius: 20px; padding: 25px; margin-bottom: 15px; }
-        .stat-val { font-size: 36px; font-weight: 800; margin: 10px 0; }
-        .ref-link-box { 
-            background: #2c2c2e; border-radius: 15px; padding: 15px; 
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        /* PAGES CONTENT */
+        .stat-card { background: var(--glass); border-radius: 22px; padding: 25px; border: 1px solid var(--glass-border); margin-bottom: 20px; }
+        .ref-box { background: rgba(0,0,0,0.2); border-radius: 14px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
     </style>
 </head>
 <body>
+    <div class="zen-bg"></div>
+    <div class="zen-stone" style="top: -50px; right: -50px;"></div>
+    <div class="zen-stone" style="bottom: 100px; left: -100px; opacity: 0.5;"></div>
 
     <div id="home" class="page active">
         <div class="header">
-            <div class="user-block">
+            <div style="display:flex; align-items:center; gap:12px;">
                 <div id="avatar" class="avatar"></div>
-                <div><small style="color:var(--text-grey)">EuroCards</small><br><b id="user-name">Клиент</b></div>
+                <div><small style="color:var(--text-secondary)">Premium Access</small><br><b><span id="u-name">Клиент</span></b></div>
             </div>
-            <i data-lucide="bell" style="color:var(--text-grey)"></i>
+            <i data-lucide="bell" style="color:var(--text-secondary); width:20px;"></i>
         </div>
 
         <div class="card-container">
-            <div class="premium-card">
-                <div style="font-size:12px; font-weight:700; letter-spacing:1.5px; opacity:0.7">EUROCARDS PREMIUM</div>
-                <div style="position:absolute; bottom:55px; font-family:monospace; font-size:22px; letter-spacing:3px;">•••• •••• •••• 2026</div>
-                <div style="position:absolute; bottom:25px; display:flex; justify-content:space-between; width:calc(100% - 50px);">
-                    <span style="font-size:10px; opacity:0.5;">HOLDER NAME</span>
-                    <i data-lucide="nfc" style="width:16px; opacity:0.5;"></i>
+            <div class="hero-card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:10px; font-weight:800; letter-spacing:2px; opacity:0.6;">EUROCARDS VIP</span>
+                    <i data-lucide="waves" style="width:20px; opacity:0.6;"></i>
+                </div>
+                <div>
+                    <div style="font-family: 'Courier New', monospace; font-size:22px; letter-spacing:4px; margin-bottom:10px;">•••• •••• •••• 2026</div>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                        <span style="font-size:11px; opacity:0.5; text-transform:uppercase;">Platinum Member</span>
+                        <div style="width:40px; height:25px; background:rgba(255,255,255,0.1); border-radius:4px;"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div style="margin-bottom:15px; font-weight:700; font-size:18px;">Тарифы</div>
         <div class="tile-grid">
-            <div class="tile bg-std" onclick="openTariff('Standard', 9900)">
-                <div><div class="t1">Standard</div><div class="t2">Для Apple Pay</div></div>
-                <div class="val-block"><div class="val">9900</div><div class="unit">₽</div></div>
-                <div class="tile-icon"><i data-lucide="credit-card"></i></div>
+            <div class="tile" onclick="openT('Standard')">
+                <div class="tile-top-left"><div class="t1">Standard</div><div class="t2">Для Apple Pay</div></div>
+                <div class="tile-bottom-left"><div class="val">9900</div><div class="unit">₽</div></div>
+                <i data-lucide="credit-card" class="tile-icon"></i>
                 <div class="plus-btn">+</div>
             </div>
-            <div class="tile bg-exp" onclick="openTariff('Expert', 12900)">
-                <div><div class="t1">Expert</div><div class="t2">С гайдом P2P</div></div>
-                <div class="val-block"><div class="val">12900</div><div class="unit">₽</div></div>
-                <div class="tile-icon"><i data-lucide="zap"></i></div>
+            <div class="tile" style="border-color: rgba(56, 189, 248, 0.3);" onclick="openT('Expert')">
+                <div class="tile-top-left"><div class="t1">Expert</div><div class="t2">С гайдом P2P</div></div>
+                <div class="tile-bottom-left"><div class="val">12900</div><div class="unit">₽</div></div>
+                <i data-lucide="zap" class="tile-icon"></i>
                 <div class="plus-btn">+</div>
             </div>
-            <div class="tile bg-trv" onclick="openTariff('Travel', 11900)">
-                <div><div class="t1">Travel</div><div class="t2">Лучший курс</div></div>
-                <div class="val-block"><div class="val">11900</div><div class="unit">₽</div></div>
-                <div class="tile-icon"><i data-lucide="plane"></i></div>
+            <div class="tile" onclick="openT('Travel')">
+                <div class="tile-top-left"><div class="t1">Travel</div><div class="t2">Лучший курс</div></div>
+                <div class="tile-bottom-left"><div class="val">11900</div><div class="unit">₽</div></div>
+                <i data-lucide="plane" class="tile-icon"></i>
                 <div class="plus-btn">+</div>
             </div>
-            <div class="tile bg-vip" onclick="openTariff('VIP Bundle', 19900)">
-                <div><div class="t1">VIP</div><div class="t2">Полный пакет</div></div>
-                <div class="val-block"><div class="val">19900</div><div class="unit">₽</div></div>
-                <div class="tile-icon"><i data-lucide="crown"></i></div>
+            <div class="tile" style="border-color: rgba(168, 85, 247, 0.3);" onclick="openT('VIP')">
+                <div class="tile-top-left"><div class="t1">VIP</div><div class="t2">Полный пакет</div></div>
+                <div class="tile-bottom-left"><div class="val">19900</div><div class="unit">₽</div></div>
+                <i data-lucide="crown" class="tile-icon"></i>
                 <div class="plus-btn">+</div>
             </div>
-        </div>
-
-        <div style="margin:25px 0 15px; font-weight:700; font-size:18px;">Дополнительно</div>
-        <div class="tile-grid">
-            <div class="tile bg-pay" style="aspect-ratio: 2/1; grid-column: span 2; flex-direction: row; align-items: center;">
-                <div><div class="t1">PayPal</div><div class="t2">Аккаунт под ключ</div></div>
-                <div class="val-block" style="margin-left:auto; margin-right:40px;"><div class="val">4900</div><div class="unit">₽</div></div>
+            <div class="tile tile-wide" onclick="openT('PayPal')">
+                <div class="tile-top-left"><div class="t1">PayPal</div><div class="t2">Аккаунт под ключ</div></div>
+                <div class="tile-bottom-left" style="margin-top:auto;"><div class="val">4900</div><div class="unit">₽</div></div>
+                <i data-lucide="wallet" class="tile-icon"></i>
                 <div class="plus-btn">+</div>
             </div>
         </div>
     </div>
 
     <div id="cards" class="page">
-        <h2>Мои карты</h2>
-        <div id="no-cards" style="text-align:center; margin-top:100px; color:var(--text-grey);">
-            <i data-lucide="shopping-bag" style="width:50px; height:50px; margin-bottom:20px;"></i>
-            <p>У вас пока нет активных заказов.<br>Выберите тариф на главной.</p>
+        <h2 style="font-weight:800; margin-bottom:20px;">Мои заказы</h2>
+        <div style="text-align:center; padding-top:60px; opacity:0.5;">
+            <i data-lucide="package" style="width:48px; height:48px; margin-bottom:15px;"></i>
+            <p>У вас пока нет активных заявок.<br>Выберите тариф на главной.</p>
         </div>
     </div>
 
     <div id="bonuses" class="page">
-        <h2>Бонусы</h2>
+        <h2 style="font-weight:800; margin-bottom:20px;">Бонусы</h2>
         <div class="stat-card">
-            <div class="t1">Ваш баланс</div>
-            <div class="stat-val">0 ₽</div>
-            <button style="background:#fff; color:#000; border:none; padding:12px; border-radius:12px; width:100%; font-weight:700;" onclick="tg.showAlert('Вывод от 5000 ₽')">Вывести</button>
+            <div style="color:var(--text-secondary); font-size:12px; font-weight:600; letter-spacing:1px;">ВАШ БАЛАНС</div>
+            <div style="font-size:38px; font-weight:800; margin:10px 0;">0 ₽</div>
+            <button style="width:100%; background:var(--text-main); color:var(--zen-dark); border:none; padding:15px; border-radius:14px; font-weight:700;" onclick="tg.showAlert('Вывод от 5 000 ₽')">Вывести средства</button>
         </div>
-        
-        <div style="margin:30px 0 15px; font-weight:700;">Реферальная программа</div>
-        <p style="color:var(--text-grey); font-size:13px; line-height:1.5;">Приглашайте друзей и получайте 2000 ₽ за каждую оформленную карту. Друг получит скидку 500 ₽.</p>
-        
-        <div class="ref-link-box">
-            <code id="ref-url" style="font-size:12px; color:var(--color-exp);">t.me/EuroCardsBot?start=123</code>
-            <i data-lucide="copy" style="width:20px;" onclick="copyRef()"></i>
+
+        <div style="margin-top:35px;">
+            <b style="font-size:18px;">Партнерская ссылка</b>
+            <p style="color:var(--text-secondary); font-size:13px; margin:8px 0 20px;">Получайте 2 000 ₽ за каждого друга. Друг получит 500 ₽ скидки.</p>
+            <div class="ref-box">
+                <code id="ref-link" style="color:var(--accent-blue); font-size:13px;">t.me/EuroCardsBot?start=...</code>
+                <i data-lucide="copy" style="width:18px; cursor:pointer;" onclick="copyL()"></i>
+            </div>
         </div>
     </div>
 
-    <div class="tab-bar">
-        <div class="tab-item active" onclick="switchPage('home', this)"><i data-lucide="home"></i>Главная</div>
-        <div class="tab-item" onclick="switchPage('cards', this)"><i data-lucide="credit-card"></i>Карты</div>
-        <div class="tab-item" onclick="switchPage('bonuses', this)"><i data-lucide="gem"></i>Бонусы</div>
-        <div class="tab-item" onclick="tg.openTelegramLink('https://t.me/your_support')"><i data-lucide="message-circle"></i>Поддержка</div>
-    </div>
+    <nav class="tab-bar">
+        <div class="tab-item active" onclick="switchP('home', this)"><i data-lucide="home"></i><span>Главная</span></div>
+        <div class="tab-item" onclick="switchP('cards', this)"><i data-lucide="layers"></i><span>Заказы</span></div>
+        <div class="tab-item" onclick="switchP('bonuses', this)"><i data-lucide="sparkles"></i><span>Бонусы</span></div>
+        <div class="tab-item" onclick="tg.openTelegramLink('https://t.me/your_support')"><i data-lucide="message-circle"></i><span>Помощь</span></div>
+    </nav>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-        tg.backgroundColor = '#000000';
-        tg.headerColor = '#000000';
+        tg.backgroundColor = '#0f172a';
+        tg.headerColor = '#0f172a';
         lucide.createIcons();
 
-        function switchPage(pId, el) {
+        function switchP(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pId).classList.add('active');
+            document.getElementById(id).classList.add('active');
             if(el) {
                 document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
                 el.classList.add('active');
             }
             tg.HapticFeedback.impactOccurred('medium');
+            window.scrollTo(0,0);
         }
 
-        function copyRef() {
-            let link = document.getElementById('ref-url').innerText;
+        function copyL() {
+            let link = document.getElementById('ref-link').innerText;
             navigator.clipboard.writeText(link);
             tg.HapticFeedback.notificationOccurred('success');
             tg.showAlert("Ссылка скопирована!");
@@ -223,8 +229,9 @@
         window.onload = () => {
             const user = tg.initDataUnsafe.user;
             if(user) {
-                document.getElementById('user-name').innerText = user.first_name;
-                document.getElementById('ref-url').innerText = `t.me/EuroCardsBot?start=${user.id}`;
+                document.getElementById('u-name').innerText = user.first_name;
+                document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${user.id}`;
+                if(user.photo_url) document.getElementById('avatar').style.backgroundImage = `url('${user.photo_url}')`;
             }
         }
     </script>
