@@ -246,7 +246,7 @@
     </nav>
 
 <script>
-    let tg = window.Telegram.WebApp;
+let tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();
     lucide.createIcons();
@@ -278,11 +278,7 @@
             document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
         }
 
-        // --- ЛОГИКА ОТОБРАЖЕНИЯ ЗАКАЗОВ (НОВОЕ) ---
         const ordersData = params.get('orders');
-        const isAdmin = params.get('adm') === '1';
-        if (isAdmin) document.getElementById('orders-title').innerText = "Админ-панель";
-
         if (ordersData) {
             try {
                 const list = JSON.parse(atob(ordersData));
@@ -297,7 +293,7 @@
                                 <div class="order-info">
                                     <small>Заказ №${o.num} • ${o.date}</small>
                                     <b>${o.name}</b>
-                                    <div style="font-size:11px; opacity:0.5;">${o.fio || ''} (${o.birth || ''})</div>
+                                    <div style="font-size:11px; opacity:0.5;">${o.fio || ''}</div>
                                     <span style="color:var(--accent-blue); font-weight:700;">${o.price} ₽</span>
                                 </div>
                                 <div class="status-badge ${badge}">${o.status}</div>
@@ -343,96 +339,50 @@
         cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
     }
 
-    // --- НОВАЯ ОТПРАВКА ЧЕРЕЗ GOOGLE SHEETS ---
-function confirmOrder() {
-    // Получаем сами элементы, чтобы менять им цвет рамки
-    const fEl = document.getElementById('order_fio');
-    const dEl = document.getElementById('order_date');
-    const pEl = document.getElementById('order_promo');
+    function confirmOrder() {
+        const fEl = document.getElementById('order_fio');
+        const dEl = document.getElementById('order_date');
+        const pEl = document.getElementById('order_promo');
 
-    const f = fEl.value.trim();
-    const d = dEl.value;
-    const p = pEl.value.trim() || "-";
-    
-    // 1. Базовая проверка на пустоту
-    if(!f || !d) { 
-        tg.showAlert("Заполните ФИО и Дату рождения!"); 
-        return; 
-    }
+        const f = fEl.value.trim();
+        const d = dEl.value;
+        const p = pEl.value.trim() || "-";
+        
+        if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
 
-    // 2. ПУНКТ 14: Только латиница и ровно 2 слова (Name Surname)
-    const nameRegex = /^[a-zA-Z]+ [a-zA-Z]+$/;
-    if (!nameRegex.test(f)) {
-        fEl.style.borderColor = "#ef4444"; // Красим рамку в красный
-        tg.showAlert("Введите Name и Surname латиницей (2 слова через пробел)");
-        return;
-    } else {
-        fEl.style.borderColor = "var(--glass-border)"; // Возвращаем норму
-    }
-
-    // 3. ПУНКТ 7: Проверка возраста (18 лет)
-    const birthDate = new Date(d);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; }
-
-    if (age < 18) {
-        dEl.style.borderColor = "#ef4444"; // Поле становится красным
-        tg.showAlert("⚠️ Продукт доступен только с 18 лет. Мы попробуем оформить заявку, но возможен отказ.");
-        // Дальше НЕ ставим return, чтобы заказ всё равно ушел, как ты и просил
-    } else {
-        dEl.style.borderColor = "var(--glass-border)";
-    }
-
-    // 4. Виброотклик и сбор данных
-    tg.HapticFeedback.notificationOccurred('success');
-    
-    const orderPayload = {
-        tariff: cur.name,
-        price: cur.final,
-        fio: f,
-        birth: d,
-        promo: p,
-        username: tg.initDataUnsafe.user ? tg.initDataUnsafe.user.username : "unknown"
-    };
-
-    // 5. Отправка в Google Таблицы (убедись, что URL верный)
-    const googleScriptUrl = "ТВОЙ_URL_СКРИПТА";
-
-    fetch(googleScriptUrl, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify(orderPayload)
-    })
-    .then(() => {
-        switchP('success_screen');
-    })
-    .catch(err => {
-        tg.showAlert("Ошибка сети. Попробуйте еще раз.");
-    });
-}
-
-        // Твой URL из Google Apps Script (замени после деплоя)
-        const googleScriptUrl = "https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec";
-
-        if(googleScriptUrl === "ВСТАВЬ_СЮДА_URL_СКРИПТА") {
-             tg.showAlert("Нужно настроить Google Таблицу!");
-             return;
+        const nameRegex = /^[a-zA-Z]+ [a-zA-Z]+$/;
+        if (!nameRegex.test(f)) {
+            fEl.style.borderColor = "#ef4444";
+            tg.showAlert("Введите Name Surname латиницей");
+            return;
         }
+
+        const age = new Date().getFullYear() - new Date(d).getFullYear();
+        if (age < 18) {
+            dEl.style.borderColor = "#ef4444";
+            tg.showAlert("⚠️ Только с 18 лет!");
+        }
+
+        tg.HapticFeedback.notificationOccurred('success');
+        
+        const orderPayload = {
+            tariff: cur.name,
+            price: cur.final,
+            fio: f,
+            birth: d,
+            promo: p,
+            username: tg.initDataUnsafe.user ? tg.initDataUnsafe.user.username : "unknown"
+        };
+
+        const googleScriptUrl = "https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec";
 
         fetch(googleScriptUrl, {
             method: 'POST',
             mode: 'no-cors',
             body: JSON.stringify(orderPayload)
         })
-        .then(() => {
-            switchP('success_screen');
-        })
-        .catch(err => {
-            tg.showAlert("Ошибка. Но мы сохранили заявку локально.");
-            switchP('success_screen');
-        });
+        .then(() => { switchP('success_screen'); })
+        .catch(() => { switchP('success_screen'); });
     }
 
     function copyL() {
