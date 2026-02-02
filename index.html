@@ -8,313 +8,154 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #0a0b10;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-blue: #38bdf8;
-            --accent-purple: #818cf8;
-            --text: #ffffff;
-        }
-
+        :root { --bg: #0a0b10; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1); --accent: #38bdf8; --text: #ffffff; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.5; }
-
-        /* Фоновое свечение */
+        body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+        
+        /* Тот самый блюр-фон */
         .blob { position: fixed; width: 300px; height: 300px; background: radial-gradient(circle, rgba(56,189,248,0.15) 0%, transparent 70%); z-index: -1; filter: blur(50px); }
-        .blob-1 { top: -100px; right: -100px; }
-        .blob-2 { bottom: -100px; left: -100px; }
-
         .container { padding: 20px; padding-bottom: 100px; max-width: 500px; margin: 0 auto; }
         
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Header */
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .user-block { display: flex; align-items: center; gap: 12px; }
-        .avatar { width: 44px; height: 44px; border-radius: 14px; background-size: cover; background-position: center; border: 2px solid var(--glass-border); font-weight: 800; font-size: 18px; color: var(--accent-blue); }
+        /* Карточки заказов (НОВОЕ) */
+        .order-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .status-badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .status-process { background: rgba(56,189,248,0.2); color: var(--accent); }
+        .status-ready { background: rgba(34,197,94,0.2); color: #22c55e; }
 
-        /* Карточки тарифов */
-        .card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; margin-bottom: 16px; position: relative; overflow: hidden; transition: transform 0.2s; }
-        .card:active { transform: scale(0.98); }
-        .card h3 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
-        .card .price { font-size: 18px; color: var(--accent-blue); font-weight: 700; }
-        .card .badge { position: absolute; top: 15px; right: 15px; background: var(--accent-blue); color: #000; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-
-        /* Стили заказов */
-        .order-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .status-badge { padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .status-process { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
-        .status-ready { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        /* Тарифы */
+        .tariff-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; margin-bottom: 15px; backdrop-filter: blur(10px); }
+        .tariff-card h3 { font-size: 20px; font-weight: 800; }
+        .price { color: var(--accent); font-size: 18px; font-weight: 700; margin-top: 5px; }
 
         /* Табы */
-        .tabs { position: fixed; bottom: 20px; left: 20px; right: 20px; background: rgba(15, 15, 20, 0.8); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; display: flex; justify-content: space-around; padding: 12px; z-index: 100; }
+        .tabs { position: fixed; bottom: 20px; left: 20px; right: 20px; background: rgba(15,15,20,0.8); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; display: flex; justify-content: space-around; padding: 12px; z-index: 100; }
         .tab-item { color: rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; cursor: pointer; }
-        .tab-item.active { color: var(--accent-blue); }
+        .tab-item.active { color: var(--accent); }
 
-        /* Формы */
-        input { width: 100%; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; color: #fff; font-family: inherit; font-size: 16px; margin-top: 8px; outline: none; }
-        input:focus { border-color: var(--accent-blue); }
-        .btn { width: 100%; background: #fff; color: #000; border: none; border-radius: 18px; padding: 18px; font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 20px; }
-        
-        /* Bottom Sheet */
-        .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; opacity: 0; transition: 0.3s; }
-        .sheet { position: fixed; bottom: -100%; left: 0; right: 0; background: #16171d; border-radius: 30px 30px 0 0; padding: 30px; z-index: 1001; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .sheet.active { bottom: 0; }
-        .sheet-line { width: 40px; height: 4px; background: var(--glass-border); border-radius: 2px; margin: -10px auto 20px; }
+        .btn { width: 100%; background: #fff; color: #000; border: none; border-radius: 18px; padding: 18px; font-size: 16px; font-weight: 800; margin-top: 20px; }
+        input { width: 100%; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; color: #fff; margin-top: 8px; outline: none; }
+        .avatar { width: 44px; height: 44px; border-radius: 14px; background: var(--glass); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; font-weight: 800; }
     </style>
 </head>
 <body>
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-
+    <div class="blob" style="top:-100px; right:-100px;"></div>
     <div class="container">
+        
         <div id="main" class="page active">
-            <header>
-                <div class="user-block">
+            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                <div style="display:flex; align-items:center; gap:12px;">
                     <div id="avatar-main" class="avatar"></div>
-                    <div>
-                        <div style="font-size: 12px; opacity: 0.5;">Привет,</div>
-                        <div id="u-name" style="font-weight: 800; font-size: 18px;">Клиент</div>
-                    </div>
+                    <div><div style="font-size:12px; opacity:0.5;">Привет,</div><div id="u-name" style="font-weight:800;">Клиент</div></div>
                 </div>
-                <i data-lucide="bell" style="opacity: 0.5;"></i>
+                <i data-lucide="bell" style="opacity:0.5;"></i>
             </header>
-
-            <h2 style="margin-bottom: 20px; font-size: 28px; font-weight: 800;">Выберите тариф</h2>
-            
-            <div class="card" onclick="showSheet('Essential')">
-                <div class="badge">Популярный</div>
-                <h3>Essential Card</h3>
-                <div class="price">9 500 ₽</div>
-            </div>
-
-            <div class="card" onclick="showSheet('Duo Safe')">
-                <h3>Duo Safe</h3>
-                <div class="price">14 000 ₽</div>
-            </div>
-
-            <div class="card" onclick="showSheet('Business Prime')">
-                <h3>Business Prime</h3>
-                <div class="price">19 900 ₽</div>
-            </div>
-
-            <div style="margin-top: 30px; opacity: 0.3; font-size: 12px; text-align: center;">
-                EuroCards 2026 • Официальный партнер платежных систем
-            </div>
+            <h2 style="margin-bottom:20px;">Выберите карту</h2>
+            <div class="tariff-card" onclick="openOrder('Essential', 9500)"><h3>Essential Card</h3><div class="price">9 500 ₽</div></div>
+            <div class="tariff-card" onclick="openOrder('Business Prime', 19900)"><h3>Business Prime</h3><div class="price">19 900 ₽</div></div>
         </div>
 
         <div id="orders" class="page">
-            <div id="cards">
-                <div style="text-align: center; margin-top: 50px; opacity: 0.5;">
-                    <i data-lucide="shopping-bag" style="width: 48px; height: 48px; margin-bottom: 10px;"></i>
-                    <p>Заказов пока нет</p>
-                </div>
+            <h2 style="margin-bottom:20px;">Мои заказы</h2>
+            <div id="orders_list">
+                <div style="text-align:center; opacity:0.3; margin-top:50px;"><i data-lucide="package" style="width:48px; height:48px;"></i><p>Заказов пока нет</p></div>
             </div>
         </div>
 
         <div id="cabinet" class="page">
-            <h2 style="margin-bottom: 25px;">Личный кабинет</h2>
-            <div class="card" style="text-align: center; padding: 30px;">
-                <div id="cab-avatar" class="avatar" style="margin: 0 auto 15px; width: 60px; height: 60px; font-size: 24px;"></div>
+            <h2>Профиль</h2>
+            <div class="tariff-card" style="text-align:center;">
                 <h3 id="cab-name">Клиент</h3>
-                <p style="opacity: 0.5; font-size: 14px;">Статус: Постоянный клиент</p>
-            </div>
-            
-            <div class="card">
-                <h3>Реферальная программа</h3>
-                <p style="font-size: 13px; opacity: 0.6; margin: 10px 0;">Приглашайте друзей и получайте 500 ₽ за каждого.</p>
-                <div id="ref-link" style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; font-size: 12px; margin-bottom: 15px; border: 1px dashed var(--glass-border);">t.me/EuroCardsBot?start=user</div>
-                <button class="btn" style="margin-top: 0; background: var(--accent-blue);" onclick="copyL()">Копировать ссылку</button>
+                <div id="ref-link" style="font-size:10px; margin-top:15px; padding:10px; background:rgba(0,0,0,0.2); border-radius:10px; border:1px dashed var(--glass-border);">t.me/EuroCardsBot?start=id</div>
+                <button class="btn" style="background:var(--accent); font-size:14px; padding:12px;" onclick="copyL()">Копировать рефку</button>
             </div>
         </div>
 
         <div id="order_form" class="page">
-            <div onclick="switchP('main')" style="margin-bottom: 20px; opacity: 0.5; display: flex; align-items: center; gap: 8px;">
-                <i data-lucide="chevron-left"></i> Назад
+            <div onclick="switchP('main')" style="margin-bottom:20px; opacity:0.5;"><i data-lucide="chevron-left"></i> Назад</div>
+            <h2>Оформление</h2>
+            <div class="tariff-card" style="margin-top:20px;">
+                <label style="font-size:12px; opacity:0.5;">ФИО (лат.)</label>
+                <input type="text" id="fio" placeholder="IVAN IVANOV">
+                <label style="font-size:12px; opacity:0.5; margin-top:15px; display:block;">Дата рождения</label>
+                <input type="date" id="birth">
+                <button class="btn" onclick="confirmOrder()">ОФОРМИТЬ</button>
             </div>
-            <h2>Детали заказа</h2>
-            <div style="margin-top: 20px;">
-                <label style="font-size: 12px; opacity: 0.5;">ФИО (как в загранпаспорте)</label>
-                <input type="text" id="order_fio" placeholder="IVAN IVANOV">
-                
-                <label style="font-size: 12px; opacity: 0.5; margin-top: 15px; display: block;">Дата рождения</label>
-                <input type="date" id="order_date">
-
-                <label style="font-size: 12px; opacity: 0.5; margin-top: 15px; display: block;">Промокод (если есть)</label>
-                <input type="text" id="order_promo" placeholder="SALE500" oninput="recalc()">
-
-                <div style="margin-top: 30px; padding: 20px; background: var(--glass); border-radius: 20px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span>Итого:</span>
-                        <span id="final_price" style="font-weight: 800; font-size: 20px; color: var(--accent-blue);">0 ₽</span>
-                    </div>
-                    <div id="old_price" style="text-align: right; text-decoration: line-through; opacity: 0.3; font-size: 14px; display: none;"></div>
-                </div>
-
-                <button class="btn" onclick="confirmOrder()">ОФОРМИТЬ И ОПЛАТИТЬ</button>
-            </div>
-        </div>
-
-        <div id="success_screen" class="page" style="text-align: center; padding-top: 50px;">
-            <div style="width: 80px; height: 80px; background: #22c55e; border-radius: 40px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                <i data-lucide="check" style="width: 48px; height: 48px; color: #000;"></i>
-            </div>
-            <h2>Заказ принят!</h2>
-            <p style="opacity: 0.6; margin: 15px 0;">Мы начали работу. Все данные отправлены боту.</p>
-            <button class="btn" onclick="tg.close()">ЗАКРЫТЬ</button>
         </div>
     </div>
 
     <div class="tabs">
-        <div class="tab-item active" onclick="switchP('main', this)">
-            <i data-lucide="home"></i>
-            <span>Главная</span>
-        </div>
-        <div class="tab-item" onclick="switchP('orders', this)">
-            <i data-lucide="package"></i>
-            <span>Заказы</span>
-        </div>
-        <div class="tab-item" onclick="switchP('cabinet', this)">
-            <i data-lucide="user"></i>
-            <span>Кабинет</span>
-        </div>
-    </div>
-
-    <div class="overlay" id="overlay" onclick="closeSheet()"></div>
-    <div class="sheet" id="sheet">
-        <div class="sheet-line"></div>
-        <h2 id="sh-name" style="margin-bottom: 10px;">Тариф</h2>
-        <div id="sh-price" style="font-size: 24px; font-weight: 800; color: var(--accent-blue); margin-bottom: 20px;">0 ₽</div>
-        <div id="sh-bullets" style="margin-bottom: 30px; opacity: 0.7;"></div>
-        <button class="btn" onclick="goToForm()">ПЕРЕЙТИ К ОФОРМЛЕНИЮ</button>
+        <div class="tab-item active" onclick="switchP('main', this)"><i data-lucide="home"></i><span>Главная</span></div>
+        <div class="tab-item" onclick="switchP('orders', this)"><i data-lucide="package"></i><span>Заказы</span></div>
+        <div class="tab-item" onclick="switchP('cabinet', this)"><i data-lucide="user"></i><span>Кабинет</span></div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-        lucide.createIcons();
+        tg.ready(); tg.expand(); lucide.createIcons();
+        let currentTariff = {};
 
-        let cur = { name: '', price: 0, final: 0 };
-        const DB = {
-            'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Apple Pay включен<br>• Работает по всему миру' },
-            'Duo Safe': { p: 14000, b: '• 2 Банка разных стран<br>• Повышенные лимиты<br>• Поддержка 24/7' },
-            'Business Prime': { p: 19900, b: '• Приоритетное открытие<br>• Справка для визы в комплекте<br>• Личный менеджер' }
-        };
-
-        function initUser() {
-            const params = new URLSearchParams(window.location.search);
-            const u = tg.initDataUnsafe.user;
+        function init() {
+            const p = new URLSearchParams(window.location.search);
+            const name = p.get('n') || "Клиент";
+            const id = p.get('id') || "0";
             
-            const name = (u && u.first_name) ? u.first_name : params.get('n') || "Клиент";
-            const id = (u && u.id) ? u.id : params.get('id') || "0";
+            document.getElementById('u-name').innerText = name;
+            document.getElementById('cab-name').innerText = name;
+            document.getElementById('avatar-main').innerText = name[0];
+            document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${id}`;
 
-            if(document.getElementById('cab-name')) document.getElementById('cab-name').innerText = name;
-            if(document.getElementById('u-name')) document.getElementById('u-name').innerText = name;
-            if(document.getElementById('ref-link')) document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${id}`;
-            
-            const avs = ['avatar-main', 'cab-avatar'];
-            avs.forEach(id => {
-                const el = document.getElementById(id);
-                if(!el) return;
-                if (u && u.photo_url) {
-                    el.style.backgroundImage = `url('${u.photo_url}')`;
-                    el.innerText = '';
-                } else {
-                    el.innerText = name[0];
-                    el.style.background = "var(--glass)";
-                    el.style.display="flex"; el.style.alignItems="center"; el.style.justifyContent="center";
-                }
-            });
-
-            // ЗАГРУЗКА ЗАКАЗОВ ИЗ BASE64
-            const ordersData = params.get('orders');
-            if (ordersData) {
+            // --- РЕНДЕР ЗАКАЗОВ ---
+            const ords = p.get('orders');
+            if(ords) {
                 try {
-                    const decodedOrders = JSON.parse(atob(ordersData));
-                    const container = document.getElementById('cards');
-                    if (decodedOrders.length > 0) {
-                        container.innerHTML = '<h2 style="margin-bottom:20px;">Мои заказы</h2>';
-                        decodedOrders.forEach(ord => {
-                            const stClass = ord.status === 'Готово' ? 'status-ready' : 'status-process';
+                    const list = JSON.parse(atob(ords));
+                    const container = document.getElementById('orders_list');
+                    if(list.length > 0) {
+                        container.innerHTML = '';
+                        list.forEach(o => {
+                            const badge = o.status === 'Готово' ? 'status-ready' : 'status-process';
                             container.innerHTML += `
                                 <div class="order-card">
                                     <div>
-                                        <div style="font-size:11px; opacity:0.5;">${ord.num} • ${ord.date}</div>
-                                        <div style="font-weight:800; font-size:16px; margin:4px 0;">${ord.name}</div>
-                                        <div style="color:var(--accent-blue); font-weight:700;">${ord.price.toLocaleString()} ₽</div>
+                                        <div style="font-size:10px; opacity:0.5;">${o.num} • ${o.date}</div>
+                                        <div style="font-weight:800; margin:4px 0;">${o.name}</div>
+                                        <div style="color:var(--accent); font-weight:700;">${o.price} ₽</div>
                                     </div>
-                                    <div class="status-badge ${stClass}">${ord.status}</div>
-                                </div>
-                            `;
+                                    <div class="status-badge ${badge}">${o.status}</div>
+                                </div>`;
                         });
                     }
-                } catch (e) { console.error("Order load error", e); }
+                } catch(e) { console.error("Error loading orders", e); }
             }
         }
-
-        initUser();
+        init();
 
         function switchP(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(el) {
-                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-                el.classList.add('active');
-            }
+            if(el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
             tg.HapticFeedback.impactOccurred('medium');
-            window.scrollTo(0,0);
         }
 
-        function showSheet(n) {
-            const t = DB[n]; cur = { name: n, price: t.p, final: t.p };
-            document.getElementById('sh-name').innerText = n;
-            document.getElementById('sh-price').innerText = t.p.toLocaleString() + ' ₽';
-            document.getElementById('sh-bullets').innerHTML = t.b;
-            document.getElementById('overlay').style.display = 'block';
-            setTimeout(() => { document.getElementById('overlay').style.opacity = '1'; document.getElementById('sheet').classList.add('active'); }, 10);
-        }
-
-        function closeSheet() {
-            document.getElementById('sheet').classList.remove('active');
-            document.getElementById('overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('overlay').style.display = 'none', 300);
-        }
-
-        function goToForm() { closeSheet(); recalc(); switchP('order_form'); }
-
-        function recalc() {
-            const pr = document.getElementById('order_promo');
-            const code = pr.value.toUpperCase().trim();
-            let fin = cur.price;
-            if(code === 'SALE500') {
-                fin -= 500;
-                document.getElementById('old_price').innerText = cur.price + ' ₽';
-                document.getElementById('old_price').style.display = 'block';
-            } else {
-                document.getElementById('old_price').style.display = 'none';
-            }
-            cur.final = fin;
-            document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
-        }
+        function openOrder(n, p) { currentTariff = {n, p}; switchP('order_form'); }
 
         function confirmOrder() {
-            const f = document.getElementById('order_fio').value.trim();
-            const d = document.getElementById('order_date').value;
-            if(!f || !d) { tg.showAlert("Заполните ФИО и Дату!"); return; }
-            const res = { fio: f, birth: d, tariff: cur.name, price: cur.final };
-            tg.HapticFeedback.notificationOccurred('success');
-            switchP('success_screen');
-            setTimeout(() => { tg.sendData(JSON.stringify(res)); }, 1000);
+            const f = document.getElementById('fio').value.trim();
+            const b = document.getElementById('birth').value;
+            if(!f || !b) { tg.showAlert("Заполните все поля!"); return; }
+            
+            // Короткий Deep Link для бота
+            const link = `https://t.me/EuroCardsBot?start=O_${encodeURIComponent(currentTariff.n)}|${currentTariff.p}|${encodeURIComponent(f)}|${b}`;
+            tg.openTelegramLink(link);
         }
 
         function copyL() {
             navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert("Ссылка скопирована!");
+            tg.showAlert("Скопировано!");
         }
     </script>
 </body>
