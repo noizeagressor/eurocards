@@ -8,14 +8,9 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --zen-dark: #0f172a;
-            --zen-blue: #1e293b;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-blue: #38bdf8;
-            --text-main: #f8fafc;
-            --text-secondary: #94a3b8;
-            /* Gradients */
+            --zen-dark: #0f172a; --zen-blue: #1e293b; --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1); --accent-blue: #38bdf8;
+            --text-main: #f8fafc; --text-secondary: #94a3b8;
             --g-std: linear-gradient(145deg, #334155, #1e293b);
             --g-duo: linear-gradient(145deg, #1e3a8a, #0f172a);
             --g-prm: linear-gradient(145deg, #312e81, #1e1b4b);
@@ -23,73 +18,39 @@
             --g-pay: linear-gradient(145deg, #003087, #009cde);
             --g-bank: linear-gradient(145deg, #27272a, #09090b);
         }
-
-        body { 
-            font-family: -apple-system, system-ui, sans-serif;
-            background: var(--zen-dark); margin: 0; padding: 0; color: var(--text-main);
-            min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
-        }
-
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--zen-dark); margin: 0; color: var(--text-main); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
         .zen-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 0%, var(--zen-blue) 0%, var(--zen-dark) 100%); z-index: -2; }
-        
         .page { display: none; padding: 20px 20px 140px; animation: slideUp 0.4s ease; }
         .page.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* TILES */
+        /* ПЛИТКИ */
         .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .tile {
-            aspect-ratio: 1 / 1; border-radius: 28px; padding: 22px; position: relative;
-            border: 1px solid var(--glass-border);
-            display: flex; flex-direction: column; justify-content: space-between;
-            transition: 0.3s; overflow: hidden;
-        }
-        .tile:active { transform: scale(0.96); opacity: 0.9; }
-        .t1 { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-        .t2 { font-size: 13px; font-weight: 500; margin-top: 2px; }
-        .val-block { display: flex; align-items: baseline; gap: 3px; }
+        .tile { aspect-ratio: 1/1; border-radius: 28px; padding: 22px; position: relative; border: 1px solid var(--glass-border); display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; overflow: hidden; }
+        .tile:active { transform: scale(0.96); }
+        .t1 { font-size: 10px; opacity: 0.5; text-transform: uppercase; font-weight: 700; }
+        .t2 { font-size: 13px; font-weight: 500; }
         .val { font-size: 24px; font-weight: 800; }
-        .unit { font-size: 14px; opacity: 0.6; }
-        .tile-icon { position: absolute; top: 22px; right: 22px; opacity: 0.8; }
-        .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .tile-icon { position: absolute; top: 22px; right: 22px; opacity: 0.5; }
 
-        /* ORDER CARDS STYLE */
-        .order-item {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 18px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .order-info b { display: block; font-size: 15px; margin-bottom: 2px; }
-        .order-info div { font-size: 11px; opacity: 0.5; }
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-        }
+        /* ЗАКАЗЫ */
+        .order-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .status-badge { padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .st-process { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
         .st-ready { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
 
-        /* FORM FIX */
-        input { 
-            width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
-            border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; outline: none; transition: 0.3s;
-        }
-        input[type="date"] { padding: 0 15px; display: block; width: 100%; appearance: none; -webkit-appearance: none; }
-        input.valid { border-color: #22c55e; background: rgba(34, 197, 94, 0.05); }
-        input.invalid { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
-
+        /* КНОПКИ И ВВОД */
+        input { width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; outline: none; }
         .btn-main { background: #fff; color: #000; border: none; width: 100%; height: 60px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; }
 
-        /* TAB BAR */
+        /* FAQ */
+        .faq-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; margin-bottom: 12px; }
+        .faq-q { padding: 18px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .faq-a { padding: 0 18px 18px; font-size: 13px; color: var(--text-secondary); display: none; }
+
+        /* НАВИГАЦИЯ */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 0.5px solid var(--glass-border); display: flex; justify-content: space-around; padding-top: 12px; z-index: 1000; }
-        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); flex: 1; font-size: 10px; font-weight: 700; text-transform: uppercase; cursor:pointer; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); flex: 1; font-size: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
         .tab-item.active { color: var(--accent-blue); }
 
         /* SHEET */
@@ -103,52 +64,29 @@
 
     <div id="home" class="page active">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-            <b style="font-size:24px; letter-spacing:-0.5px;">EuroCards</b>
-            <div id="avatar-main" style="width:36px; height:36px; border-radius:50%; background:var(--glass); border:1px solid var(--glass-border); background-size:cover;"></div>
+            <b style="font-size:24px;">EuroCards</b>
+            <div id="avatar-main" style="width:36px; height:36px; border-radius:50%; background:var(--glass); background-size:cover;"></div>
         </div>
-
         <div class="tile-grid">
             <div class="tile" style="background: var(--g-std)" onclick="showSheet('Essential')">
-                <div class="tile-top-left"><div class="t1">Essential</div><div class="t2">Base Access</div></div>
-                <div class="tile-bottom-left"><div class="val">9500</div><div class="unit">₽</div></div>
+                <div><div class="t1">Essential</div><div class="t2">Base Access</div></div>
+                <div><span class="val">9500</span><small> ₽</small></div>
                 <i data-lucide="credit-card" class="tile-icon"></i>
-                <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="background: var(--g-duo)" onclick="showSheet('Duo Safe')">
-                <div class="tile-top-left"><div class="t1">Duo Safe</div><div class="t2">Double Protection</div></div>
-                <div class="val-block"><div class="val">14000</div><div class="unit">₽</div></div>
+                <div><div class="t1">Duo Safe</div><div class="t2">Double Protection</div></div>
+                <div><span class="val">14000</span><small> ₽</small></div>
                 <i data-lucide="layers" class="tile-icon"></i>
-                <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="background: var(--g-prm)" onclick="showSheet('Business Prime')">
-                <div class="tile-top-left"><div class="t1">Business</div><div class="t2">Premium Support</div></div>
-                <div class="val-block"><div class="val">19900</div><div class="unit">₽</div></div>
+                <div><div class="t1">Business</div><div class="t2">Premium Support</div></div>
+                <div><span class="val">19900</span><small> ₽</small></div>
                 <i data-lucide="shield-check" class="tile-icon"></i>
-                <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="background: var(--g-elt)" onclick="showSheet('Infinite Elite')">
-                <div class="tile-top-left"><div class="t1">Infinite</div><div class="t2">Elite Bundle</div></div>
-                <div class="val-block"><div class="val">39900</div><div class="unit">₽</div></div>
+                <div><div class="t1">Infinite</div><div class="t2">Elite Bundle</div></div>
+                <div><span class="val">39900</span><small> ₽</small></div>
                 <i data-lucide="crown" class="tile-icon"></i>
-                <div class="plus-btn">+</div>
-            </div>
-            <div class="tile" style="grid-column: span 2; aspect-ratio: 2.3/1; background: var(--g-pay)" onclick="showSheet('PayPal')">
-                <div class="tile-top-left"><div class="t1">PayPal</div><div class="t2">Personal Verified</div></div>
-                <div class="val-block"><div class="val">4900</div><div class="unit">₽</div></div>
-                <i data-lucide="wallet" class="tile-icon"></i>
-                <div class="plus-btn">+</div>
-            </div>
-            <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Wise')">
-                <div class="tile-top-left"><div class="t1">Wise</div><div class="t2">Personal Account</div></div>
-                <div class="val-block"><div class="val">20000</div><div class="unit">₽</div></div>
-                <i data-lucide="landmark" class="tile-icon"></i>
-                <div class="plus-btn">+</div>
-            </div>
-            <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Revolut')">
-                <div class="tile-top-left"><div class="t1">Revolut</div><div class="t2">Digital Banking</div></div>
-                <div class="val-block"><div class="val">20000</div><div class="unit">₽</div></div>
-                <i data-lucide="refresh-ccw" class="tile-icon"></i>
-                <div class="plus-btn">+</div>
             </div>
         </div>
     </div>
@@ -157,61 +95,67 @@
         <h2 id="orders-title" style="font-weight:800;">Мои заказы</h2>
         <div id="orders-container"></div>
         <div id="order-list-empty" style="text-align:center; padding-top:80px; opacity:0.3; display:none;">
-            <i data-lucide="package" style="width:60px; height:60px; margin-bottom:20px;"></i>
+            <i data-lucide="package" style="width:60px; height:60px;"></i>
             <p>Заказов пока нет</p>
         </div>
     </div>
 
     <div id="bonuses" class="page">
         <h2 style="font-weight:800;">Бонусы</h2>
-        <div style="background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 25px; margin-bottom: 15px;">
+        <div style="background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 25px;">
             <small style="opacity:0.6; font-weight:700;">БАЛАНС</small>
             <div style="font-size:38px; font-weight:900; margin:10px 0;">0 ₽</div>
-            <button class="btn-main" style="height:50px; font-size:14px;" onclick="tg.showAlert('Вывод от 5000 ₽')">Вывести</button>
+            <button class="btn-main" style="height:50px; font-size:14px;" onclick="tg.showAlert('Минимум 5000 ₽')">Вывести</button>
         </div>
-        <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border);">
+        <div style="margin-top:20px; background: rgba(0,0,0,0.3); border-radius: 16px; padding: 18px; border: 1px solid var(--glass-border); display:flex; justify-content:space-between;">
             <code id="ref-link" style="color:var(--accent-blue); font-size:12px;">...</code>
-            <i data-lucide="copy" style="width:18px; cursor:pointer;" onclick="copyL()"></i>
+            <i data-lucide="copy" style="width:18px;" onclick="copyL()"></i>
         </div>
     </div>
 
     <div id="profile" class="page">
         <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
-            <div id="avatar-cab" style="width:60px; height:60px; border-radius:50%; background:var(--glass); border:1px solid var(--glass-border); background-size:cover;"></div>
+            <div id="avatar-cab" style="width:60px; height:60px; border-radius:50%; background:var(--glass); background-size:cover;"></div>
             <div><b id="cab-name" style="font-size:20px;">Клиент</b><br><small style="color:var(--text-secondary)">Личный кабинет</small></div>
         </div>
-
-        <h3 style="margin-bottom:15px;">Помощь и FAQ</h3>
-        <button class="btn-main" style="background:var(--glass); color:#fff; border:1px solid var(--glass-border);" onclick="tg.openTelegramLink('https://t.me/eurocardsapp_bot')">Связаться с поддержкой</button>
+        <h3 style="margin-bottom:15px;">Помощь</h3>
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">Какие документы? <i data-lucide="chevron-down"></i></div>
+            <div class="faq-a">Только загранпаспорт. Никаких доверенностей.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">Как пополнять? <i data-lucide="chevron-down"></i></div>
+            <div class="faq-a">Через P2P в приложении банка (Рубли -> USDT -> Евро).</div>
+        </div>
+        <button class="btn-main" style="background:var(--glass); color:#fff; border:1px solid var(--glass-border);" onclick="tg.openTelegramLink('https://t.me/eurocardsapp_bot')">Поддержка</button>
     </div>
 
     <div id="order_form" class="page">
         <div style="font-size:28px; font-weight:900; margin-bottom:30px;">Оформление</div>
-        <input type="text" id="order_fio" placeholder="ИМЯ ФАМИЛИЯ (ЗАГРАН)">
+        <input type="text" id="order_fio" placeholder="ИМЯ ФАМИЛИЯ (ЛАТ)">
         <input type="date" id="order_date">
         <input type="text" id="order_promo" placeholder="ПРОМОКОД" oninput="recalc()">
-        
         <div style="text-align:center; margin:40px 0;">
-            <div id="old_price" style="text-decoration:line-through; opacity:0.4; display:none; margin-bottom:5px;">0 ₽</div>
+            <div id="old_price" style="text-decoration:line-through; opacity:0.4; display:none;">0 ₽</div>
             <div id="final_price" style="font-size:48px; font-weight:900;">0 ₽</div>
-            <div id="sel_name" style="color:var(--accent-blue); font-weight:700; margin-top:5px; text-transform:uppercase; font-size:12px;"></div>
+            <div id="sel_name" style="color:var(--accent-blue); text-transform:uppercase; font-size:12px;"></div>
         </div>
-        <button class="btn-main" onclick="confirmOrder()">ОПЛАТИТЬ ЗАКАЗ</button>
+        <button class="btn-main" onclick="confirmOrder()">ОПЛАТИТЬ</button>
     </div>
 
     <nav class="tab-bar">
         <div class="tab-item active" onclick="switchP('home', this)"><i data-lucide="home"></i><span>Главная</span></div>
         <div class="tab-item" onclick="switchP('cards', this)"><i data-lucide="layers"></i><span>Заказы</span></div>
         <div class="tab-item" onclick="switchP('bonuses', this)"><i data-lucide="sparkles"></i><span>Бонусы</span></div>
-        <div class="tab-item" onclick="switchP('profile', this)"><i data-lucide="user"></i><span>Кабинет</span></div>
+        <div class="tab-item" onclick="switchP('profile', this)"><i data-lucide="user"></i><span>Профиль</span></div>
     </nav>
 
     <div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
     <div class="sheet" id="sheet">
         <div style="width:40px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin:-16px auto 25px;"></div>
-        <h2 id="sh-name" style="font-size:32px; margin:0;">Тариф</h2>
-        <p id="sh-price" style="font-size:24px; font-weight:800; color:var(--accent-blue); margin:10px 0 30px;">0 ₽</p>
-        <div id="sh-bullets" style="color:var(--text-secondary); font-size:14px; line-height:1.8; margin-bottom:40px;"></div>
+        <h2 id="sh-name" style="font-size:32px;">Тариф</h2>
+        <p id="sh-price" style="font-size:24px; font-weight:800; color:var(--accent-blue);">0 ₽</p>
+        <div id="sh-bullets" style="margin-bottom:40px; opacity:0.6;"></div>
         <button class="btn-main" onclick="goToForm()">ПРОДОЛЖИТЬ</button>
     </div>
 
@@ -219,23 +163,22 @@
         let tg = window.Telegram.WebApp; tg.expand(); lucide.createIcons();
         let cur = { name: '', price: 0, final: 0 };
         const DB = {
-            'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Apple Pay включен' },
-            'Duo Safe': { p: 14000, b: '• 2 Банка сразу<br>• Скидка 50% на второй банк' },
-            'Business Prime': { p: 19900, b: '• Duo Safe + Поддержка 24/7' },
-            'Infinite Elite': { p: 39900, b: '• 3 Банка (Wise/Revolut)' },
-            'PayPal': { p: 4900, b: '• Личный верифицированный аккаунт' },
-            'Wise': { p: 20000, b: '• Личный счет Wise (IBAN)' },
-            'Revolut': { p: 20000, b: '• Личный счет Revolut' }
+            'Essential': { p: 9500, b: '• Apple Pay • Лимит 5000€' },
+            'Duo Safe': { p: 14000, b: '• 2 Страны • Поддержка' },
+            'Business Prime': { p: 19900, b: '• Справка для визы • Лимит 50000€' },
+            'Infinite Elite': { p: 39900, b: '• 3 Банка • Консьерж' }
         };
 
         function switchP(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(el) {
-                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-                el.classList.add('active');
-            }
-            tg.HapticFeedback.impactOccurred('medium'); window.scrollTo(0,0);
+            if(el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function toggleFaq(el) {
+            let a = el.querySelector('.faq-a');
+            a.style.display = a.style.display === 'block' ? 'none' : 'block';
         }
 
         function showSheet(n) {
@@ -256,14 +199,10 @@
         function goToForm() { closeSheet(); document.getElementById('sel_name').innerText = cur.name; recalc(); switchP('order_form'); }
 
         function recalc() {
-            const pr = document.getElementById('order_promo');
-            const code = pr.value.toUpperCase().trim();
+            const code = document.getElementById('order_promo').value.toUpperCase().trim();
             let fin = cur.price;
-            if(code === 'SALE500') {
-                fin -= 500; pr.classList.add('valid'); 
-                document.getElementById('old_price').innerText = cur.price + ' ₽';
-                document.getElementById('old_price').style.display = 'block';
-            } else { pr.classList.remove('valid'); document.getElementById('old_price').style.display = 'none'; }
+            if(code === 'SALE500') { fin -= 500; document.getElementById('old_price').innerText = cur.price + ' ₽'; document.getElementById('old_price').style.display = 'block'; }
+            else { document.getElementById('old_price').style.display = 'none'; }
             cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
         }
 
@@ -275,14 +214,12 @@
             
             const botUsername = "eurocardsapp_bot"; 
             const orderData = `O_${cur.name}|${cur.final}|${f}|${d}|${p}`;
-            const botUrl = `https://t.me/${botUsername}?start=${encodeURIComponent(orderData)}`;
-            
-            tg.openTelegramLink(botUrl);
+            tg.openTelegramLink(`https://t.me/${eurocardsapp_bot}?start=${encodeURIComponent(orderData)}`);
         }
 
         function copyL() {
             navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
-            tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!");
+            tg.showAlert("Скопировано!");
         }
 
         window.onload = () => {
@@ -297,6 +234,7 @@
                     const list = JSON.parse(atob(ordersData));
                     const container = document.getElementById('orders-container');
                     if (list.length > 0) {
+                        container.innerHTML = '';
                         list.forEach(o => {
                             const badge = o.status === 'Готово' ? 'st-ready' : 'st-process';
                             container.innerHTML += `
@@ -304,15 +242,15 @@
                                     <div class="order-info">
                                         <small>Заказ №${o.num} • ${o.date}</small>
                                         <b>${o.name}</b>
-                                        <div>Клиент: ${o.fio} (${o.birth})</div>
+                                        <div style="font-size:11px; opacity:0.5;">${o.fio} (${o.birth})</div>
                                         <span style="color:var(--accent-blue); font-weight:700;">${o.price} ₽</span>
                                     </div>
                                     <div class="status-badge ${badge}">${o.status}</div>
                                 </div>`;
                         });
-                    } else { document.getElementById('order-list-empty').style.display = 'block'; }
+                    } else document.getElementById('order-list-empty').style.display = 'block';
                 } catch (e) { document.getElementById('order-list-empty').style.display = 'block'; }
-            } else { document.getElementById('order-list-empty').style.display = 'block'; }
+            } else document.getElementById('order-list-empty').style.display = 'block';
 
             const u = tg.initDataUnsafe.user;
             const name = u ? u.first_name : params.get('n') || "Клиент";
