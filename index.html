@@ -236,21 +236,44 @@
     }
 
     // 3. НОВЫЙ МЕХАНИЗМ ОТПРАВКИ (DEEP LINK)
-    function confirmOrder() {
-        const f = document.getElementById('order_fio').value;
-        const d = document.getElementById('order_date').value;
-        if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
+function confirmOrder() {
+    const f = document.getElementById('order_fio').value.trim();
+    const d = document.getElementById('order_date').value;
+    const p = document.getElementById('order_promo').value.trim() || "-";
+    
+    if(!f || !d) { tg.showAlert("Заполните ФИО и Дату!"); return; }
 
-        tg.HapticFeedback.notificationOccurred('success');
-        
-        // Чистим название тарифа от пробелов для ссылки
-        const tariffName = cur.name.replace(/\s+/g, '');
-        const finalPrice = cur.final;
-        
-        // !!! ВАЖНО: ЗАМЕНИ НА USERNAME СВОЕГО БОТА НИЖЕ !!!
-        const botUsername = "eurocardsapp_bot"; 
-        
-        const deepLink = `https://t.me/${botUsername}?start=ORDER_${tariffName}_${finalPrice}`;
+    tg.HapticFeedback.notificationOccurred('success');
+    
+    // Собираем данные
+    const orderPayload = {
+        tariff: cur.name,
+        price: cur.final,
+        fio: f,
+        birth: d,
+        promo: p,
+        username: tg.initDataUnsafe.user ? tg.initDataUnsafe.user.username : "unknown"
+    };
+
+    // ВСТАВЬ СЮДА СВОЙ URL ИЗ ШАГА 1
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec";
+
+    // Отправляем невидимый запрос
+    fetch(scriptURL, {
+        method: 'POST',
+        mode: 'no-cors', // Важно для обхода CORS
+        cache: 'no-cache',
+        body: JSON.stringify(orderPayload)
+    })
+    .then(() => {
+        // Приложение НЕ закрывается, просто переключаем экран на успех
+        switchP('success_screen');
+    })
+    .catch(err => {
+        tg.showAlert("Ошибка при отправке. Попробуйте снова.");
+        console.error(err);
+    });
+}
 
         // Открываем ссылку - это закроет аппку и отправит команду боту
         tg.openTelegramLink(deepLink);
