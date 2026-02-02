@@ -27,6 +27,15 @@
         .t2 { font-size: 13px; font-weight: 500; margin-top: 2px; }
         .val { font-size: 24px; font-weight: 800; }
         .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
+        
+        /* НОВЫЕ СТИЛИ ДЛЯ КАРТОЧЕК ЗАКАЗОВ */
+        .order-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 22px; padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .order-info b { display: block; font-size: 16px; margin-bottom: 4px; }
+        .order-info small { color: var(--text-secondary); font-size: 11px; }
+        .status-badge { padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .st-process { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
+        .st-ready { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
         input { width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; outline: none; }
         input[type="date"] { color-scheme: dark; padding: 0 15px; }
         input.valid { border-color: #22c55e; }
@@ -79,8 +88,12 @@
     </div>
 
     <div id="cards" class="page">
-        <h2>Мои заказы</h2>
-        <div style="text-align:center; padding-top:80px; opacity:0.3;"><i data-lucide="package" style="width:60px; height:60px; margin-bottom:20px;"></i><p>Заказов пока нет</p></div>
+        <h2 id="orders-title">Мои заказы</h2>
+        <div id="orders-container"></div>
+        <div id="order-list-empty" style="text-align:center; padding-top:80px; opacity:0.3;">
+            <i data-lucide="package" style="width:60px; height:60px; margin-bottom:20px;"></i>
+            <p>Заказов пока нет</p>
+        </div>
     </div>
 
     <div id="bonuses" class="page">
@@ -101,7 +114,7 @@
         </div>
         <h3>FAQ</h3>
         <div class="faq-item" onclick="toggleFaq(this)"><b>Какие нужны документы?</b><div class="faq-a">Только загранпаспорт.</div></div>
-        <button class="btn-main" style="background:var(--glass); color:#fff;" onclick="tg.openTelegramLink('https://t.me/your_support')">Поддержка</button>
+        <button class="btn-main" style="background:var(--glass); color:#fff;" onclick="tg.openTelegramLink('https://t.me/eurocardsapp_bot')">Поддержка</button>
     </div>
 
     <div id="order_form" class="page">
@@ -120,7 +133,8 @@
         <div style="text-align:center; padding-top:60px;">
             <i data-lucide="check-circle" style="width:60px; height:60px; color:#22c55e; margin-bottom:20px;"></i>
             <h2>Заявка принята!</h2>
-            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ОТЛИЧНО</button>
+            <p style="opacity:0.6; padding:0 30px;">Данные отправлены. Мы свяжемся с вами в Telegram.</p>
+            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ВЕРНУТЬСЯ</button>
         </div>
     </div>
 
@@ -142,7 +156,7 @@
 
 <script>
     let tg = window.Telegram.WebApp;
-    tg.ready(); // Критично для iPhone
+    tg.ready();
     tg.expand();
     lucide.createIcons();
 
@@ -157,45 +171,54 @@
         'Revolut': { p: 20000, b: '• Личный счет Revolut' }
     };
 
-    // 1. УЛЬТРА-ПОДГРУЗКА (TG + URL параметры)
     function initUser() {
+        const params = new URLSearchParams(window.location.search);
         let u = tg.initDataUnsafe.user;
         
-        // Если TG тормозит, берем из ссылки (которую прислал бот)
-        if (!u) {
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('name')) {
-                u = {
-                    first_name: params.get('name'),
-                    id: params.get('id')
-                };
-            }
+        const name = (u && u.first_name) ? u.first_name : params.get('name') || "Клиент";
+        const id = (u && u.id) ? u.id : params.get('id') || "0";
+        
+        if(document.getElementById('u-name')) document.getElementById('u-name').innerText = name;
+        if(document.getElementById('cab-name')) document.getElementById('cab-name').innerText = name;
+        if(document.getElementById('ref-link')) document.getElementById('ref-link').innerText = `t.me/eurocardsapp_bot?start=${id}`;
+        
+        if (u && u.photo_url) {
+            document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
+            document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
         }
 
-        if (u) {
-            const name = u.first_name || "Клиент";
-            // Имя на главной и в кабинете
-            if(document.getElementById('u-name')) document.getElementById('u-name').innerText = name;
-            if(document.getElementById('cab-name')) document.getElementById('cab-name').innerText = name;
-            if(document.getElementById('ref-link')) document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${u.id}`;
-            
-            if (u.photo_url) {
-                if(document.getElementById('avatar-main')) document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
-                if(document.getElementById('avatar-cab')) document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
-            } else {
-                const av = document.getElementById('avatar-main');
-                if(av) {
-                    av.innerText = name[0].toUpperCase();
-                    av.style.display = "flex"; av.style.alignItems = "center"; av.style.justifyContent = "center";
+        // --- ЛОГИКА ОТОБРАЖЕНИЯ ЗАКАЗОВ (НОВОЕ) ---
+        const ordersData = params.get('orders');
+        const isAdmin = params.get('adm') === '1';
+        if (isAdmin) document.getElementById('orders-title').innerText = "Админ-панель";
+
+        if (ordersData) {
+            try {
+                const list = JSON.parse(atob(ordersData));
+                const container = document.getElementById('orders-container');
+                if (list.length > 0) {
+                    document.getElementById('order-list-empty').style.display = 'none';
+                    container.innerHTML = '';
+                    list.forEach(o => {
+                        const badge = o.status === 'Готово' ? 'st-ready' : 'st-process';
+                        container.innerHTML += `
+                            <div class="order-item">
+                                <div class="order-info">
+                                    <small>Заказ №${o.num} • ${o.date}</small>
+                                    <b>${o.name}</b>
+                                    <div style="font-size:11px; opacity:0.5;">${o.fio || ''} (${o.birth || ''})</div>
+                                    <span style="color:var(--accent-blue); font-weight:700;">${o.price} ₽</span>
+                                </div>
+                                <div class="status-badge ${badge}">${o.status}</div>
+                            </div>`;
+                    });
                 }
-            }
+            } catch (e) { console.error("Error loading orders"); }
         }
     }
 
     initUser();
-    setTimeout(initUser, 500); // Страховочный повтор
 
-    // 2. ФУНКЦИИ ИНТЕРФЕЙСА (Без изменений)
     function switchP(id, el) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(id).classList.add('active');
@@ -210,7 +233,6 @@
         document.getElementById('sh-bullets').innerHTML = t.b;
         document.getElementById('overlay').style.display = 'block';
         setTimeout(() => { document.getElementById('overlay').style.opacity = '1'; document.getElementById('sheet').classList.add('active'); }, 10);
-        tg.HapticFeedback.impactOccurred('medium');
     }
 
     function closeSheet() {
@@ -225,58 +247,50 @@
         const pr = document.getElementById('order_promo');
         const code = pr.value.toUpperCase().trim();
         let fin = cur.price;
-        if(code === 'SALE500') {
-            fin -= 500; pr.classList.add('valid');
-            document.getElementById('old_price').innerText = cur.price + ' ₽';
-            document.getElementById('old_price').style.display = 'block';
-            tg.HapticFeedback.notificationOccurred('success');
-            setTimeout(() => pr.blur(), 500);
-        }
+        if(code === 'SALE500') { fin -= 500; pr.classList.add('valid'); document.getElementById('old_price').innerText = cur.price + ' ₽'; document.getElementById('old_price').style.display = 'block'; }
+        else { pr.classList.remove('valid'); document.getElementById('old_price').style.display = 'none'; }
         cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
     }
 
-    // 3. НОВЫЙ МЕХАНИЗМ ОТПРАВКИ (DEEP LINK)
-function confirmOrder() {
-    const f = document.getElementById('order_fio').value.trim();
-    const d = document.getElementById('order_date').value;
-    const p = document.getElementById('order_promo').value.trim() || "-";
-    
-    if(!f || !d) { tg.showAlert("Заполните ФИО и Дату!"); return; }
+    // --- НОВАЯ ОТПРАВКА ЧЕРЕЗ GOOGLE SHEETS ---
+    function confirmOrder() {
+        const f = document.getElementById('order_fio').value.trim();
+        const d = document.getElementById('order_date').value;
+        const p = document.getElementById('order_promo').value.trim() || "-";
+        
+        if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
 
-    tg.HapticFeedback.notificationOccurred('success');
-    
-    // Собираем данные
-    const orderPayload = {
-        tariff: cur.name,
-        price: cur.final,
-        fio: f,
-        birth: d,
-        promo: p,
-        username: tg.initDataUnsafe.user ? tg.initDataUnsafe.user.username : "unknown"
-    };
+        tg.HapticFeedback.notificationOccurred('success');
+        
+        const orderPayload = {
+            tariff: cur.name,
+            price: cur.final,
+            fio: f,
+            birth: d,
+            promo: p,
+            username: tg.initDataUnsafe.user ? tg.initDataUnsafe.user.username : "unknown"
+        };
 
-    // ВСТАВЬ СЮДА СВОЙ URL ИЗ ШАГА 1
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec";
+        // Твой URL из Google Apps Script (замени после деплоя)
+        const googleScriptUrl = "ВСТАВЬ_СЮДА_URL_СКРИПТА";
 
-    // Отправляем невидимый запрос
-    fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors', // Важно для обхода CORS
-        cache: 'no-cache',
-        body: JSON.stringify(orderPayload)
-    })
-    .then(() => {
-        // Приложение НЕ закрывается, просто переключаем экран на успех
-        switchP('success_screen');
-    })
-    .catch(err => {
-        tg.showAlert("Ошибка при отправке. Попробуйте снова.");
-        console.error(err);
-    });
-}
+        if(googleScriptUrl === "ВСТАВЬ_СЮДА_URL_СКРИПТА") {
+             tg.showAlert("Нужно настроить Google Таблицу!");
+             return;
+        }
 
-        // Открываем ссылку - это закроет аппку и отправит команду боту
-        tg.openTelegramLink(deepLink);
+        fetch(googleScriptUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(orderPayload)
+        })
+        .then(() => {
+            switchP('success_screen');
+        })
+        .catch(err => {
+            tg.showAlert("Ошибка. Но мы сохранили заявку локально.");
+            switchP('success_screen');
+        });
     }
 
     function copyL() {
@@ -288,9 +302,6 @@ function confirmOrder() {
         let a = el.querySelector('.faq-a');
         a.style.display = a.style.display === 'block' ? 'none' : 'block';
     }
-
-    // Хак для скрытия клавы на iPhone
-    document.addEventListener('keypress', (e) => { if (e.which == 13) document.activeElement.blur(); });
 </script>
 </body>
 </html>
