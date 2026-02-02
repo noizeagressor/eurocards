@@ -53,6 +53,29 @@
         .tile-icon { position: absolute; top: 22px; right: 22px; opacity: 0.8; }
         .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; border: 1px solid rgba(255,255,255,0.1); }
 
+        /* ORDER CARDS STYLE */
+        .order-item {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .order-info b { display: block; font-size: 16px; margin-bottom: 4px; }
+        .order-info small { color: var(--text-secondary); font-size: 11px; }
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+        .st-process { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
+        .st-ready { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+
         /* FORM FIX */
         input { 
             width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
@@ -71,7 +94,7 @@
 
         /* TAB BAR */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 0.5px solid var(--glass-border); display: flex; justify-content: space-around; padding-top: 12px; z-index: 1000; }
-        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); flex: 1; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); flex: 1; font-size: 10px; font-weight: 700; text-transform: uppercase; cursor:pointer; }
         .tab-item.active { color: var(--accent-blue); }
 
         /* SHEET */
@@ -137,6 +160,8 @@
 
     <div id="cards" class="page">
         <h2 style="font-weight:800;">Мои заказы</h2>
+        <div id="orders-container">
+            </div>
         <div id="order-list-empty" style="text-align:center; padding-top:80px; opacity:0.3;">
             <i data-lucide="package" style="width:60px; height:60px; margin-bottom:20px;"></i>
             <p>Заказов пока нет</p>
@@ -289,7 +314,10 @@
             if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
             tg.HapticFeedback.notificationOccurred('success');
             switchP('success_screen');
-            tg.sendData(JSON.stringify({action: "ORDER", tariff: cur.name, price: cur.final, fio: f, birth: d}));
+            // ВАЖНО: Deep Link для отправки в бот
+            const orderData = `O_${cur.name}|${cur.final}|${f}|${d}`;
+            const botUrl = `https://t.me/EuroCardsBot?start=${encodeURIComponent(orderData)}`;
+            tg.openTelegramLink(botUrl);
         }
 
         function copyL() {
@@ -297,15 +325,47 @@
             tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!");
         }
 
+        // --- ФУНКЦИЯ ЗАГРУЗКИ ЗАКАЗОВ ---
         window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
             const u = tg.initDataUnsafe.user;
-            if(u) {
-                document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${u.id}`;
-                document.getElementById('cab-name').innerText = u.first_name;
-                if(u.photo_url) {
-                    document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
-                    document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
-                }
+            
+            // Заполнение профиля
+            const name = (u && u.first_name) ? u.first_name : params.get('n') || "Клиент";
+            const id = (u && u.id) ? u.id : params.get('id') || "0";
+            
+            document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${id}`;
+            document.getElementById('cab-name').innerText = name;
+            
+            if(u && u.photo_url) {
+                document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
+                document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
+            }
+
+            // РЕНДЕР ЗАКАЗОВ
+            const ordersData = params.get('orders');
+            if (ordersData) {
+                try {
+                    const list = JSON.parse(atob(ordersData)); // Расшифровка из Base64
+                    const container = document.getElementById('orders-container');
+                    if (list.length > 0) {
+                        document.getElementById('order-list-empty').style.display = 'none';
+                        container.innerHTML = ''; // Очистка
+                        list.forEach(o => {
+                            const badge = o.status === 'Готово' ? 'st-ready' : 'st-process';
+                            container.innerHTML += `
+                                <div class="order-item">
+                                    <div class="order-info">
+                                        <small>${o.num} • ${o.date}</small>
+                                        <b>${o.name}</b>
+                                        <span style="color:var(--accent-blue); font-weight:700;">${o.price.toLocaleString()} ₽</span>
+                                    </div>
+                                    <div class="status-badge ${badge}">${o.status}</div>
+                                </div>
+                            `;
+                        });
+                    }
+                } catch (e) { console.error("Error decoding orders:", e); }
             }
         }
     </script>
