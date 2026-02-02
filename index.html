@@ -2,160 +2,311 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EuroCards Premium</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>EuroCards Zen Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0a0b10; --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1); --accent: #38bdf8; --text: #ffffff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+        :root {
+            --zen-dark: #0f172a;
+            --zen-blue: #1e293b;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-blue: #38bdf8;
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            /* Gradients */
+            --g-std: linear-gradient(145deg, #334155, #1e293b);
+            --g-duo: linear-gradient(145deg, #1e3a8a, #0f172a);
+            --g-prm: linear-gradient(145deg, #312e81, #1e1b4b);
+            --g-elt: linear-gradient(145deg, #171717, #000000);
+            --g-pay: linear-gradient(145deg, #003087, #009cde);
+            --g-bank: linear-gradient(145deg, #27272a, #09090b);
+        }
+
+        body { 
+            font-family: -apple-system, system-ui, sans-serif;
+            background: var(--zen-dark); margin: 0; padding: 0; color: var(--text-main);
+            min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased;
+        }
+
+        .zen-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 0%, var(--zen-blue) 0%, var(--zen-dark) 100%); z-index: -2; }
         
-        /* Тот самый блюр-фон */
-        .blob { position: fixed; width: 300px; height: 300px; background: radial-gradient(circle, rgba(56,189,248,0.15) 0%, transparent 70%); z-index: -1; filter: blur(50px); }
-        .container { padding: 20px; padding-bottom: 100px; max-width: 500px; margin: 0 auto; }
-        
-        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page { display: none; padding: 20px 20px 140px; animation: slideUp 0.4s ease; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Карточки заказов (НОВОЕ) */
-        .order-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; padding: 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .status-badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .status-process { background: rgba(56,189,248,0.2); color: var(--accent); }
-        .status-ready { background: rgba(34,197,94,0.2); color: #22c55e; }
+        /* TILES */
+        .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .tile {
+            aspect-ratio: 1 / 1; border-radius: 28px; padding: 22px; position: relative;
+            border: 1px solid var(--glass-border);
+            display: flex; flex-direction: column; justify-content: space-between;
+            transition: 0.3s; overflow: hidden;
+        }
+        .tile:active { transform: scale(0.96); opacity: 0.9; }
+        .t1 { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .t2 { font-size: 13px; font-weight: 500; margin-top: 2px; }
+        .val-block { display: flex; align-items: baseline; gap: 3px; }
+        .val { font-size: 24px; font-weight: 800; }
+        .unit { font-size: 14px; opacity: 0.6; }
+        .tile-icon { position: absolute; top: 22px; right: 22px; opacity: 0.8; }
+        .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; border: 1px solid rgba(255,255,255,0.1); }
 
-        /* Тарифы */
-        .tariff-card { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; margin-bottom: 15px; backdrop-filter: blur(10px); }
-        .tariff-card h3 { font-size: 20px; font-weight: 800; }
-        .price { color: var(--accent); font-size: 18px; font-weight: 700; margin-top: 5px; }
+        /* FORM FIX */
+        input { 
+            width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+            border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; outline: none; transition: 0.3s;
+        }
+        input[type="date"] { padding: 0 15px; display: block; width: 100%; appearance: none; -webkit-appearance: none; }
+        input.valid { border-color: #22c55e; background: rgba(34, 197, 94, 0.05); }
+        input.invalid { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
 
-        /* Табы */
-        .tabs { position: fixed; bottom: 20px; left: 20px; right: 20px; background: rgba(15,15,20,0.8); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; display: flex; justify-content: space-around; padding: 12px; z-index: 100; }
-        .tab-item { color: rgba(255,255,255,0.4); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; cursor: pointer; }
-        .tab-item.active { color: var(--accent); }
+        .btn-main { background: #fff; color: #000; border: none; width: 100%; height: 60px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; }
 
-        .btn { width: 100%; background: #fff; color: #000; border: none; border-radius: 18px; padding: 18px; font-size: 16px; font-weight: 800; margin-top: 20px; }
-        input { width: 100%; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; color: #fff; margin-top: 8px; outline: none; }
-        .avatar { width: 44px; height: 44px; border-radius: 14px; background: var(--glass); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; font-weight: 800; }
+        /* CABINET / FAQ */
+        .faq-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; margin-bottom: 12px; }
+        .faq-q { padding: 18px; font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .faq-a { padding: 0 18px 18px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; display: none; }
+
+        /* TAB BAR */
+        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 0.5px solid var(--glass-border); display: flex; justify-content: space-around; padding-top: 12px; z-index: 1000; }
+        .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); flex: 1; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .tab-item.active { color: var(--accent-blue); }
+
+        /* SHEET */
+        .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; opacity: 0; transition: 0.3s; }
+        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #1a1f2e; border-radius: 32px 32px 0 0; padding: 32px 24px 60px; box-sizing: border-box; z-index: 2001; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); border-top: 1px solid var(--glass-border); }
+        .sheet.active { bottom: 0; }
     </style>
 </head>
 <body>
-    <div class="blob" style="top:-100px; right:-100px;"></div>
-    <div class="container">
+    <div class="zen-bg"></div>
+
+    <div id="home" class="page active">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+            <b style="font-size:24px; letter-spacing:-0.5px;">EuroCards</b>
+            <div id="avatar-main" style="width:36px; height:36px; border-radius:50%; background:var(--glass); border:1px solid var(--glass-border); background-size:cover;"></div>
+        </div>
+
+        <div class="tile-grid">
+            <div class="tile" style="background: var(--g-std)" onclick="showSheet('Essential')">
+                <div class="tile-top-left"><div class="t1">Essential</div><div class="t2">Base Access</div></div>
+                <div class="tile-bottom-left"><div class="val">9500</div><div class="unit">₽</div></div>
+                <i data-lucide="credit-card" class="tile-icon"></i>
+                <div class="plus-btn">+</div>
+            </div>
+            <div class="tile" style="background: var(--g-duo)" onclick="showSheet('Duo Safe')">
+                <div class="tile-top-left"><div class="t1">Duo Safe</div><div class="t2">Double Protection</div></div>
+                <div class="val-block"><div class="val">14000</div><div class="unit">₽</div></div>
+                <i data-lucide="layers" class="tile-icon"></i>
+                <div class="plus-btn">+</div>
+            </div>
+            <div class="tile" style="background: var(--g-prm)" onclick="showSheet('Business Prime')">
+                <div class="tile-top-left"><div class="t1">Business</div><div class="t2">Premium Support</div></div>
+                <div class="val-block"><div class="val">19900</div><div class="unit">₽</div></div>
+                <i data-lucide="shield-check" class="tile-icon"></i>
+                <div class="plus-btn">+</div>
+            </div>
+            <div class="tile" style="background: var(--g-elt)" onclick="showSheet('Infinite Elite')">
+                <div class="tile-top-left"><div class="t1">Infinite</div><div class="t2">Elite Bundle</div></div>
+                <div class="val-block"><div class="val">39900</div><div class="unit">₽</div></div>
+                <i data-lucide="crown" class="tile-icon"></i>
+                <div class="plus-btn">+</div>
+            </div>
+            <div class="tile" style="grid-column: span 2; aspect-ratio: 2.3/1; background: var(--g-pay)" onclick="showSheet('PayPal')">
+                <div class="tile-top-left"><div class="t1">PayPal</div><div class="t2">Personal Verified</div></div>
+                <div class="val-block"><div class="val">4900</div><div class="unit">₽</div></div>
+                <i data-lucide="wallet" class="tile-icon"></i>
+                <div class="plus-btn">+</div>
+            </div>
+            <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Wise')">
+                <div class="tile-top-left"><div class="t1">Wise</div><div class="t2">Personal Account</div></div>
+                <div class="val-block"><div class="val">20000</div><div class="unit">₽</div></div>
+                <i data-lucide="landmark" class="tile-icon"></i>
+                <div class="plus-btn">+</div>
+            </div>
+            <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Revolut')">
+                <div class="tile-top-left"><div class="t1">Revolut</div><div class="t2">Digital Banking</div></div>
+                <div class="val-block"><div class="val">20000</div><div class="unit">₽</div></div>
+                <i data-lucide="refresh-ccw" class="tile-icon"></i>
+                <div class="plus-btn">+</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cards" class="page">
+        <h2 style="font-weight:800;">Мои заказы</h2>
+        <div id="order-list-empty" style="text-align:center; padding-top:80px; opacity:0.3;">
+            <i data-lucide="package" style="width:60px; height:60px; margin-bottom:20px;"></i>
+            <p>Заказов пока нет</p>
+        </div>
+    </div>
+
+    <div id="bonuses" class="page">
+        <h2 style="font-weight:800;">Бонусы</h2>
+        <div style="background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 25px; margin-bottom: 15px;">
+            <small style="opacity:0.6; font-weight:700;">БАЛАНС</small>
+            <div style="font-size:38px; font-weight:900; margin:10px 0;">0 ₽</div>
+            <button class="btn-main" style="height:50px; font-size:14px;" onclick="tg.showAlert('Вывод от 5000 ₽')">Вывести</button>
+        </div>
+        <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border);">
+            <code id="ref-link" style="color:var(--accent-blue); font-size:12px;">...</code>
+            <i data-lucide="copy" style="width:18px; cursor:pointer;" onclick="copyL()"></i>
+        </div>
+    </div>
+
+    <div id="profile" class="page">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
+            <div id="avatar-cab" style="width:60px; height:60px; border-radius:50%; background:var(--glass); border:1px solid var(--glass-border); background-size:cover;"></div>
+            <div><b id="cab-name" style="font-size:20px;">Клиент</b><br><small style="color:var(--text-secondary)">Личный кабинет</small></div>
+        </div>
+
+        <h3 style="margin-bottom:15px;">Помощь и FAQ</h3>
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">Какие нужны документы? <i data-lucide="chevron-down" style="width:16px;"></i></div>
+            <div class="faq-a">Требуется только заграничный паспорт. Никаких дополнительных справок и доверенностей.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">Как пополнять счет? <i data-lucide="chevron-down" style="width:16px;"></i></div>
+            <div class="faq-a">Через P2P: отправляете рубли, получаете USDT на бирже и мгновенно меняете на Евро/Доллары в своем банке.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+            <div class="faq-q">Срок действия карты? <i data-lucide="chevron-down" style="width:16px;"></i></div>
+            <div class="faq-a">Карта действует 3 года. Перевыпуск в приложении банка — бесплатный.</div>
+        </div>
+
+        <button class="btn-main" style="margin-top:20px; background:var(--glass); color:#fff; border:1px solid var(--glass-border);" onclick="tg.openTelegramLink('https://t.me/your_support')">Связаться с поддержкой</button>
+    </div>
+
+    <div id="order_form" class="page">
+        <div style="font-size:28px; font-weight:900; margin-bottom:30px;">Оформление</div>
+        <input type="text" id="order_fio" placeholder="ИМЯ ФАМИЛИЯ (ЗАГРАН)">
+        <input type="date" id="order_date">
+        <input type="text" id="order_promo" placeholder="ПРОМОКОД" oninput="recalc()">
         
-        <div id="main" class="page active">
-            <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div id="avatar-main" class="avatar"></div>
-                    <div><div style="font-size:12px; opacity:0.5;">Привет,</div><div id="u-name" style="font-weight:800;">Клиент</div></div>
-                </div>
-                <i data-lucide="bell" style="opacity:0.5;"></i>
-            </header>
-            <h2 style="margin-bottom:20px;">Выберите карту</h2>
-            <div class="tariff-card" onclick="openOrder('Essential', 9500)"><h3>Essential Card</h3><div class="price">9 500 ₽</div></div>
-            <div class="tariff-card" onclick="openOrder('Business Prime', 19900)"><h3>Business Prime</h3><div class="price">19 900 ₽</div></div>
+        <div style="text-align:center; margin:40px 0;">
+            <div id="old_price" style="text-decoration:line-through; opacity:0.4; display:none; margin-bottom:5px;">0 ₽</div>
+            <div id="final_price" style="font-size:48px; font-weight:900;">0 ₽</div>
+            <div id="sel_name" style="color:var(--accent-blue); font-weight:700; margin-top:5px; text-transform:uppercase; font-size:12px;"></div>
         </div>
+        <button class="btn-main" onclick="confirmOrder()">ОПЛАТИТЬ ЗАКАЗ</button>
+    </div>
 
-        <div id="orders" class="page">
-            <h2 style="margin-bottom:20px;">Мои заказы</h2>
-            <div id="orders_list">
-                <div style="text-align:center; opacity:0.3; margin-top:50px;"><i data-lucide="package" style="width:48px; height:48px;"></i><p>Заказов пока нет</p></div>
+    <div id="success_screen" class="page">
+        <div style="text-align:center; padding-top:60px;">
+            <div style="width:100px; height:100px; background:rgba(34, 197, 94, 0.1); border-radius:50%; display:flex; justify-content:center; align-items:center; margin:0 auto 30px;">
+                <i data-lucide="check-circle" style="width:60px; height:60px; color:#22c55e;"></i>
             </div>
-        </div>
-
-        <div id="cabinet" class="page">
-            <h2>Профиль</h2>
-            <div class="tariff-card" style="text-align:center;">
-                <h3 id="cab-name">Клиент</h3>
-                <div id="ref-link" style="font-size:10px; margin-top:15px; padding:10px; background:rgba(0,0,0,0.2); border-radius:10px; border:1px dashed var(--glass-border);">t.me/EuroCardsBot?start=id</div>
-                <button class="btn" style="background:var(--accent); font-size:14px; padding:12px;" onclick="copyL()">Копировать рефку</button>
-            </div>
-        </div>
-
-        <div id="order_form" class="page">
-            <div onclick="switchP('main')" style="margin-bottom:20px; opacity:0.5;"><i data-lucide="chevron-left"></i> Назад</div>
-            <h2>Оформление</h2>
-            <div class="tariff-card" style="margin-top:20px;">
-                <label style="font-size:12px; opacity:0.5;">ФИО (лат.)</label>
-                <input type="text" id="fio" placeholder="IVAN IVANOV">
-                <label style="font-size:12px; opacity:0.5; margin-top:15px; display:block;">Дата рождения</label>
-                <input type="date" id="birth">
-                <button class="btn" onclick="confirmOrder()">ОФОРМИТЬ</button>
-            </div>
+            <h2 style="font-size:28px; font-weight:900; margin-bottom:15px;">Успешно!</h2>
+            <p style="color:var(--text-secondary); line-height:1.6; padding:0 20px;">Заявка отправлена. Ожидайте ответа специалиста в течение 24 часов.</p>
+            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ВЕРНУТЬСЯ НА ГЛАВНУЮ</button>
         </div>
     </div>
 
-    <div class="tabs">
-        <div class="tab-item active" onclick="switchP('main', this)"><i data-lucide="home"></i><span>Главная</span></div>
-        <div class="tab-item" onclick="switchP('orders', this)"><i data-lucide="package"></i><span>Заказы</span></div>
-        <div class="tab-item" onclick="switchP('cabinet', this)"><i data-lucide="user"></i><span>Кабинет</span></div>
+    <div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
+    <div class="sheet" id="sheet">
+        <div style="width:40px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin:-16px auto 25px;"></div>
+        <h2 id="sh-name" style="font-size:32px; margin:0;">Тариф</h2>
+        <p id="sh-price" style="font-size:24px; font-weight:800; color:var(--accent-blue); margin:10px 0 30px;">0 ₽</p>
+        <div id="sh-bullets" style="color:var(--text-secondary); font-size:14px; line-height:1.8; margin-bottom:40px;"></div>
+        <button class="btn-main" onclick="goToForm()">ПРОДОЛЖИТЬ</button>
     </div>
+
+    <nav class="tab-bar">
+        <div class="tab-item active" onclick="switchP('home', this)"><i data-lucide="home"></i><span>Главная</span></div>
+        <div class="tab-item" onclick="switchP('cards', this)"><i data-lucide="layers"></i><span>Заказы</span></div>
+        <div class="tab-item" onclick="switchP('bonuses', this)"><i data-lucide="sparkles"></i><span>Бонусы</span></div>
+        <div class="tab-item" onclick="switchP('profile', this)"><i data-lucide="user"></i><span>Кабинет</span></div>
+    </nav>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.ready(); tg.expand(); lucide.createIcons();
-        let currentTariff = {};
-
-        function init() {
-            const p = new URLSearchParams(window.location.search);
-            const name = p.get('n') || "Клиент";
-            const id = p.get('id') || "0";
-            
-            document.getElementById('u-name').innerText = name;
-            document.getElementById('cab-name').innerText = name;
-            document.getElementById('avatar-main').innerText = name[0];
-            document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${id}`;
-
-            // --- РЕНДЕР ЗАКАЗОВ ---
-            const ords = p.get('orders');
-            if(ords) {
-                try {
-                    const list = JSON.parse(atob(ords));
-                    const container = document.getElementById('orders_list');
-                    if(list.length > 0) {
-                        container.innerHTML = '';
-                        list.forEach(o => {
-                            const badge = o.status === 'Готово' ? 'status-ready' : 'status-process';
-                            container.innerHTML += `
-                                <div class="order-card">
-                                    <div>
-                                        <div style="font-size:10px; opacity:0.5;">${o.num} • ${o.date}</div>
-                                        <div style="font-weight:800; margin:4px 0;">${o.name}</div>
-                                        <div style="color:var(--accent); font-weight:700;">${o.price} ₽</div>
-                                    </div>
-                                    <div class="status-badge ${badge}">${o.status}</div>
-                                </div>`;
-                        });
-                    }
-                } catch(e) { console.error("Error loading orders", e); }
-            }
-        }
-        init();
+        let tg = window.Telegram.WebApp; tg.expand(); lucide.createIcons();
+        let cur = { name: '', price: 0, final: 0 };
+        const DB = {
+            'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Skrill/Neteller на выбор<br>• Apple Pay включен' },
+            'Duo Safe': { p: 14000, b: '• 2 Банка сразу<br>• Скидка 50% на второй банк<br>• Двойные лимиты' },
+            'Business Prime': { p: 19900, b: '• Duo Safe + Поддержка 24/7<br>• Помощь при блокировках' },
+            'Infinite Elite': { p: 39900, b: '• 3 Банка (Wise/Revolut)<br>• PayPal Pro в подарок' },
+            'PayPal': { p: 4900, b: '• Личный верифицированный аккаунт' },
+            'Wise': { p: 20000, b: '• Личный счет Wise (IBAN)' },
+            'Revolut': { p: 20000, b: '• Личный счет Revolut' }
+        };
 
         function switchP(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            if(el) { document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active')); el.classList.add('active'); }
+            if(el) {
+                document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+                el.classList.add('active');
+            }
+            tg.HapticFeedback.impactOccurred('medium'); window.scrollTo(0,0);
+        }
+
+        function toggleFaq(el) {
+            let a = el.querySelector('.faq-a');
+            let isOpen = a.style.display === 'block';
+            a.style.display = isOpen ? 'none' : 'block';
+            tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function showSheet(n) {
+            const t = DB[n]; cur = { name: n, price: t.p, final: t.p };
+            document.getElementById('sh-name').innerText = n;
+            document.getElementById('sh-price').innerText = t.p.toLocaleString() + ' ₽';
+            document.getElementById('sh-bullets').innerHTML = t.b;
+            document.getElementById('overlay').style.display = 'block';
+            setTimeout(() => { document.getElementById('overlay').style.opacity = '1'; document.getElementById('sheet').classList.add('active'); }, 10);
             tg.HapticFeedback.impactOccurred('medium');
         }
 
-        function openOrder(n, p) { currentTariff = {n, p}; switchP('order_form'); }
+        function closeSheet() {
+            document.getElementById('sheet').classList.remove('active');
+            document.getElementById('overlay').style.opacity = '0';
+            setTimeout(() => document.getElementById('overlay').style.display = 'none', 300);
+        }
+
+        function goToForm() {
+            closeSheet(); document.getElementById('sel_name').innerText = cur.name; recalc(); switchP('order_form');
+        }
+
+        function recalc() {
+            const pr = document.getElementById('order_promo');
+            const code = pr.value.toUpperCase().trim();
+            let fin = cur.price;
+            if(code === 'SALE500') {
+                fin -= 500; pr.classList.add('valid'); pr.classList.remove('invalid');
+                document.getElementById('old_price').innerText = cur.price + ' ₽';
+                document.getElementById('old_price').style.display = 'block';
+                if(code.length === 7) tg.HapticFeedback.notificationOccurred('success');
+            } else if(code.length > 0) { pr.classList.add('invalid'); pr.classList.remove('valid'); }
+            cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
+        }
 
         function confirmOrder() {
-            const f = document.getElementById('fio').value.trim();
-            const b = document.getElementById('birth').value;
-            if(!f || !b) { tg.showAlert("Заполните все поля!"); return; }
-            
-            // Короткий Deep Link для бота
-            const link = `https://t.me/EuroCardsBot?start=O_${encodeURIComponent(currentTariff.n)}|${currentTariff.p}|${encodeURIComponent(f)}|${b}`;
-            tg.openTelegramLink(link);
+            const f = document.getElementById('order_fio').value;
+            const d = document.getElementById('order_date').value;
+            if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
+            tg.HapticFeedback.notificationOccurred('success');
+            switchP('success_screen');
+            tg.sendData(JSON.stringify({action: "ORDER", tariff: cur.name, price: cur.final, fio: f, birth: d}));
         }
 
         function copyL() {
             navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
-            tg.showAlert("Скопировано!");
+            tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!");
+        }
+
+        window.onload = () => {
+            const u = tg.initDataUnsafe.user;
+            if(u) {
+                document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${u.id}`;
+                document.getElementById('cab-name').innerText = u.first_name;
+                if(u.photo_url) {
+                    document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
+                    document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
+                }
+            }
         }
     </script>
 </body>
