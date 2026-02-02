@@ -64,8 +64,8 @@
             justify-content: space-between;
             align-items: center;
         }
-        .order-info b { display: block; font-size: 16px; margin-bottom: 4px; }
-        .order-info small { color: var(--text-secondary); font-size: 11px; }
+        .order-info b { display: block; font-size: 15px; margin-bottom: 2px; }
+        .order-info div { font-size: 11px; opacity: 0.5; }
         .status-badge {
             padding: 6px 12px;
             border-radius: 10px;
@@ -86,11 +86,6 @@
         input.invalid { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
 
         .btn-main { background: #fff; color: #000; border: none; width: 100%; height: 60px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; }
-
-        /* CABINET / FAQ */
-        .faq-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; margin-bottom: 12px; }
-        .faq-q { padding: 18px; font-weight: 600; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
-        .faq-a { padding: 0 18px 18px; font-size: 13px; color: var(--text-secondary); line-height: 1.5; display: none; }
 
         /* TAB BAR */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 0.5px solid var(--glass-border); display: flex; justify-content: space-around; padding-top: 12px; z-index: 1000; }
@@ -159,10 +154,9 @@
     </div>
 
     <div id="cards" class="page">
-        <h2 style="font-weight:800;">Мои заказы</h2>
-        <div id="orders-container">
-            </div>
-        <div id="order-list-empty" style="text-align:center; padding-top:80px; opacity:0.3;">
+        <h2 id="orders-title" style="font-weight:800;">Мои заказы</h2>
+        <div id="orders-container"></div>
+        <div id="order-list-empty" style="text-align:center; padding-top:80px; opacity:0.3; display:none;">
             <i data-lucide="package" style="width:60px; height:60px; margin-bottom:20px;"></i>
             <p>Заказов пока нет</p>
         </div>
@@ -188,20 +182,7 @@
         </div>
 
         <h3 style="margin-bottom:15px;">Помощь и FAQ</h3>
-        <div class="faq-item" onclick="toggleFaq(this)">
-            <div class="faq-q">Какие нужны документы? <i data-lucide="chevron-down" style="width:16px;"></i></div>
-            <div class="faq-a">Требуется только заграничный паспорт. Никаких дополнительных справок и доверенностей.</div>
-        </div>
-        <div class="faq-item" onclick="toggleFaq(this)">
-            <div class="faq-q">Как пополнять счет? <i data-lucide="chevron-down" style="width:16px;"></i></div>
-            <div class="faq-a">Через P2P: отправляете рубли, получаете USDT на бирже и мгновенно меняете на Евро/Доллары в своем банке.</div>
-        </div>
-        <div class="faq-item" onclick="toggleFaq(this)">
-            <div class="faq-q">Срок действия карты? <i data-lucide="chevron-down" style="width:16px;"></i></div>
-            <div class="faq-a">Карта действует 3 года. Перевыпуск в приложении банка — бесплатный.</div>
-        </div>
-
-        <button class="btn-main" style="margin-top:20px; background:var(--glass); color:#fff; border:1px solid var(--glass-border);" onclick="tg.openTelegramLink('https://t.me/your_support')">Связаться с поддержкой</button>
+        <button class="btn-main" style="background:var(--glass); color:#fff; border:1px solid var(--glass-border);" onclick="tg.openTelegramLink('https://t.me/eurocardsapp_bot')">Связаться с поддержкой</button>
     </div>
 
     <div id="order_form" class="page">
@@ -218,16 +199,12 @@
         <button class="btn-main" onclick="confirmOrder()">ОПЛАТИТЬ ЗАКАЗ</button>
     </div>
 
-    <div id="success_screen" class="page">
-        <div style="text-align:center; padding-top:60px;">
-            <div style="width:100px; height:100px; background:rgba(34, 197, 94, 0.1); border-radius:50%; display:flex; justify-content:center; align-items:center; margin:0 auto 30px;">
-                <i data-lucide="check-circle" style="width:60px; height:60px; color:#22c55e;"></i>
-            </div>
-            <h2 style="font-size:28px; font-weight:900; margin-bottom:15px;">Успешно!</h2>
-            <p style="color:var(--text-secondary); line-height:1.6; padding:0 20px;">Заявка отправлена. Ожидайте ответа специалиста в течение 24 часов.</p>
-            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ВЕРНУТЬСЯ НА ГЛАВНУЮ</button>
-        </div>
-    </div>
+    <nav class="tab-bar">
+        <div class="tab-item active" onclick="switchP('home', this)"><i data-lucide="home"></i><span>Главная</span></div>
+        <div class="tab-item" onclick="switchP('cards', this)"><i data-lucide="layers"></i><span>Заказы</span></div>
+        <div class="tab-item" onclick="switchP('bonuses', this)"><i data-lucide="sparkles"></i><span>Бонусы</span></div>
+        <div class="tab-item" onclick="switchP('profile', this)"><i data-lucide="user"></i><span>Кабинет</span></div>
+    </nav>
 
     <div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
     <div class="sheet" id="sheet">
@@ -238,21 +215,14 @@
         <button class="btn-main" onclick="goToForm()">ПРОДОЛЖИТЬ</button>
     </div>
 
-    <nav class="tab-bar">
-        <div class="tab-item active" onclick="switchP('home', this)"><i data-lucide="home"></i><span>Главная</span></div>
-        <div class="tab-item" onclick="switchP('cards', this)"><i data-lucide="layers"></i><span>Заказы</span></div>
-        <div class="tab-item" onclick="switchP('bonuses', this)"><i data-lucide="sparkles"></i><span>Бонусы</span></div>
-        <div class="tab-item" onclick="switchP('profile', this)"><i data-lucide="user"></i><span>Кабинет</span></div>
-    </nav>
-
     <script>
         let tg = window.Telegram.WebApp; tg.expand(); lucide.createIcons();
         let cur = { name: '', price: 0, final: 0 };
         const DB = {
-            'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Skrill/Neteller на выбор<br>• Apple Pay включен' },
-            'Duo Safe': { p: 14000, b: '• 2 Банка сразу<br>• Скидка 50% на второй банк<br>• Двойные лимиты' },
-            'Business Prime': { p: 19900, b: '• Duo Safe + Поддержка 24/7<br>• Помощь при блокировках' },
-            'Infinite Elite': { p: 39900, b: '• 3 Банка (Wise/Revolut)<br>• PayPal Pro в подарок' },
+            'Essential': { p: 9500, b: '• Моментальный выпуск<br>• Apple Pay включен' },
+            'Duo Safe': { p: 14000, b: '• 2 Банка сразу<br>• Скидка 50% на второй банк' },
+            'Business Prime': { p: 19900, b: '• Duo Safe + Поддержка 24/7' },
+            'Infinite Elite': { p: 39900, b: '• 3 Банка (Wise/Revolut)' },
             'PayPal': { p: 4900, b: '• Личный верифицированный аккаунт' },
             'Wise': { p: 20000, b: '• Личный счет Wise (IBAN)' },
             'Revolut': { p: 20000, b: '• Личный счет Revolut' }
@@ -268,13 +238,6 @@
             tg.HapticFeedback.impactOccurred('medium'); window.scrollTo(0,0);
         }
 
-        function toggleFaq(el) {
-            let a = el.querySelector('.faq-a');
-            let isOpen = a.style.display === 'block';
-            a.style.display = isOpen ? 'none' : 'block';
-            tg.HapticFeedback.impactOccurred('light');
-        }
-
         function showSheet(n) {
             const t = DB[n]; cur = { name: n, price: t.p, final: t.p };
             document.getElementById('sh-name').innerText = n;
@@ -282,7 +245,6 @@
             document.getElementById('sh-bullets').innerHTML = t.b;
             document.getElementById('overlay').style.display = 'block';
             setTimeout(() => { document.getElementById('overlay').style.opacity = '1'; document.getElementById('sheet').classList.add('active'); }, 10);
-            tg.HapticFeedback.impactOccurred('medium');
         }
 
         function closeSheet() {
@@ -291,92 +253,74 @@
             setTimeout(() => document.getElementById('overlay').style.display = 'none', 300);
         }
 
-        function goToForm() {
-            closeSheet(); document.getElementById('sel_name').innerText = cur.name; recalc(); switchP('order_form');
-        }
+        function goToForm() { closeSheet(); document.getElementById('sel_name').innerText = cur.name; recalc(); switchP('order_form'); }
 
         function recalc() {
             const pr = document.getElementById('order_promo');
             const code = pr.value.toUpperCase().trim();
             let fin = cur.price;
             if(code === 'SALE500') {
-                fin -= 500; pr.classList.add('valid'); pr.classList.remove('invalid');
+                fin -= 500; pr.classList.add('valid'); 
                 document.getElementById('old_price').innerText = cur.price + ' ₽';
                 document.getElementById('old_price').style.display = 'block';
-                if(code.length === 7) tg.HapticFeedback.notificationOccurred('success');
-            } else if(code.length > 0) { pr.classList.add('invalid'); pr.classList.remove('valid'); }
+            } else { pr.classList.remove('valid'); document.getElementById('old_price').style.display = 'none'; }
             cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
         }
 
-      function confirmOrder() {
-    const f = document.getElementById('order_fio').value.trim();
-    const d = document.getElementById('order_date').value;
-    if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
-    
-    tg.HapticFeedback.notificationOccurred('success');
-    
-    // ВАЖНО: Впиши сюда юзернейм СВОЕГО бота без символа @
-    const myBotUsername = "eurocardsapp_bot"; 
-    
-    // Формируем данные заказа
-    const orderData = `O_${cur.name}|${cur.final}|${f}|${d}`;
-    
-    // Формируем ссылку именно на ТВОЕГО бота
-    const botUrl = `https://t.me/${myBotUsername}?start=${encodeURIComponent(orderData)}`;
-    
-    // Отправляем пользователя в ТВОЙ бот с данными заказа
-    tg.openTelegramLink(botUrl);
-    
-    // Показываем экран успеха (опционально, так как приложение закроется при переходе)
-    switchP('success_screen');
-}
+        function confirmOrder() {
+            const f = document.getElementById('order_fio').value.trim();
+            const d = document.getElementById('order_date').value;
+            const p = document.getElementById('order_promo').value.trim() || "-";
+            if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
+            
+            const botUsername = "eurocardsapp_bot"; 
+            const orderData = `O_${cur.name}|${cur.final}|${f}|${d}|${p}`;
+            const botUrl = `https://t.me/${botUsername}?start=${encodeURIComponent(orderData)}`;
+            
+            tg.openTelegramLink(botUrl);
+        }
 
         function copyL() {
             navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
             tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!");
         }
 
-        // --- ФУНКЦИЯ ЗАГРУЗКИ ЗАКАЗОВ ---
         window.onload = () => {
             const params = new URLSearchParams(window.location.search);
-            const u = tg.initDataUnsafe.user;
-            
-            // Заполнение профиля
-            const name = (u && u.first_name) ? u.first_name : params.get('n') || "Клиент";
-            const id = (u && u.id) ? u.id : params.get('id') || "0";
-            
-            document.getElementById('ref-link').innerText = `t.me/EuroCardsBot?start=${id}`;
-            document.getElementById('cab-name').innerText = name;
-            
-            if(u && u.photo_url) {
-                document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
-                document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
-            }
-
-            // РЕНДЕР ЗАКАЗОВ
+            const isAdmin = params.get('adm') === '1';
             const ordersData = params.get('orders');
+            
+            if(isAdmin) document.getElementById('orders-title').innerText = "Админ-панель";
+
             if (ordersData) {
                 try {
-                    const list = JSON.parse(atob(ordersData)); // Расшифровка из Base64
+                    const list = JSON.parse(atob(ordersData));
                     const container = document.getElementById('orders-container');
                     if (list.length > 0) {
-                        document.getElementById('order-list-empty').style.display = 'none';
-                        container.innerHTML = ''; // Очистка
                         list.forEach(o => {
                             const badge = o.status === 'Готово' ? 'st-ready' : 'st-process';
                             container.innerHTML += `
                                 <div class="order-item">
                                     <div class="order-info">
-                                        <small>${o.num} • ${o.date}</small>
+                                        <small>Заказ №${o.num} • ${o.date}</small>
                                         <b>${o.name}</b>
-                                        <span style="color:var(--accent-blue); font-weight:700;">${o.price.toLocaleString()} ₽</span>
+                                        <div>Клиент: ${o.fio} (${o.birth})</div>
+                                        <span style="color:var(--accent-blue); font-weight:700;">${o.price} ₽</span>
                                     </div>
                                     <div class="status-badge ${badge}">${o.status}</div>
-                                </div>
-                            `;
+                                </div>`;
                         });
-                    }
-                } catch (e) { console.error("Error decoding orders:", e); }
+                    } else { document.getElementById('order-list-empty').style.display = 'block'; }
+                } catch (e) { document.getElementById('order-list-empty').style.display = 'block'; }
+            } else { document.getElementById('order-list-empty').style.display = 'block'; }
+
+            const u = tg.initDataUnsafe.user;
+            const name = u ? u.first_name : params.get('n') || "Клиент";
+            document.getElementById('cab-name').innerText = name;
+            document.getElementById('ref-link').innerText = `t.me/eurocardsapp_bot?start=${u ? u.id : '0'}`;
+            if(u && u.photo_url) {
+                document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
+                document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
             }
         }
     </script>
