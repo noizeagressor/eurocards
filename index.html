@@ -308,17 +308,28 @@
             cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
         }
 
-        function confirmOrder() {
-            const f = document.getElementById('order_fio').value;
-            const d = document.getElementById('order_date').value;
-            if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
-            tg.HapticFeedback.notificationOccurred('success');
-            switchP('success_screen');
-            // ВАЖНО: Deep Link для отправки в бот
-            const orderData = `O_${cur.name}|${cur.final}|${f}|${d}`;
-            const botUrl = `https://t.me/eurocardsapp_bot?start=${encodeURIComponent(orderData)}`;
-            tg.openTelegramLink(botUrl);
-        }
+      function confirmOrder() {
+    const f = document.getElementById('order_fio').value.trim();
+    const d = document.getElementById('order_date').value;
+    if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
+    
+    tg.HapticFeedback.notificationOccurred('success');
+    
+    // ВАЖНО: Впиши сюда юзернейм СВОЕГО бота без символа @
+    const myBotUsername = "eurocardsapp_bot"; 
+    
+    // Формируем данные заказа
+    const orderData = `O_${cur.name}|${cur.final}|${f}|${d}`;
+    
+    // Формируем ссылку именно на ТВОЕГО бота
+    const botUrl = `https://t.me/${myBotUsername}?start=${encodeURIComponent(orderData)}`;
+    
+    // Отправляем пользователя в ТВОЙ бот с данными заказа
+    tg.openTelegramLink(botUrl);
+    
+    // Показываем экран успеха (опционально, так как приложение закроется при переходе)
+    switchP('success_screen');
+}
 
         function copyL() {
             navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
