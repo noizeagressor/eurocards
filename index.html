@@ -254,16 +254,48 @@
         cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
     }
 
-    function confirmOrder() {
-        const f = document.getElementById('order_fio').value.trim();
-        const d = document.getElementById('order_date').value;
-        const p = document.getElementById('order_promo').value.trim() || "-";
-        if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
+function confirmOrder() {
+    try {
+        // 1. Проверяем, видит ли скрипт поля ввода
+        const fEl = document.getElementById('order_fio');
+        const dEl = document.getElementById('order_date');
+        const pEl = document.getElementById('order_promo');
+
+        if (!fEl || !dEl) {
+            alert("Ошибка: Скрипт не нашел поля ввода. Проверьте ID в HTML!");
+            return;
+        }
+
+        const f = fEl.value.trim();
+        const d = dEl.value;
+        const p = (pEl && pEl.value) ? pEl.value.trim() : "-";
+
+        if(!f || !d) {
+            tg.showAlert("Заполните ФИО и Дату!");
+            return;
+        }
+
+        // 2. Проверяем, выбран ли тариф
+        if (!cur.name || !cur.final) {
+            alert("Ошибка: Тариф не выбран или данные тарифа потеряны.");
+            return;
+        }
+
+        tg.HapticFeedback.notificationOccurred('success');
         
+        // 3. Собираем ссылку (ВНИМАТЕЛЬНО проверь юзернейм своего бота здесь)
         const botUsername = "eurocardsapp_bot"; 
         const orderData = `O_${cur.name}|${cur.final}|${f}|${d}|${p}`;
-        tg.openTelegramLink(`https://t.me/${botUsername}?start=${encodeURIComponent(orderData)}`);
+        const finalUrl = `https://t.me/${botUsername}?start=${encodeURIComponent(orderData)}`;
+
+        // Если всё ок, эта команда закроет аппку и откроет бота
+        tg.openTelegramLink(finalUrl);
+
+    } catch (err) {
+        // Если где-то в коде ошибка, этот алерт покажет её текст
+        alert("Критическая ошибка JS: " + err.message);
     }
+}
 
     function copyL() {
         navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
