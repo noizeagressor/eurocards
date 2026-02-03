@@ -8,17 +8,45 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --zen-dark: #0f172a; --zen-blue: #1e293b;
-            --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-blue: #38bdf8; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            /* Темная тема с глубокими оттенками */
+            --zen-dark: #020617; 
+            --zen-blue: #0f172a;
+            --glass: rgba(255, 255, 255, 0.04); 
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-blue: #38bdf8; 
+            --text-main: #f8fafc; 
+            --text-secondary: #94a3b8;
             --error: #ef4444;
-            --g-std: linear-gradient(145deg, #334155, #1e293b); --g-duo: linear-gradient(145deg, #1e3a8a, #0f172a);
-            --g-prm: linear-gradient(145deg, #064e3b, #022c22); --g-elt: linear-gradient(145deg, #171717, #000000);
-            --g-pay: linear-gradient(145deg, #003087, #009cde); --g-bank: linear-gradient(145deg, #27272a, #09090b);
+
+            /* Полупрозрачные градиенты для эффекта стекла */
+            --g-std: linear-gradient(145deg, rgba(51, 65, 85, 0.3), rgba(30, 41, 59, 0.2));
+            --g-duo: linear-gradient(145deg, rgba(30, 58, 138, 0.3), rgba(15, 23, 42, 0.2));
+            --g-prm: linear-gradient(145deg, rgba(6, 78, 59, 0.3), rgba(2, 44, 34, 0.2));
+            --g-elt: linear-gradient(145deg, rgba(23, 23, 23, 0.4), rgba(0, 0, 0, 0.3));
+            --g-pay: linear-gradient(145deg, rgba(0, 48, 135, 0.3), rgba(0, 156, 222, 0.2));
+            --g-bank: linear-gradient(145deg, rgba(39, 39, 42, 0.3), rgba(9, 9, 11, 0.2));
         }
 
-        body { font-family: -apple-system, system-ui, sans-serif; background: var(--zen-dark); margin: 0; padding: 0; color: var(--text-main); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-        .zen-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 0%, var(--zen-blue) 0%, var(--zen-dark) 100%); z-index: -2; }
+        body { 
+            font-family: -apple-system, system-ui, sans-serif; 
+            background: var(--zen-dark); 
+            margin: 0; padding: 0; 
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased; 
+        }
+
+        /* Улучшенный фон с мягкими "световыми пятнами" */
+        .zen-bg { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: 
+                radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 20% 80%, rgba(30, 58, 138, 0.1) 0%, transparent 40%),
+                var(--zen-dark);
+            z-index: -2; 
+        }
+
         .page { display: none; padding: 20px 20px 140px; animation: slideUp 0.4s ease; }
         .page.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -26,37 +54,51 @@
         /* HEADER */
         .header-user { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 0 5px; }
         .user-info { display: flex; align-items: center; gap: 12px; }
-        .avatar-circle { width: 44px; height: 44px; border-radius: 50%; background: var(--glass); border: 1px solid var(--glass-border); background-size: cover; background-position: center; }
+        .avatar-circle { 
+            width: 44px; height: 44px; border-radius: 50%; 
+            background: var(--glass); border: 1px solid var(--glass-border); 
+            background-size: cover; background-position: center; 
+            backdrop-filter: blur(10px);
+        }
         .user-text { display: flex; flex-direction: column; justify-content: center; }
         .greeting { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .user-name { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
-        .notif-btn { position: relative; width: 42px; height: 42px; background: var(--glass); border-radius: 14px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border); color: var(--text-secondary); }
+        
+        .notif-btn { 
+            position: relative; width: 42px; height: 42px; 
+            background: var(--glass); border-radius: 14px; 
+            display: flex; align-items: center; justify-content: center; 
+            border: 1px solid var(--glass-border); color: var(--text-secondary); 
+            backdrop-filter: blur(10px);
+        }
         .notif-dot { position: absolute; top: 11px; right: 11px; width: 7px; height: 7px; background: var(--accent-blue); border-radius: 50%; border: 2px solid var(--zen-dark); }
 
-        /* GRID & SECTION */
         .section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin: 30px 0 15px 5px; }
         .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         
-        /* ПРОКАЧАННЫЕ ПЛИТКИ */
+        /* ГЛАСС-ПЛИТКИ */
         .tile { 
             aspect-ratio: 1 / 1; border-radius: 28px; padding: 22px; position: relative; 
-            border: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; 
-            justify-content: space-between; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
+            border: 1px solid var(--glass-border); 
+            display: flex; flex-direction: column; 
+            justify-content: space-between; overflow: hidden; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
-        .tile:active { transform: scale(0.95) translateY(2px); }
+        .tile:active { transform: scale(0.96) translateY(2px); }
         
-        /* Луч света на грани */
+        /* Внутреннее свечение (Inner Light) */
         .tile::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 28px; padding: 1px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 50%);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             mask-composite: exclude; pointer-events: none;
         }
 
-        /* Логотипы-призраки на фоне */
         .tile::after {
             content: ''; position: absolute; bottom: -10%; right: -10%; width: 65%; height: 65%;
-            background-repeat: no-repeat; background-size: contain; opacity: 0.04; 
+            background-repeat: no-repeat; background-size: contain; opacity: 0.05; 
             filter: brightness(0) invert(1); transform: rotate(-15deg); pointer-events: none;
         }
         .tile[onclick*="Essential"]::after { background-image: url('https://cdn-icons-png.flaticon.com/512/179/179431.png'); }
@@ -65,37 +107,45 @@
         .tile[onclick*="PayPal"]::after { background-image: url('https://cdn-icons-png.flaticon.com/512/174/174861.png'); }
 
         .tile-content { position: relative; z-index: 2; }
-        .t1 { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .t1 { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
         .t2 { font-size: 13px; font-weight: 500; margin-top: 2px; }
         .val-block { display: flex; align-items: baseline; gap: 3px; position: relative; z-index: 2; }
         .val { font-size: 24px; font-weight: 800; }
-        .unit { font-size: 14px; opacity: 0.6; }
-        .tile-icon { position: absolute; top: 20px; right: 20px; width: 20px; height: 20px; opacity: 0.2; color: #fff; z-index: 2; }
-        .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.1); z-index: 2; }
+        .unit { font-size: 14px; opacity: 0.5; }
+        .tile-icon { position: absolute; top: 20px; right: 20px; width: 22px; height: 22px; opacity: 0.3; color: #fff; z-index: 2; }
+        .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.1); z-index: 2; }
 
         /* FORMS */
-        input { width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 4px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input { width: 100%; height: 60px; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 4px; box-sizing: border-box; outline: none; transition: 0.3s; backdrop-filter: blur(10px); }
         input[type="date"] { color-scheme: dark; display: flex; align-items: center; min-height: 60px; }
-        input.valid { border-color: #22c55e !important; box-shadow: 0 0 10px rgba(34, 197, 94, 0.2); }
+        input.valid { border-color: #22c55e !important; box-shadow: 0 0 15px rgba(34, 197, 94, 0.1); }
         input.invalid { border-color: var(--error) !important; background: rgba(239, 68, 68, 0.05); animation: shake 0.4s ease-in-out; }
         .error-msg { color: var(--error); font-size: 11px; margin-bottom: 15px; margin-left: 10px; display: none; font-weight: 600; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
-        /* ORDERS LIST FIX */
-        .order-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 22px; padding: 18px; margin-bottom: 12px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
-        .order-info { min-width: 0; }
-        .order-info b { display: block; font-size: 15px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .status-badge { padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .st-process { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
-        .st-ready { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .btn-main { background: #fff; color: #000; border: none; width: 100%; height: 60px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; cursor: pointer; transition: 0.2s; }
+        .btn-main:active { transform: scale(0.98); opacity: 0.9; }
 
-        .btn-main { background: #fff; color: #000; border: none; width: 100%; height: 60px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; cursor: pointer; }
-        .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 0.5px solid var(--glass-border); display: flex; justify-content: space-around; padding-top: 12px; z-index: 1000; }
+        /* ГЛАСС-ТАББАР */
+        .tab-bar { 
+            position: fixed; bottom: 0; width: 100%; height: 85px; 
+            background: rgba(2, 6, 23, 0.6); 
+            backdrop-filter: blur(25px); 
+            border-top: 0.5px solid var(--glass-border); 
+            display: flex; justify-content: space-around; padding-top: 12px; z-index: 1000; 
+        }
         .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); flex: 1; font-size: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
         .tab-item.active { color: var(--accent-blue); }
 
-        .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; opacity: 0; transition: 0.3s; }
-        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #1a1f2e; border-radius: 32px 32px 0 0; padding: 32px 24px 60px; box-sizing: border-box; z-index: 2001; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); border-top: 1px solid var(--glass-border); }
+        /* ORDERS & OTHER */
+        .order-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 22px; padding: 18px; margin-bottom: 12px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; backdrop-filter: blur(10px); }
+        .status-badge { padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .st-process { background: rgba(56, 189, 248, 0.1); color: var(--accent-blue); }
+        .st-ready { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+
+        .faq-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; margin-bottom: 12px; padding: 18px; cursor: pointer; backdrop-filter: blur(10px); }
+        .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; display: none; opacity: 0; transition: 0.3s; backdrop-filter: blur(4px); }
+        .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: rgba(26, 31, 46, 0.95); backdrop-filter: blur(30px); border-radius: 32px 32px 0 0; padding: 32px 24px 60px; box-sizing: border-box; z-index: 2001; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); border-top: 1px solid var(--glass-border); }
         .sheet.active { bottom: 0; }
     </style>
 </head>
@@ -119,47 +169,54 @@
         <h3 class="section-title">Банки на ваше имя</h3>
         <div class="tile-grid">
             <div class="tile" style="background: var(--g-std)" onclick="showSheet('Essential')">
+                <i data-lucide="credit-card" class="tile-icon"></i>
                 <div class="tile-content"><div class="t1">Essential</div><div class="t2">Base Access</div></div>
                 <div class="val-block"><span class="val">9500</span><span class="unit">₽</span></div>
-                <i data-lucide="credit-card" class="tile-icon"></i><div class="plus-btn">+</div>
+                <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="background: var(--g-duo)" onclick="showSheet('Duo Safe')">
+                <i data-lucide="layers" class="tile-icon"></i>
                 <div class="tile-content"><div class="t1">Duo Safe</div><div class="t2">Double Power</div></div>
                 <div class="val-block"><span class="val">14000</span><span class="unit">₽</span></div>
-                <i data-lucide="layers" class="tile-icon"></i><div class="plus-btn">+</div>
+                <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="background: var(--g-prm)" onclick="showSheet('Business Prime')">
+                <i data-lucide="shield-check" class="tile-icon"></i>
                 <div class="tile-content"><div class="t1">Business</div><div class="t2">Max Support</div></div>
                 <div class="val-block"><span class="val">19900</span><span class="unit">₽</span></div>
-                <i data-lucide="shield-check" class="tile-icon"></i><div class="plus-btn">+</div>
+                <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="background: var(--g-elt)" onclick="showSheet('Infinite Elite')">
+                <i data-lucide="crown" class="tile-icon"></i>
                 <div class="tile-content"><div class="t1">Infinite</div><div class="t2">Elite Bundle</div></div>
                 <div class="val-block"><span class="val">39900</span><span class="unit">₽</span></div>
-                <i data-lucide="crown" class="tile-icon"></i><div class="plus-btn">+</div>
+                <div class="plus-btn">+</div>
             </div>
         </div>
 
         <h3 class="section-title">Готовые банки (дропы)</h3>
         <div class="tile-grid">
             <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Wise')">
+                <i data-lucide="landmark" class="tile-icon"></i>
                 <div class="tile-content"><div class="t1">Wise</div><div class="t2">Personal Euro</div></div>
                 <div class="val-block"><span class="val">20000</span><span class="unit">₽</span></div>
-                <i data-lucide="landmark" class="tile-icon"></i><div class="plus-btn">+</div>
+                <div class="plus-btn">+</div>
             </div>
             <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Revolut')">
+                <i data-lucide="refresh-ccw" class="tile-icon"></i>
                 <div class="tile-content"><div class="t1">Revolut</div><div class="t2">Full Access</div></div>
                 <div class="val-block"><span class="val">20000</span><span class="unit">₽</span></div>
-                <i data-lucide="refresh-ccw" class="tile-icon"></i><div class="plus-btn">+</div>
+                <div class="plus-btn">+</div>
             </div>
         </div>
 
         <h3 class="section-title">Дополнительные услуги</h3>
         <div class="tile-grid">
             <div class="tile" style="grid-column: span 2; aspect-ratio: 2.3/1; background: var(--g-pay)" onclick="showSheet('PayPal')">
+                <i data-lucide="wallet" class="tile-icon"></i>
                 <div class="tile-content"><div class="t1">PayPal Pro</div><div class="t2">Verified Personal Account</div></div>
                 <div class="val-block"><span class="val">4900</span><span class="unit">₽</span></div>
-                <i data-lucide="wallet" class="tile-icon"></i><div class="plus-btn">+</div>
+                <div class="plus-btn">+</div>
             </div>
         </div>
     </div>
@@ -175,13 +232,13 @@
 
     <div id="bonuses" class="page">
         <h2>Бонусы</h2>
-        <div style="background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 25px; margin-bottom: 20px;">
+        <div style="background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 25px; margin-bottom: 20px; backdrop-filter: blur(10px);">
             <small style="opacity:0.6; font-weight:700;">БАЛАНС</small>
             <div style="font-size:38px; font-weight:900; margin:10px 0;">0 ₽</div>
             <button class="btn-main" style="height:50px; font-size:14px;" onclick="tg.showAlert('Вывод от 5000 ₽')">Вывести средства</button>
         </div>
         <h3 class="section-title">Партнерская программа</h3>
-        <div class="faq-item" style="padding:20px; font-size:13px; line-height:1.6; background:var(--glass); border-radius:18px;">
+        <div class="faq-item" style="padding:20px; font-size:13px; line-height:1.6;">
             <b>Как это работает?</b><br>
             1. Скопируйте ссылку ниже.<br>
             2. Отправьте другу.<br>
@@ -226,7 +283,7 @@
             <i data-lucide="check-circle" style="width:80px; height:80px; color:#22c55e;"></i>
             <h2 style="margin-top:20px;">Заявка принята!</h2>
             <p style="opacity:0.6; padding:0 30px;">Менеджер свяжется с вами в ближайшее время.</p>
-            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ВЕРНУТЬСЯ</button>
+            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ОТЛИЧНО</button>
         </div>
     </div>
 
@@ -283,18 +340,10 @@
                     container.innerHTML = '';
                     list.forEach(o => {
                         const badge = o.status === 'Готово' ? 'st-ready' : 'st-process';
-                        container.innerHTML += `
-                            <div class="order-item">
-                                <div class="order-info">
-                                    <small style="opacity:0.5; font-size:10px;">№${o.num} • ${o.date || ''}</small>
-                                    <b>${o.name}</b>
-                                    <span style="color:var(--accent-blue); font-size:13px; font-weight:700;">${o.price} ₽</span>
-                                </div>
-                                <div class="status-badge ${badge}">${o.status}</div>
-                            </div>`;
+                        container.innerHTML += `<div class="order-item"><div class="order-info"><small>№${o.num} • ${o.date || ''}</small><b>${o.name}</b><span style="color:var(--accent-blue); font-size:13px; font-weight:700;">${o.price} ₽</span></div><div class="status-badge ${badge}">${o.status}</div></div>`;
                     });
                 }
-            } catch (e) { console.error("Orders load error"); }
+            } catch (e) { console.error("Orders error"); }
         }
     }
     initUser();
