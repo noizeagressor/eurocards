@@ -27,6 +27,7 @@
         .header-user { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 0 5px; }
         .user-info { display: flex; align-items: center; gap: 12px; }
         .avatar-circle { width: 44px; height: 44px; border-radius: 50%; background: var(--glass); border: 1px solid var(--glass-border); background-size: cover; background-position: center; }
+        .user-text { display: flex; flex-direction: column; justify-content: center; }
         .greeting { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
         .user-name { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
         .notif-btn { position: relative; width: 42px; height: 42px; background: var(--glass); border-radius: 14px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border); color: var(--text-secondary); }
@@ -35,35 +36,63 @@
         /* GRID & SECTION */
         .section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin: 30px 0 15px 5px; }
         .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .tile { aspect-ratio: 1 / 1; border-radius: 28px; padding: 22px; position: relative; border: 1px solid var(--glass-border); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; transition: 0.3s; cursor: pointer; }
-        .tile:active { transform: scale(0.96); opacity: 0.9; }
+        
+        /* ПРОКАЧАННЫЕ ПЛИТКИ */
+        .tile { 
+            aspect-ratio: 1 / 1; border-radius: 28px; padding: 22px; position: relative; 
+            border: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; 
+            justify-content: space-between; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
+        }
+        .tile:active { transform: scale(0.95) translateY(2px); }
+        
+        /* Луч света на грани */
+        .tile::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 28px; padding: 1px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude; pointer-events: none;
+        }
+
+        /* Логотипы-призраки на фоне */
+        .tile::after {
+            content: ''; position: absolute; bottom: -10%; right: -10%; width: 65%; height: 65%;
+            background-repeat: no-repeat; background-size: contain; opacity: 0.04; 
+            filter: brightness(0) invert(1); transform: rotate(-15deg); pointer-events: none;
+        }
+        .tile[onclick*="Essential"]::after { background-image: url('https://cdn-icons-png.flaticon.com/512/179/179431.png'); }
+        .tile[onclick*="Wise"]::after { background-image: url('https://cdn-icons-png.flaticon.com/512/5968/5968940.png'); }
+        .tile[onclick*="Revolut"]::after { background-image: url('https://cdn-icons-png.flaticon.com/512/5968/5968914.png'); }
+        .tile[onclick*="PayPal"]::after { background-image: url('https://cdn-icons-png.flaticon.com/512/174/174861.png'); }
+
+        .tile-content { position: relative; z-index: 2; }
         .t1 { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
         .t2 { font-size: 13px; font-weight: 500; margin-top: 2px; }
-        .val-block { display: flex; align-items: baseline; gap: 3px; }
+        .val-block { display: flex; align-items: baseline; gap: 3px; position: relative; z-index: 2; }
         .val { font-size: 24px; font-weight: 800; }
         .unit { font-size: 14px; opacity: 0.6; }
-        .tile-icon { position: absolute; top: 20px; right: 20px; width: 20px; height: 20px; opacity: 0.2; color: #fff; }
-        .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
+        .tile-icon { position: absolute; top: 20px; right: 20px; width: 20px; height: 20px; opacity: 0.2; color: #fff; z-index: 2; }
+        .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.1); z-index: 2; }
 
-        /* FORMS & ERRORS */
+        /* FORMS */
         input { width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 4px; box-sizing: border-box; outline: none; transition: 0.3s; }
-        input[type="date"] { color-scheme: dark; }
+        input[type="date"] { color-scheme: dark; display: flex; align-items: center; min-height: 60px; }
+        input.valid { border-color: #22c55e !important; box-shadow: 0 0 10px rgba(34, 197, 94, 0.2); }
         input.invalid { border-color: var(--error) !important; background: rgba(239, 68, 68, 0.05); animation: shake 0.4s ease-in-out; }
         .error-msg { color: var(--error); font-size: 11px; margin-bottom: 15px; margin-left: 10px; display: none; font-weight: 600; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        /* ORDERS LIST FIX */
+        .order-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 22px; padding: 18px; margin-bottom: 12px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; }
+        .order-info { min-width: 0; }
+        .order-info b { display: block; font-size: 15px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .status-badge { padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .st-process { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
+        .st-ready { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
 
         .btn-main { background: #fff; color: #000; border: none; width: 100%; height: 60px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; cursor: pointer; }
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 0.5px solid var(--glass-border); display: flex; justify-content: space-around; padding-top: 12px; z-index: 1000; }
         .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); flex: 1; font-size: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
         .tab-item.active { color: var(--accent-blue); }
-
-        /* FAQ & ORDERS */
-        .faq-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; margin-bottom: 12px; padding: 18px; cursor: pointer; }
-        .faq-a { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-top: 10px; display: none; }
-        .order-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 22px; padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .status-badge { padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .st-process { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
-        .st-ready { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
 
         .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; opacity: 0; transition: 0.3s; }
         .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #1a1f2e; border-radius: 32px 32px 0 0; padding: 32px 24px 60px; box-sizing: border-box; z-index: 2001; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); border-top: 1px solid var(--glass-border); }
@@ -152,15 +181,15 @@
             <button class="btn-main" style="height:50px; font-size:14px;" onclick="tg.showAlert('Вывод от 5000 ₽')">Вывести средства</button>
         </div>
         <h3 class="section-title">Партнерская программа</h3>
-        <div class="faq-item" style="padding:20px; font-size:13px; line-height:1.6;">
+        <div class="faq-item" style="padding:20px; font-size:13px; line-height:1.6; background:var(--glass); border-radius:18px;">
             <b>Как это работает?</b><br>
             1. Скопируйте ссылку ниже.<br>
             2. Отправьте другу.<br>
             3. Получите 500 ₽ за каждую его оплату!
         </div>
-        <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border);">
+        <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); margin-top: 15px;">
             <code id="ref-link" style="color:var(--accent-blue); font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px;">...</code>
-            <i data-lucide="copy" style="width:18px; cursor:pointer;" onclick="copyL()"></i>
+            <i data-lucide="copy" style="width:18px; cursor:pointer; color:var(--accent-blue);" onclick="copyL()"></i>
         </div>
     </div>
 
@@ -171,7 +200,7 @@
         </div>
         <h3>FAQ</h3>
         <div class="faq-item" onclick="toggleFaq(this)"><b>Какие нужны документы?</b><div class="faq-a">Только действующий заграничный паспорт.</div></div>
-        <div class="faq-item" onclick="toggleFaq(this)"><b>Как пополнить карту из РФ?</b><div class="faq-a">Через криптобиржи (P2P) — покупаете USDT и меняете на валюту банка.</div></div>
+        <div class="faq-item" onclick="toggleFaq(this)"><b>Как пополнить карту?</b><div class="faq-a">Через криптобиржи (P2P) — USDT меняете на валюту банка.</div></div>
         <button class="btn-main" style="background:var(--glass); color:#fff; border:1px solid var(--glass-border); margin-top:20px;" onclick="tg.openTelegramLink('https://t.me/eurocardsapp_bot')">Связаться с поддержкой</button>
     </div>
 
@@ -197,7 +226,7 @@
             <i data-lucide="check-circle" style="width:80px; height:80px; color:#22c55e;"></i>
             <h2 style="margin-top:20px;">Заявка принята!</h2>
             <p style="opacity:0.6; padding:0 30px;">Менеджер свяжется с вами в ближайшее время.</p>
-            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ОТЛИЧНО</button>
+            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ВЕРНУТЬСЯ</button>
         </div>
     </div>
 
@@ -254,10 +283,18 @@
                     container.innerHTML = '';
                     list.forEach(o => {
                         const badge = o.status === 'Готово' ? 'st-ready' : 'st-process';
-                        container.innerHTML += `<div class="order-item"><div class="order-info"><small>№${o.num} • ${o.date}</small><b>${o.name}</b><div style="font-size:11px; opacity:0.5;">${o.fio || ''}</div><span style="color:var(--accent-blue); font-weight:700;">${o.price} ₽</span></div><div class="status-badge ${badge}">${o.status}</div></div>`;
+                        container.innerHTML += `
+                            <div class="order-item">
+                                <div class="order-info">
+                                    <small style="opacity:0.5; font-size:10px;">№${o.num} • ${o.date || ''}</small>
+                                    <b>${o.name}</b>
+                                    <span style="color:var(--accent-blue); font-size:13px; font-weight:700;">${o.price} ₽</span>
+                                </div>
+                                <div class="status-badge ${badge}">${o.status}</div>
+                            </div>`;
                     });
                 }
-            } catch (e) { console.error("Orders error"); }
+            } catch (e) { console.error("Orders load error"); }
         }
     }
     initUser();
@@ -285,7 +322,14 @@
         const pr = document.getElementById('order_promo');
         const code = pr.value.toUpperCase().trim();
         let fin = cur.price;
-        if(code === 'SALE500') { fin -= 500; pr.classList.add('valid'); document.getElementById('old_price').innerText = cur.price + ' ₽'; document.getElementById('old_price').style.display = 'block'; }
+        if(code === 'SALE500') { 
+            fin -= 500; 
+            if (!pr.classList.contains('valid')) {
+                pr.classList.add('valid');
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+            document.getElementById('old_price').innerText = cur.price + ' ₽'; document.getElementById('old_price').style.display = 'block'; 
+        }
         else { pr.classList.remove('valid'); document.getElementById('old_price').style.display = 'none'; }
         cur.final = fin; document.getElementById('final_price').innerText = fin.toLocaleString() + ' ₽';
     }
@@ -321,7 +365,7 @@
     }
 
     function toggleFaq(el) { let a = el.querySelector('.faq-a'); a.style.display = a.style.display === 'block' ? 'none' : 'block'; }
-    function copyL() { navigator.clipboard.writeText(document.getElementById('ref-link').innerText); tg.showAlert("Скопировано!"); }
+    function copyL() { navigator.clipboard.writeText(document.getElementById('ref-link').innerText); tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!"); }
 </script>
 </body>
 </html>
