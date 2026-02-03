@@ -6,39 +6,34 @@
     <title>EuroCards Zen Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-<style>
+    <style>
         :root {
             --zen-dark: #0f172a; --zen-blue: #1e293b;
             --glass: rgba(255, 255, 255, 0.05); --glass-border: rgba(255, 255, 255, 0.1);
             --accent-blue: #38bdf8; --text-main: #f8fafc; --text-secondary: #94a3b8;
+            --error: #ef4444;
             --g-std: linear-gradient(145deg, #334155, #1e293b); --g-duo: linear-gradient(145deg, #1e3a8a, #0f172a);
             --g-prm: linear-gradient(145deg, #064e3b, #022c22); --g-elt: linear-gradient(145deg, #171717, #000000);
             --g-pay: linear-gradient(145deg, #003087, #009cde); --g-bank: linear-gradient(145deg, #27272a, #09090b);
         }
 
         body { font-family: -apple-system, system-ui, sans-serif; background: var(--zen-dark); margin: 0; padding: 0; color: var(--text-main); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-
-        /* --- НОВАЯ ШАПКА И ПРОФИЛЬ --- */
-        .header-user { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 0 5px; }
-        .user-info { display: flex; align-items: center; gap: 12px; }
-        .avatar-circle { width: 44px; height: 44px; border-radius: 50%; background: var(--glass); border: 1px solid var(--glass-border); background-size: cover; background-position: center; }
-        .user-text { display: flex; flex-direction: column; justify-content: center; }
-        .greeting { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
-        .user-name { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
-
-        /* --- УВЕДОМЛЕНИЯ --- */
-        .notif-btn { position: relative; width: 42px; height: 42px; background: var(--glass); border-radius: 14px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border); color: var(--text-secondary); }
-        .notif-dot { position: absolute; top: 11px; right: 11px; width: 7px; height: 7px; background: var(--accent-blue); border-radius: 50%; border: 2px solid var(--zen-dark); }
-
-        /* --- ЗАГОЛОВКИ КАТЕГОРИЙ --- */
-        .section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin: 30px 0 15px 5px; }
-
         .zen-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 0%, var(--zen-blue) 0%, var(--zen-dark) 100%); z-index: -2; }
         .page { display: none; padding: 20px 20px 140px; animation: slideUp 0.4s ease; }
         .page.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- ПЛИТКИ --- */
+        /* HEADER */
+        .header-user { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 0 5px; }
+        .user-info { display: flex; align-items: center; gap: 12px; }
+        .avatar-circle { width: 44px; height: 44px; border-radius: 50%; background: var(--glass); border: 1px solid var(--glass-border); background-size: cover; background-position: center; }
+        .greeting { font-size: 11px; color: var(--text-secondary); font-weight: 500; }
+        .user-name { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; }
+        .notif-btn { position: relative; width: 42px; height: 42px; background: var(--glass); border-radius: 14px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border); color: var(--text-secondary); }
+        .notif-dot { position: absolute; top: 11px; right: 11px; width: 7px; height: 7px; background: var(--accent-blue); border-radius: 50%; border: 2px solid var(--zen-dark); }
+
+        /* GRID & SECTION */
+        .section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); margin: 30px 0 15px 5px; }
         .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .tile { aspect-ratio: 1 / 1; border-radius: 28px; padding: 22px; position: relative; border: 1px solid var(--glass-border); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; transition: 0.3s; cursor: pointer; }
         .tile:active { transform: scale(0.96); opacity: 0.9; }
@@ -49,32 +44,27 @@
         .unit { font-size: 14px; opacity: 0.6; }
         .tile-icon { position: absolute; top: 20px; right: 20px; width: 20px; height: 20px; opacity: 0.2; color: #fff; }
         .plus-btn { position: absolute; bottom: 22px; right: 22px; width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
-        
-        /* --- КАРТОЧКИ ЗАКАЗОВ --- */
-        .order-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 22px; padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .order-info b { display: block; font-size: 15px; margin-bottom: 2px; }
-        .order-info div { font-size: 11px; opacity: 0.5; }
-        .status-badge { padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .st-process { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
-        .st-ready { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
 
-        /* --- ФОРМЫ --- */
-        input { width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 20px; box-sizing: border-box; outline: none; transition: 0.3s; }
-        input[type="date"] { color-scheme: dark; padding: 0 15px; }
-        input.valid { border-color: #22c55e; }
-        input.invalid { border-color: #ef4444; }
+        /* FORMS & ERRORS */
+        input { width: 100%; height: 60px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 18px; padding: 0 20px; color: #fff; font-size: 16px; margin-bottom: 4px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input[type="date"] { color-scheme: dark; }
+        input.invalid { border-color: var(--error) !important; background: rgba(239, 68, 68, 0.05); animation: shake 0.4s ease-in-out; }
+        .error-msg { color: var(--error); font-size: 11px; margin-bottom: 15px; margin-left: 10px; display: none; font-weight: 600; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
         .btn-main { background: #fff; color: #000; border: none; width: 100%; height: 60px; border-radius: 20px; font-weight: 800; font-size: 16px; margin-top: 10px; cursor: pointer; }
-
-        /* --- ТАБ-БАР --- */
         .tab-bar { position: fixed; bottom: 0; width: 100%; height: 85px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-top: 0.5px solid var(--glass-border); display: flex; justify-content: space-around; padding-top: 12px; z-index: 1000; }
         .tab-item { display: flex; flex-direction: column; align-items: center; color: var(--text-secondary); flex: 1; font-size: 10px; font-weight: 700; text-transform: uppercase; cursor: pointer; }
         .tab-item.active { color: var(--accent-blue); }
 
-        /* --- FAQ --- */
+        /* FAQ & ORDERS */
         .faq-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 18px; margin-bottom: 12px; padding: 18px; cursor: pointer; }
         .faq-a { font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-top: 10px; display: none; }
+        .order-item { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 22px; padding: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .status-badge { padding: 6px 12px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .st-process { background: rgba(56, 189, 248, 0.15); color: var(--accent-blue); }
+        .st-ready { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
 
-        /* --- ШТОРКА (SHEET) --- */
         .sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; opacity: 0; transition: 0.3s; }
         .sheet { position: fixed; bottom: -100%; left: 0; width: 100%; background: #1a1f2e; border-radius: 32px 32px 0 0; padding: 32px 24px 60px; box-sizing: border-box; z-index: 2001; transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); border-top: 1px solid var(--glass-border); }
         .sheet.active { bottom: 0; }
@@ -83,100 +73,67 @@
 <body>
     <div class="zen-bg"></div>
 
-  <div id="home" class="page active">
-    <div class="header-user">
-        <div class="user-info">
-            <div id="avatar-main" class="avatar-circle"></div>
-            <div class="user-text">
-                <span class="greeting">Добрый вечер,</span>
-                <b id="u-name" class="user-name">Загрузка...</b>
+    <div id="home" class="page active">
+        <div class="header-user">
+            <div class="user-info">
+                <div id="avatar-main" class="avatar-circle"></div>
+                <div class="user-text">
+                    <span class="greeting">Добрый вечер,</span>
+                    <b id="u-name" class="user-name">Загрузка...</b>
+                </div>
+            </div>
+            <div class="notif-btn" onclick="tg.showAlert('У вас пока нет новых уведомлений')">
+                <i data-lucide="bell"></i><span class="notif-dot"></span>
             </div>
         </div>
-        <div class="notif-btn" onclick="tg.showAlert('У вас пока нет новых уведомлений')">
-            <i data-lucide="bell"></i>
-            <span class="notif-dot"></span>
+
+        <h3 class="section-title">Банки на ваше имя</h3>
+        <div class="tile-grid">
+            <div class="tile" style="background: var(--g-std)" onclick="showSheet('Essential')">
+                <div class="tile-content"><div class="t1">Essential</div><div class="t2">Base Access</div></div>
+                <div class="val-block"><span class="val">9500</span><span class="unit">₽</span></div>
+                <i data-lucide="credit-card" class="tile-icon"></i><div class="plus-btn">+</div>
+            </div>
+            <div class="tile" style="background: var(--g-duo)" onclick="showSheet('Duo Safe')">
+                <div class="tile-content"><div class="t1">Duo Safe</div><div class="t2">Double Power</div></div>
+                <div class="val-block"><span class="val">14000</span><span class="unit">₽</span></div>
+                <i data-lucide="layers" class="tile-icon"></i><div class="plus-btn">+</div>
+            </div>
+            <div class="tile" style="background: var(--g-prm)" onclick="showSheet('Business Prime')">
+                <div class="tile-content"><div class="t1">Business</div><div class="t2">Max Support</div></div>
+                <div class="val-block"><span class="val">19900</span><span class="unit">₽</span></div>
+                <i data-lucide="shield-check" class="tile-icon"></i><div class="plus-btn">+</div>
+            </div>
+            <div class="tile" style="background: var(--g-elt)" onclick="showSheet('Infinite Elite')">
+                <div class="tile-content"><div class="t1">Infinite</div><div class="t2">Elite Bundle</div></div>
+                <div class="val-block"><span class="val">39900</span><span class="unit">₽</span></div>
+                <i data-lucide="crown" class="tile-icon"></i><div class="plus-btn">+</div>
+            </div>
+        </div>
+
+        <h3 class="section-title">Готовые банки (дропы)</h3>
+        <div class="tile-grid">
+            <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Wise')">
+                <div class="tile-content"><div class="t1">Wise</div><div class="t2">Personal Euro</div></div>
+                <div class="val-block"><span class="val">20000</span><span class="unit">₽</span></div>
+                <i data-lucide="landmark" class="tile-icon"></i><div class="plus-btn">+</div>
+            </div>
+            <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Revolut')">
+                <div class="tile-content"><div class="t1">Revolut</div><div class="t2">Full Access</div></div>
+                <div class="val-block"><span class="val">20000</span><span class="unit">₽</span></div>
+                <i data-lucide="refresh-ccw" class="tile-icon"></i><div class="plus-btn">+</div>
+            </div>
+        </div>
+
+        <h3 class="section-title">Дополнительные услуги</h3>
+        <div class="tile-grid">
+            <div class="tile" style="grid-column: span 2; aspect-ratio: 2.3/1; background: var(--g-pay)" onclick="showSheet('PayPal')">
+                <div class="tile-content"><div class="t1">PayPal Pro</div><div class="t2">Verified Personal Account</div></div>
+                <div class="val-block"><span class="val">4900</span><span class="unit">₽</span></div>
+                <i data-lucide="wallet" class="tile-icon"></i><div class="plus-btn">+</div>
+            </div>
         </div>
     </div>
-
-    <h3 class="section-title">Банки на ваше имя</h3>
-    <div class="tile-grid">
-        <div class="tile" style="background: var(--g-std)" onclick="showSheet('Essential')">
-            <div class="tile-content">
-                <div class="t1">Essential</div>
-                <div class="t2">Base Access</div>
-            </div>
-            <div class="val-block"><span class="val">9500</span><span class="unit">₽</span></div>
-            <i data-lucide="credit-card" class="tile-icon"></i>
-            <div class="plus-btn">+</div>
-        </div>
-
-        <div class="tile" style="background: var(--g-duo)" onclick="showSheet('Duo Safe')">
-            <div class="tile-content">
-                <div class="t1">Duo Safe</div>
-                <div class="t2">Double Power</div>
-            </div>
-            <div class="val-block"><span class="val">14000</span><span class="unit">₽</span></div>
-            <i data-lucide="layers" class="tile-icon"></i>
-            <div class="plus-btn">+</div>
-        </div>
-
-        <div class="tile" style="background: var(--g-prm)" onclick="showSheet('Business Prime')">
-            <div class="tile-content">
-                <div class="t1">Business</div>
-                <div class="t2">Max Support</div>
-            </div>
-            <div class="val-block"><span class="val">19900</span><span class="unit">₽</span></div>
-            <i data-lucide="shield-check" class="tile-icon"></i>
-            <div class="plus-btn">+</div>
-        </div>
-
-        <div class="tile" style="background: var(--g-elt)" onclick="showSheet('Infinite Elite')">
-            <div class="tile-content">
-                <div class="t1">Infinite</div>
-                <div class="t2">Elite Bundle</div>
-            </div>
-            <div class="val-block"><span class="val">39900</span><span class="unit">₽</span></div>
-            <i data-lucide="crown" class="tile-icon"></i>
-            <div class="plus-btn">+</div>
-        </div>
-    </div>
-
-    <h3 class="section-title">Готовые банки (дропы)</h3>
-    <div class="tile-grid">
-        <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Wise')">
-            <div class="tile-content">
-                <div class="t1">Wise</div>
-                <div class="t2">Personal Euro</div>
-            </div>
-            <div class="val-block"><span class="val">20000</span><span class="unit">₽</span></div>
-            <i data-lucide="landmark" class="tile-icon"></i>
-            <div class="plus-btn">+</div>
-        </div>
-
-        <div class="tile" style="background: var(--g-bank)" onclick="showSheet('Revolut')">
-            <div class="tile-content">
-                <div class="t1">Revolut</div>
-                <div class="t2">Full Access</div>
-            </div>
-            <div class="val-block"><span class="val">20000</span><span class="unit">₽</span></div>
-            <i data-lucide="refresh-ccw" class="tile-icon"></i>
-            <div class="plus-btn">+</div>
-        </div>
-    </div>
-
-    <h3 class="section-title">Дополнительные услуги</h3>
-    <div class="tile-grid">
-        <div class="tile" style="grid-column: span 2; aspect-ratio: 2.3/1; background: var(--g-pay)" onclick="showSheet('PayPal')">
-            <div class="tile-content">
-                <div class="t1">PayPal Pro</div>
-                <div class="t2">Verified Personal Account</div>
-            </div>
-            <div class="val-block"><span class="val">4900</span><span class="unit">₽</span></div>
-            <i data-lucide="wallet" class="tile-icon"></i>
-            <div class="plus-btn">+</div>
-        </div>
-    </div>
-</div>
 
     <div id="cards" class="page">
         <h2 id="orders-title">Мои заказы</h2>
@@ -189,30 +146,45 @@
 
     <div id="bonuses" class="page">
         <h2>Бонусы</h2>
-        <div style="background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 25px; margin-bottom: 15px;">
-            <small>БАЛАНС</small><div style="font-size:38px; font-weight:900; margin:10px 0;">0 ₽</div>
-            <button class="btn-main" onclick="tg.showAlert('Вывод от 5000 ₽')">Вывести</button>
+        <div style="background: var(--glass); border: 1px solid var(--glass-border); border-radius: 24px; padding: 25px; margin-bottom: 20px;">
+            <small style="opacity:0.6; font-weight:700;">БАЛАНС</small>
+            <div style="font-size:38px; font-weight:900; margin:10px 0;">0 ₽</div>
+            <button class="btn-main" style="height:50px; font-size:14px;" onclick="tg.showAlert('Вывод от 5000 ₽')">Вывести средства</button>
+        </div>
+        <h3 class="section-title">Партнерская программа</h3>
+        <div class="faq-item" style="padding:20px; font-size:13px; line-height:1.6;">
+            <b>Как это работает?</b><br>
+            1. Скопируйте ссылку ниже.<br>
+            2. Отправьте другу.<br>
+            3. Получите 500 ₽ за каждую его оплату!
         </div>
         <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 18px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border);">
-            <code id="ref-link" style="color:var(--accent-blue); font-size:12px;">...</code><i data-lucide="copy" style="width:18px; cursor:pointer;" onclick="copyL()"></i>
+            <code id="ref-link" style="color:var(--accent-blue); font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px;">...</code>
+            <i data-lucide="copy" style="width:18px; cursor:pointer;" onclick="copyL()"></i>
         </div>
     </div>
 
     <div id="profile" class="page">
         <div style="display:flex; align-items:center; gap:15px; margin-bottom:30px;">
-            <div id="avatar-cab" style="width:60px; height:60px; border-radius:50%; background:var(--glass); border:1px solid var(--glass-border); background-size:cover;"></div>
-            <div><b id="cab-name">Клиент</b><br><small style="color:var(--text-secondary)">Личный кабинет</small></div>
+            <div id="avatar-cab" class="avatar-circle" style="width:60px; height:60px;"></div>
+            <div><b id="cab-name" style="font-size:18px;">Клиент</b><br><small style="color:var(--accent-blue); font-weight:700;">Premium Member</small></div>
         </div>
         <h3>FAQ</h3>
-        <div class="faq-item" onclick="toggleFaq(this)"><b>Какие нужны документы?</b><div class="faq-a">Только загранпаспорт.</div></div>
-        <button class="btn-main" style="background:var(--glass); color:#fff;" onclick="tg.openTelegramLink('https://t.me/eurocardsapp_bot')">Поддержка</button>
+        <div class="faq-item" onclick="toggleFaq(this)"><b>Какие нужны документы?</b><div class="faq-a">Только действующий заграничный паспорт.</div></div>
+        <div class="faq-item" onclick="toggleFaq(this)"><b>Как пополнить карту из РФ?</b><div class="faq-a">Через криптобиржи (P2P) — покупаете USDT и меняете на валюту банка.</div></div>
+        <button class="btn-main" style="background:var(--glass); color:#fff; border:1px solid var(--glass-border); margin-top:20px;" onclick="tg.openTelegramLink('https://t.me/eurocardsapp_bot')">Связаться с поддержкой</button>
     </div>
 
     <div id="order_form" class="page">
         <h2>Оформление</h2>
-        <input type="text" id="order_fio" placeholder="ИМЯ ФАМИЛИЯ" enterkeyhint="done">
+        <input type="text" id="order_fio" placeholder="NAME SURNAME (LATIN)" oninput="this.value = this.value.toUpperCase()">
+        <div id="fio_error" class="error-msg">Только латиница, Имя и Фамилия</div>
+
         <input type="date" id="order_date">
-        <input type="text" id="order_promo" placeholder="ПРОМОКОД" oninput="recalc()" enterkeyhint="done">
+        <div id="date_error" class="error-msg">Только для лиц старше 18 лет</div>
+
+        <input type="text" id="order_promo" placeholder="ПРОМОКОД (ЕСЛИ ЕСТЬ)" oninput="recalc()">
+        
         <div style="text-align:center; margin:30px 0;">
             <div id="old_price" style="text-decoration:line-through; opacity:0.4; display:none;">0 ₽</div>
             <div id="final_price" style="font-size:48px; font-weight:900;">0 ₽</div>
@@ -222,10 +194,10 @@
 
     <div id="success_screen" class="page">
         <div style="text-align:center; padding-top:60px;">
-            <i data-lucide="check-circle" style="width:60px; height:60px; color:#22c55e; margin-bottom:20px;"></i>
-            <h2>Заявка принята!</h2>
-            <p style="opacity:0.6; padding:0 30px;">Данные отправлены. Мы свяжемся с вами в Telegram.</p>
-            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ВЕРНУТЬСЯ</button>
+            <i data-lucide="check-circle" style="width:80px; height:80px; color:#22c55e;"></i>
+            <h2 style="margin-top:20px;">Заявка принята!</h2>
+            <p style="opacity:0.6; padding:0 30px;">Менеджер свяжется с вами в ближайшее время.</p>
+            <button class="btn-main" style="margin-top:40px;" onclick="switchP('home')">ОТЛИЧНО</button>
         </div>
     </div>
 
@@ -246,10 +218,8 @@
     </nav>
 
 <script>
-let tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
-    lucide.createIcons();
+    let tg = window.Telegram.WebApp;
+    tg.ready(); tg.expand(); lucide.createIcons();
 
     let cur = { name: '', price: 0, final: 0 };
     const DB = {
@@ -265,19 +235,15 @@ let tg = window.Telegram.WebApp;
     function initUser() {
         const params = new URLSearchParams(window.location.search);
         let u = tg.initDataUnsafe.user;
-        
         const name = (u && u.first_name) ? u.first_name : params.get('name') || "Клиент";
         const id = (u && u.id) ? u.id : params.get('id') || "0";
-        
-        if(document.getElementById('u-name')) document.getElementById('u-name').innerText = name;
-        if(document.getElementById('cab-name')) document.getElementById('cab-name').innerText = name;
-        if(document.getElementById('ref-link')) document.getElementById('ref-link').innerText = `t.me/eurocardsapp_bot?start=${id}`;
-        
+        document.getElementById('u-name').innerText = name;
+        document.getElementById('cab-name').innerText = name;
+        document.getElementById('ref-link').innerText = `t.me/eurocardsapp_bot?start=${id}`;
         if (u && u.photo_url) {
             document.getElementById('avatar-main').style.backgroundImage = `url('${u.photo_url}')`;
             document.getElementById('avatar-cab').style.backgroundImage = `url('${u.photo_url}')`;
         }
-
         const ordersData = params.get('orders');
         if (ordersData) {
             try {
@@ -288,22 +254,12 @@ let tg = window.Telegram.WebApp;
                     container.innerHTML = '';
                     list.forEach(o => {
                         const badge = o.status === 'Готово' ? 'st-ready' : 'st-process';
-                        container.innerHTML += `
-                            <div class="order-item">
-                                <div class="order-info">
-                                    <small>Заказ №${o.num} • ${o.date}</small>
-                                    <b>${o.name}</b>
-                                    <div style="font-size:11px; opacity:0.5;">${o.fio || ''}</div>
-                                    <span style="color:var(--accent-blue); font-weight:700;">${o.price} ₽</span>
-                                </div>
-                                <div class="status-badge ${badge}">${o.status}</div>
-                            </div>`;
+                        container.innerHTML += `<div class="order-item"><div class="order-info"><small>№${o.num} • ${o.date}</small><b>${o.name}</b><div style="font-size:11px; opacity:0.5;">${o.fio || ''}</div><span style="color:var(--accent-blue); font-weight:700;">${o.price} ₽</span></div><div class="status-badge ${badge}">${o.status}</div></div>`;
                     });
                 }
-            } catch (e) { console.error("Error loading orders"); }
+            } catch (e) { console.error("Orders error"); }
         }
     }
-
     initUser();
 
     function switchP(id, el) {
@@ -322,12 +278,7 @@ let tg = window.Telegram.WebApp;
         setTimeout(() => { document.getElementById('overlay').style.opacity = '1'; document.getElementById('sheet').classList.add('active'); }, 10);
     }
 
-    function closeSheet() {
-        document.getElementById('sheet').classList.remove('active');
-        document.getElementById('overlay').style.opacity = '0';
-        setTimeout(() => document.getElementById('overlay').style.display = 'none', 300);
-    }
-
+    function closeSheet() { document.getElementById('sheet').classList.remove('active'); document.getElementById('overlay').style.opacity = '0'; setTimeout(() => document.getElementById('overlay').style.display = 'none', 300); }
     function goToForm() { closeSheet(); recalc(); switchP('order_form'); }
 
     function recalc() {
@@ -340,60 +291,37 @@ let tg = window.Telegram.WebApp;
     }
 
     function confirmOrder() {
-        const fEl = document.getElementById('order_fio');
-        const dEl = document.getElementById('order_date');
-        const pEl = document.getElementById('order_promo');
+        const fEl = document.getElementById('order_fio'), dEl = document.getElementById('order_date');
+        const fErr = document.getElementById('fio_error'), dErr = document.getElementById('date_error');
+        const f = fEl.value.trim(), d = dEl.value;
 
-        const f = fEl.value.trim();
-        const d = dEl.value;
-        const p = pEl.value.trim() || "-";
-        
-        if(!f || !d) { tg.showAlert("Заполните данные!"); return; }
+        fEl.classList.remove('invalid'); dEl.classList.remove('invalid');
+        fErr.style.display = 'none'; dErr.style.display = 'none';
 
         const nameRegex = /^[a-zA-Z]+ [a-zA-Z]+$/;
         if (!nameRegex.test(f)) {
-            fEl.style.borderColor = "#ef4444";
-            tg.showAlert("Введите Name Surname латиницей");
-            return;
+            fEl.classList.add('invalid'); fErr.style.display = 'block';
+            tg.HapticFeedback.notificationOccurred('error'); return;
         }
 
-        const age = new Date().getFullYear() - new Date(d).getFullYear();
-        if (age < 18) {
-            dEl.style.borderColor = "#ef4444";
-            tg.showAlert("⚠️ Только с 18 лет!");
-        }
+        if (!d) { dEl.classList.add('invalid'); tg.HapticFeedback.notificationOccurred('error'); return; }
+
+        const birthDate = new Date(d); const today = new Date();
+        if (birthDate > today) { dEl.classList.add('invalid'); dErr.innerText = "Ошибка в дате"; dErr.style.display = 'block'; tg.HapticFeedback.notificationOccurred('error'); return; }
+
+        let age = today.getFullYear() - birthDate.getFullYear();
+        if (age < 18) { dEl.classList.add('invalid'); dErr.innerText = "Только 18+"; dErr.style.display = 'block'; tg.HapticFeedback.notificationOccurred('error'); return; }
 
         tg.HapticFeedback.notificationOccurred('success');
-        
-        const orderPayload = {
-            tariff: cur.name,
-            price: cur.final,
-            fio: f,
-            birth: d,
-            promo: p,
-            username: tg.initDataUnsafe.user ? tg.initDataUnsafe.user.username : "unknown"
-        };
+        const payload = { tariff: cur.name, price: cur.final, fio: f, birth: d, promo: document.getElementById('order_promo').value.trim() || "-", username: tg.initDataUnsafe.user ? tg.initDataUnsafe.user.username : "unknown" };
 
-        const googleScriptUrl = "https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec";
-
-        fetch(googleScriptUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(orderPayload)
-        })
-        .then(() => { switchP('success_screen'); })
-        .catch(() => { switchP('success_screen'); });
+        fetch("https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec", {
+            method: 'POST', mode: 'no-cors', body: JSON.stringify(payload)
+        }).then(() => switchP('success_screen')).catch(() => switchP('success_screen'));
     }
 
-    function copyL() {
-        navigator.clipboard.writeText(document.getElementById('ref-link').innerText);
-        tg.HapticFeedback.notificationOccurred('success'); tg.showAlert("Скопировано!");
-    }
-
-    function toggleFaq(el) {
-        let a = el.querySelector('.faq-a');
-        a.style.display = a.style.display === 'block' ? 'none' : 'block';
-    }
+    function toggleFaq(el) { let a = el.querySelector('.faq-a'); a.style.display = a.style.display === 'block' ? 'none' : 'block'; }
+    function copyL() { navigator.clipboard.writeText(document.getElementById('ref-link').innerText); tg.showAlert("Скопировано!"); }
 </script>
 </body>
 </html>
