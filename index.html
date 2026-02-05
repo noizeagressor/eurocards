@@ -4,447 +4,402 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>EuroCards Zen Premium</title>
-    <!-- Подключаем Telegram Web App API и иконки Lucide -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg-deep: #020617;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --accent: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.3);
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
+            --bg: #050505;
+            --card-bg: rgba(15, 15, 15, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --accent-cyan: #22d3ee;
+            --accent-gold: #fbbf24;
+            --text-primary: #ffffff;
+            --text-secondary: #71717a;
             
-            /* Цвета для фоновых сфер */
-            --blob-1: #0ea5e9;
-            --blob-2: #8b5cf6;
-            --blob-3: #2dd4bf;
+            /* Сложные градиенты для Aurora Background */
+            --aurora-1: #083344;
+            --aurora-2: #1e1b4b;
+            --aurora-3: #422006;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg-deep);
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
             margin: 0;
             padding: 0;
-            color: var(--text-main);
+            color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Анимированный фон со сферами */
-        .background-canvas {
+        /* Текстурный шум поверх всего */
+        body::before {
+            content: "";
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* Aurora Mesh Background */
+        .aurora-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
             z-index: -2;
-            background: var(--bg-deep);
             overflow: hidden;
+            background: var(--bg);
         }
 
-        .blob {
+        .aurora-element {
             position: absolute;
-            width: 450px;
-            height: 450px;
-            border-radius: 50%;
-            filter: blur(90px);
-            opacity: 0.22;
-            animation: drift 30s infinite alternate ease-in-out;
+            width: 150vw;
+            height: 150vh;
+            filter: blur(120px);
+            opacity: 0.4;
+            animation: rotate 60s infinite linear;
         }
 
-        .b1 { background: var(--blob-1); top: -150px; right: -100px; }
-        .b2 { background: var(--blob-2); bottom: -100px; left: -150px; animation-delay: -5s; }
-        .b3 { background: var(--blob-3); top: 35%; left: 15%; opacity: 0.12; animation-duration: 45s; }
+        .ae-1 { background: radial-gradient(circle, var(--aurora-1) 0%, transparent 60%); top: -50%; left: -25%; }
+        .ae-2 { background: radial-gradient(circle, var(--aurora-2) 0%, transparent 60%); bottom: -50%; right: -25%; animation-direction: reverse; }
+        .ae-3 { background: radial-gradient(circle, var(--aurora-3) 0%, transparent 50%); top: 25%; left: 25%; opacity: 0.2; }
 
-        @keyframes drift {
-            from { transform: translate(0, 0) scale(1); }
-            to { transform: translate(60px, 120px) scale(1.15); }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
-        /* Контейнер страниц */
-        .page {
-            display: none;
-            padding: 20px 20px 140px;
-            animation: pageIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
+        .container { padding: 20px 20px 140px; }
 
-        .page.active { display: block; }
-
-        @keyframes pageIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Шапка пользователя */
-        .app-header {
+        /* HEADER */
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 35px;
-            padding: 10px 5px;
+            margin-bottom: 40px;
+            padding-top: env(safe-area-inset-top);
         }
 
-        .profile-stack {
-            display: flex;
-            align-items: center;
+        .brand-section { display: flex; align-items: center; gap: 15px; }
+        .avatar {
+            width: 50px; height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(225deg, #111, #222);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .avatar i { color: var(--accent-cyan); }
+        
+        .user-meta { display: flex; flex-direction: column; }
+        .user-greeting { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+        .user-id { font-size: 18px; font-weight: 700; color: #fff; }
+
+        .notif-wrapper {
+            width: 45px; height: 45px;
+            border-radius: 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary);
+            position: relative;
+        }
+        .notif-status {
+            position: absolute;
+            top: 12px; right: 12px;
+            width: 6px; height: 6px;
+            background: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        /* GRID SYSTEM */
+        .section-label {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-cyan);
+            margin: 45px 0 20px 5px;
+        }
+
+        .asym-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
             gap: 15px;
         }
 
-        .avatar-wrap {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            padding: 2px;
-            box-shadow: 0 0 20px var(--accent-glow);
-        }
-
-        .avatar-img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background-size: cover;
-            background-position: center;
-            background-image: url('https://api.dicebear.com/7.x/avataaars/svg?seed=Felix');
-        }
-
-        .welcome-text { font-size: 13px; color: var(--text-dim); margin-bottom: 2px; }
-        .user-name { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-
-        .icon-btn {
-            width: 46px;
-            height: 46px;
-            background: var(--glass-bg);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            color: var(--text-dim);
-            position: relative;
-        }
-
-        .notif-badge {
-            position: absolute;
-            top: 13px; right: 13px;
-            width: 8px; height: 8px;
-            background: #fb7185;
-            border-radius: 50%;
-            border: 2px solid var(--bg-deep);
-            box-shadow: 0 0 10px #fb7185;
-        }
-
-        /* Заголовки секций */
-        .section-header {
-            font-size: 13px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--text-dim);
-            margin: 40px 0 20px 8px;
-            opacity: 0.8;
-        }
-
-        /* Сетка плиток */
-        .product-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .product-card {
-            aspect-ratio: 1 / 1.15;
-            border-radius: 36px;
-            padding: 25px;
-            background: rgba(255, 255, 255, 0.025);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
             position: relative;
             overflow: hidden;
-            backdrop-filter: blur(35px) saturate(180%) contrast(110%);
-            -webkit-backdrop-filter: blur(35px) saturate(180%) contrast(110%);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
         }
 
-        .product-card:active { transform: scale(0.94); }
+        .card:active { transform: translateY(2px) scale(0.98); border-color: var(--accent-cyan); }
 
-        /* Эффект свечения грани сверху */
-        .product-card::before {
-            content: '';
+        /* Дизайн плиток */
+        .card-small { grid-column: span 3; height: 160px; }
+        .card-large { grid-column: span 6; height: 180px; }
+        
+        /* Особый стиль для Премиум тарифа */
+        .card-infinite {
+            grid-column: span 6;
+            height: 220px;
+            background: linear-gradient(135deg, rgba(66, 32, 6, 0.4), rgba(5, 5, 5, 0.9));
+            border-color: rgba(251, 191, 36, 0.2);
+        }
+
+        .card-infinite::after {
+            content: "";
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 36px;
-            padding: 1.2px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 50%);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            pointer-events: none;
+            top: -50%; right: -20%;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, var(--accent-gold) 0%, transparent 70%);
+            opacity: 0.1;
         }
 
         .card-icon {
-            width: 58px;
-            height: 58px;
-            color: #fff;
-            margin-bottom: 22px;
-            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
-            opacity: 0.95;
+            position: absolute;
+            top: 20px; right: 20px;
+            color: var(--text-secondary);
+            opacity: 0.4;
         }
 
-        .card-label {
-            font-size: 11px;
+        .card-tag {
+            font-size: 10px;
             font-weight: 800;
-            color: var(--text-dim);
+            color: var(--text-secondary);
             text-transform: uppercase;
-            letter-spacing: 1.2px;
-            margin-bottom: 6px;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
         }
 
-        .card-price {
-            font-size: 21px;
-            font-weight: 900;
-            color: #fff;
-            letter-spacing: -0.5px;
-        }
+        .card-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+        .card-price { font-size: 16px; font-weight: 600; color: var(--accent-cyan); }
+        .card-price-gold { color: var(--accent-gold); }
 
-        /* Плавающая навигация */
-        .dock-nav {
+        /* NAVIGATION BAR */
+        .nav-pill {
             position: fixed;
-            bottom: 25px;
+            bottom: 30px;
             left: 20px;
             right: 20px;
-            height: 78px;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(30px) saturate(160%);
-            -webkit-backdrop-filter: blur(30px) saturate(160%);
-            border: 1px solid var(--glass-border);
-            border-radius: 32px;
+            height: 70px;
+            background: rgba(10, 10, 10, 0.85);
+            border: 1px solid var(--border);
+            border-radius: 24px;
             display: flex;
-            justify-content: space-around;
             align-items: center;
+            justify-content: space-around;
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             z-index: 1000;
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
 
-        .nav-item {
+        .nav-link {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            color: var(--text-dim);
+            gap: 4px;
+            color: var(--text-secondary);
+            text-decoration: none;
             font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
-            gap: 6px;
-            flex: 1;
-            transition: 0.2s;
+            letter-spacing: 0.5px;
+            transition: 0.3s;
         }
 
-        .nav-item.active { color: var(--accent); }
-        .nav-item i { width: 22px; height: 22px; }
+        .nav-link.active { color: var(--accent-cyan); }
+        .nav-link i { width: 22px; height: 22px; }
 
-        /* Шторка (Bottom Sheet) */
-        .sheet-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 2000;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+        /* DRAWER (BOTTOM SHEET) */
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: none; z-index: 2000;
+            opacity: 0; transition: 0.3s;
         }
 
-        .bottom-sheet {
+        .drawer {
             position: fixed;
-            bottom: -100%;
-            left: 0;
+            bottom: -100%; left: 0;
             width: 100%;
-            background: rgba(15, 23, 42, 0.98);
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            border-radius: 42px 42px 0 0;
-            padding: 45px 25px 65px;
+            background: #0a0a0a;
+            border-top: 1px solid var(--border);
+            border-radius: 30px 30px 0 0;
+            padding: 40px 25px 60px;
             box-sizing: border-box;
             z-index: 2001;
-            transition: bottom 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-            border-top: 1px solid var(--glass-border);
+            transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
+        .drawer.active { bottom: 0; }
 
-        .bottom-sheet.active { bottom: 0; }
-
-        .sheet-handle {
-            width: 45px; height: 5px;
-            background: rgba(255, 255, 255, 0.15);
+        .drawer-handle {
+            width: 40px; height: 4px;
+            background: #222;
             border-radius: 10px;
-            margin: -25px auto 35px;
+            margin: -20px auto 30px;
         }
 
-        .sheet-title { font-size: 32px; font-weight: 900; margin-bottom: 10px; }
-        .sheet-price { font-size: 26px; font-weight: 800; color: var(--accent); margin-bottom: 30px; }
-        .sheet-info { color: var(--text-dim); font-size: 16px; line-height: 1.8; margin-bottom: 45px; }
+        .drawer-h1 { font-size: 32px; font-weight: 800; margin: 0 0 10px; }
+        .drawer-price { font-size: 24px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 30px; }
+        .drawer-list { color: var(--text-secondary); line-height: 1.8; margin-bottom: 40px; font-size: 15px; }
 
-        .main-btn {
-            background: #fff;
+        .cta-button {
+            background: var(--text-primary);
             color: #000;
             border: none;
             width: 100%;
-            height: 66px;
-            border-radius: 24px;
+            height: 65px;
+            border-radius: 18px;
             font-weight: 900;
             font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 12px 30px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
         }
 
-        .main-btn:active { transform: scale(0.97); opacity: 0.95; }
+        /* Страницы */
+        .view { display: none; }
+        .view.active { display: block; animation: fadeIn 0.4s ease forwards; }
 
-        /* Вспомогательные стили */
-        .wide-card {
-            grid-column: span 2;
-            aspect-ratio: 2.4 / 1;
-            flex-direction: row;
-            justify-content: flex-start;
-            padding-left: 35px;
-            gap: 25px;
-            text-align: left;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        
-        .wide-card .t-content { display: flex; flex-direction: column; }
     </style>
 </head>
 <body>
-    <div class="background-canvas">
-        <div class="blob b1"></div>
-        <div class="blob b2"></div>
-        <div class="blob b3"></div>
+    <div class="aurora-container">
+        <div class="aurora-element ae-1"></div>
+        <div class="aurora-element ae-2"></div>
+        <div class="aurora-element ae-3"></div>
     </div>
 
-    <!-- ГЛАВНАЯ СТРАНИЦА -->
-    <div id="home-page" class="page active">
-        <header class="app-header">
-            <div class="profile-stack">
-                <div class="avatar-wrap">
-                    <div id="user-avatar" class="avatar-img"></div>
+    <div class="container">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="brand-section">
+                <div class="avatar">
+                    <i data-lucide="zap"></i>
                 </div>
-                <div>
-                    <div class="welcome-text">Добрый вечер,</div>
-                    <div id="display-name" class="user-name">Загрузка...</div>
+                <div class="user-meta">
+                    <span class="user-greeting">System Active</span>
+                    <span id="username" class="user-id">Loading...</span>
                 </div>
             </div>
-            <div class="icon-btn" onclick="tg.showAlert('У вас нет новых уведомлений')">
-                <i data-lucide="bell"></i><span class="notif-dot"></span>
+            <div class="notif-wrapper" onclick="tg.showAlert('Все системы работают в штатном режиме')">
+                <i data-lucide="bell"></i>
+                <div class="notif-status"></div>
             </div>
         </header>
 
-        <section>
-            <h3 class="section-header">Банки на ваше имя</h3>
-            <div class="product-grid">
-                <article class="product-card" onclick="openProduct('Essential')">
+        <!-- VIEW: MAIN -->
+        <main id="view-home" class="view active">
+            <h3 class="section-label">Private Banking</h3>
+            <div class="asym-grid">
+                <div class="card card-small" onclick="openDrawer('Essential')">
                     <i data-lucide="credit-card" class="card-icon"></i>
-                    <div class="card-label">Essential</div>
-                    <div class="card-price">9,500 ₽</div>
-                </article>
-                <article class="product-card" onclick="openProduct('Duo Safe')">
-                    <i data-lucide="link" class="card-icon"></i>
-                    <div class="card-label">Duo Safe</div>
-                    <div class="card-price">14,000 ₽</div>
-                </article>
-                <article class="product-card" onclick="openProduct('Business Prime')">
-                    <i data-lucide="shield-check" class="card-icon"></i>
-                    <div class="card-label">Business Prime</div>
-                    <div class="card-price">19,900 ₽</div>
-                </article>
-                <article class="product-card" onclick="openProduct('Infinite Elite')">
-                    <i data-lucide="crown" class="card-icon"></i>
-                    <div class="card-label">Infinite Elite</div>
-                    <div class="card-price">39,900 ₽</div>
-                </article>
+                    <span class="card-tag">Base Entry</span>
+                    <span class="card-title">Essential</span>
+                    <span class="card-price">9,500 ₽</span>
+                </div>
+                <div class="card card-small" onclick="openDrawer('Duo Safe')">
+                    <i data-lucide="shield" class="card-icon"></i>
+                    <span class="card-tag">Personal Set</span>
+                    <span class="card-title">Duo Safe</span>
+                    <span class="card-price">14,000 ₽</span>
+                </div>
+                <div class="card card-large" onclick="openDrawer('Business Prime')">
+                    <i data-lucide="trending-up" class="card-icon"></i>
+                    <span class="card-tag">Pro Level</span>
+                    <span class="card-title">Business Prime</span>
+                    <span class="card-price">19,900 ₽</span>
+                </div>
+                <div class="card card-infinite" onclick="openDrawer('Infinite Elite')">
+                    <i data-lucide="crown" class="card-icon" style="color:var(--accent-gold); opacity: 1;"></i>
+                    <span class="card-tag" style="color:var(--accent-gold)">Premium Network</span>
+                    <span class="card-title">Infinite Elite</span>
+                    <span class="card-price card-price-gold">39,900 ₽</span>
+                </div>
+            </div>
+
+            <h3 class="section-label">Verified Drops</h3>
+            <div class="asym-grid">
+                <div class="card card-small" onclick="openDrawer('Wise')">
+                    <i data-lucide="globe" class="card-icon"></i>
+                    <span class="card-tag">EU IBAN</span>
+                    <span class="card-title">Wise</span>
+                    <span class="card-price">20,000 ₽</span>
+                </div>
+                <div class="card card-small" onclick="openDrawer('Revolut')">
+                    <i data-lucide="repeat" class="card-icon"></i>
+                    <span class="card-tag">Crypto Ready</span>
+                    <span class="card-title">Revolut</span>
+                    <span class="card-price">20,000 ₽</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- VIEW: ORDERS -->
+        <section id="view-orders" class="view">
+            <h2 style="font-size: 32px; font-weight: 800;">Activity</h2>
+            <div style="margin-top: 100px; text-align: center; color: var(--text-secondary);">
+                <i data-lucide="activity" style="width: 60px; height: 60px; margin-bottom: 20px; opacity: 0.2;"></i>
+                <p>Нет активных процессов в системе</p>
             </div>
         </section>
 
-        <section>
-            <h3 class="section-header">Готовые банки (дропы)</h3>
-            <div class="product-grid">
-                <article class="product-card" onclick="openProduct('Wise Account')">
-                    <i data-lucide="landmark" class="card-icon"></i>
-                    <div class="card-label">Wise Account</div>
-                    <div class="card-price">20,000 ₽</div>
-                </article>
-                <article class="product-card" onclick="openProduct('Revolut Full')">
-                    <i data-lucide="refresh-cw" class="card-icon"></i>
-                    <div class="card-label">Revolut Full</div>
-                    <div class="card-price">20,000 ₽</div>
-                </article>
-            </div>
-        </section>
-
-        <section>
-            <h3 class="section-header">Дополнительные услуги</h3>
-            <div class="product-grid">
-                <article class="product-card wide-card" onclick="openProduct('PayPal Pro')">
-                    <i data-lucide="wallet" class="card-icon" style="margin-bottom: 0;"></i>
-                    <div class="t-content">
-                        <div class="card-label">PayPal Pro</div>
-                        <div class="card-price">4,900 ₽</div>
-                    </div>
-                </article>
+        <!-- VIEW: PROFILE -->
+        <section id="view-profile" class="view">
+            <h2 style="font-size: 32px; font-weight: 800;">Vault</h2>
+            <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; padding: 30px; margin-top: 20px;">
+                <span class="user-greeting">Balance Available</span>
+                <div style="font-size: 48px; font-weight: 800; margin: 10px 0;">0.00 ₽</div>
+                <button class="cta-button" style="height: 50px; font-size: 14px; background: transparent; color: #fff; border: 1px solid #333;" onclick="tg.showAlert('Минимум для вывода: 5,000 ₽')">Withdraw</button>
             </div>
         </section>
     </div>
 
-    <!-- СТРАНИЦА ЗАКАЗОВ -->
-    <div id="orders-page" class="page">
-        <h2 style="font-size: 32px; font-weight: 900; margin-bottom: 30px;">Заказы</h2>
-        <div style="text-align: center; padding-top: 100px; opacity: 0.25;">
-            <i data-lucide="package" style="width: 72px; height: 72px; margin-bottom: 20px;"></i>
-            <p style="font-weight: 600;">У вас пока нет активных заказов</p>
+    <!-- BOTTOM NAV -->
+    <nav class="nav-pill">
+        <div class="nav-link active" onclick="switchView('view-home', this)">
+            <i data-lucide="layout-grid"></i>
+            <span>Market</span>
         </div>
-    </div>
-
-    <!-- СТРАНИЦА ПРОФИЛЯ -->
-    <div id="profile-page" class="page">
-        <h2 style="font-size: 32px; font-weight: 900; margin-bottom: 35px;">Кабинет</h2>
-        <div style="background: var(--glass-bg); border-radius: 32px; padding: 30px; border: 1px solid var(--glass-border); backdrop-filter: blur(20px);">
-            <div style="font-size: 13px; color: var(--text-dim); text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Ваш баланс</div>
-            <div style="font-size: 46px; font-weight: 900; margin: 15px 0;">0 ₽</div>
-            <button class="main-btn" onclick="tg.showAlert('Минимальный вывод от 5,000 ₽')">Вывести средства</button>
+        <div class="nav-link" onclick="switchView('view-orders', this)">
+            <i data-lucide="box"></i>
+            <span>Vault</span>
         </div>
-    </div>
-
-    <!-- НАВИГАЦИЯ -->
-    <nav class="dock-nav">
-        <div class="nav-item active" onclick="switchTab('home-page', this)">
-            <i data-lucide="home"></i>Главная
-        </div>
-        <div class="nav-item" onclick="switchTab('orders-page', this)">
-            <i data-lucide="layers"></i>Заказы
-        </div>
-        <div class="nav-item" onclick="switchTab('profile-page', this)">
-            <i data-lucide="user"></i>Кабинет
+        <div class="nav-link" onclick="switchView('view-profile', this)">
+            <i data-lucide="user"></i>
+            <span>System</span>
         </div>
     </nav>
 
-    <!-- BOTTOM SHEET -->
-    <div id="overlay" class="sheet-overlay" onclick="closeSheet()"></div>
-    <div id="product-sheet" class="bottom-sheet">
-        <div class="sheet-handle"></div>
-        <h2 id="sh-name" class="sheet-title">Тариф</h2>
-        <p id="sh-price" class="sheet-price">0 ₽</p>
-        <div id="sh-desc" class="sheet-info"></div>
-        <button class="main-btn" onclick="startOrder()">ПЕРЕЙТИ К ОФОРМЛЕНИЮ</button>
+    <!-- DRAWER -->
+    <div id="overlay" class="overlay" onclick="closeDrawer()"></div>
+    <div id="drawer" class="drawer">
+        <div class="drawer-handle"></div>
+        <h2 id="d-name" class="drawer-h1">Essential</h2>
+        <div id="d-price" class="drawer-price">9,500 ₽</div>
+        <div id="d-desc" class="drawer-list"></div>
+        <button class="cta-button" onclick="confirmOrder()">Initialize Order</button>
     </div>
 
     <script>
@@ -453,72 +408,59 @@
         tg.expand();
         lucide.createIcons();
 
-        let currentProduct = null;
-
-        const PRODUCT_DATA = {
-            'Essential': { p: '9,500 ₽', d: '• Моментальный выпуск виртуальной карты<br>• Работает с Apple Pay и Google Pay<br>• Пополнение через криптобиржи (P2P)' },
-            'Duo Safe': { p: '14,000 ₽', d: '• Комплект из двух банков разных стран<br>• Максимальная надежность и резервирование<br>• Скидка 30% на второй аккаунт' },
-            'Business Prime': { p: '19,900 ₽', d: '• Высокие лимиты на покупки и переводы<br>• Персональный менеджер 24/7<br>• Помощь в совершении первой оплаты' },
-            'Infinite Elite': { p: '39,900 ₽', d: '• 3 Банковских аккаунта топовых необанков<br>• Аккаунт PayPal Pro в комплекте<br>• Пожизненная поддержка' },
-            'Wise Account': { p: '20,000 ₽', d: '• Полностью верифицированный аккаунт Wise<br>• Личный IBAN в еврозоне<br>• Полный доступ через приложение' },
-            'Revolut Full': { p: '20,000 ₽', d: '• Верифицированный Revolut (Европа)<br>• Виртуальные и физические карты<br>• Мгновенный обмен валют' },
-            'PayPal Pro': { p: '4,900 ₽', d: '• Подтвержденный персональный аккаунт<br>• Привязка к любому зарубежному банку<br>• Безопасные оплаты по всему миру' }
+        const PRODUCT_DB = {
+            'Essential': { price: '9,500 ₽', desc: '• Мгновенная виртуальная карта<br>• Поддержка Apple/Google Pay<br>• Доступ к мировым сервисам' },
+            'Duo Safe': { price: '14,000 ₽', desc: '• Комплект из 2 разных банков<br>• Страховка от блокировок<br>• Скидка 30% на обслуживание' },
+            'Business Prime': { price: '19,900 ₽', d: 'Pro Level', desc: '• Повышенные лимиты транзакций<br>• Выделенный канал поддержки<br>• Приоритетный выпуск за 12 часов' },
+            'Infinite Elite': { price: '39,900 ₽', desc: '• Премиальный пакет из 3 банков<br>• Верифицированный PayPal Pro<br>• Бессрочная гарантия на замену' },
+            'Wise': { price: '20,000 ₽', desc: '• Персональный IBAN (Европа)<br>• Идеально для крупных переводов<br>• Верифицированный аккаунт' },
+            'Revolut': { price: '20,000 ₽', desc: '• Мультивалютный банкинг<br>• Встроенная крипто-биржа<br>• Полный функционал приложения' }
         };
 
-        // Инициализация пользователя
         function init() {
             const user = tg.initDataUnsafe.user;
-            const name = user ? (user.first_name || user.username) : "Клиент";
-            document.getElementById('display-name').innerText = name;
-            
-            if (user && user.photo_url) {
-                document.getElementById('user-avatar').style.backgroundImage = `url('${user.photo_url}')`;
-            }
+            const name = user ? (user.first_name || user.username) : "Guest_User";
+            document.getElementById('username').innerText = name;
         }
         init();
 
-        // Переключение табов
-        function switchTab(id, el) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        function switchView(id, el) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             el.classList.add('active');
             
             tg.HapticFeedback.impactOccurred('medium');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Открытие карточки продукта
-        function openProduct(name) {
-            const data = PRODUCT_DATA[name];
-            currentProduct = name;
-            
-            document.getElementById('sh-name').innerText = name;
-            document.getElementById('sh-price').innerText = data.p;
-            document.getElementById('sh-desc').innerHTML = data.d;
-            
+        let activeProduct = '';
+        function openDrawer(name) {
+            activeProduct = name;
+            const data = PRODUCT_DB[name];
+            document.getElementById('d-name').innerText = name;
+            document.getElementById('d-price').innerText = data.price;
+            document.getElementById('d-desc').innerHTML = data.desc;
+
             document.getElementById('overlay').style.display = 'block';
             setTimeout(() => {
                 document.getElementById('overlay').style.opacity = '1';
-                document.getElementById('product-sheet').classList.add('active');
+                document.getElementById('drawer').classList.add('active');
             }, 10);
             
             tg.HapticFeedback.impactOccurred('light');
         }
 
-        function closeSheet() {
-            document.getElementById('product-sheet').classList.remove('active');
+        function closeDrawer() {
+            document.getElementById('drawer').classList.remove('active');
             document.getElementById('overlay').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('overlay').style.display = 'none';
-            }, 300);
+            setTimeout(() => document.getElementById('overlay').style.display = 'none', 400);
         }
 
-        function startOrder() {
+        function confirmOrder() {
             tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert(`Вы выбрали тариф "${currentProduct}". В полной версии здесь откроется форма анкеты.`);
-            closeSheet();
+            tg.showAlert(`Инициализация процесса "${activeProduct}". Переход к анкете...`);
+            closeDrawer();
         }
     </script>
 </body>
