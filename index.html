@@ -7,71 +7,52 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
         :root {
-            --bg: #050505;
-            --card-bg: rgba(15, 15, 15, 0.7);
+            --bg-color: #08080a;
+            --surface: #121216;
+            --surface-light: #1c1c24;
+            --accent: #ffffff;
+            --accent-dim: #38bdf8;
+            --text-p: #ffffff;
+            --text-s: #71717a;
+            --glass: rgba(255, 255, 255, 0.03);
             --border: rgba(255, 255, 255, 0.08);
-            --accent-cyan: #22d3ee;
-            --accent-gold: #fbbf24;
-            --text-primary: #ffffff;
-            --text-secondary: #71717a;
-            
-            /* Сложные градиенты для Aurora Background */
-            --aurora-1: #083344;
-            --aurora-2: #1e1b4b;
-            --aurora-3: #422006;
+            --safe-area-bottom: env(safe-area-inset-bottom);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
             margin: 0;
             padding: 0;
-            color: var(--text-primary);
+            color: var(--text-p);
             min-height: 100vh;
             overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
         }
 
-        /* Текстурный шум поверх всего */
-        body::before {
-            content: "";
+        /* Декоративный "фокус" на фоне */
+        .bg-glow {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            opacity: 0.03;
+            top: -10%; left: 50%;
+            transform: translateX(-50%);
+            width: 100vw; height: 40vh;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, transparent 70%);
+            z-index: -1;
             pointer-events: none;
-            z-index: 999;
         }
 
-        /* Aurora Mesh Background */
-        .aurora-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -2;
-            overflow: hidden;
-            background: var(--bg);
+        .app-container {
+            padding: 20px 20px 120px;
+            max-width: 600px;
+            margin: 0 auto;
         }
-
-        .aurora-element {
-            position: absolute;
-            width: 150vw;
-            height: 150vh;
-            filter: blur(120px);
-            opacity: 0.4;
-            animation: rotate 60s infinite linear;
-        }
-
-        .ae-1 { background: radial-gradient(circle, var(--aurora-1) 0%, transparent 60%); top: -50%; left: -25%; }
-        .ae-2 { background: radial-gradient(circle, var(--aurora-2) 0%, transparent 60%); bottom: -50%; right: -25%; animation-direction: reverse; }
-        .ae-3 { background: radial-gradient(circle, var(--aurora-3) 0%, transparent 50%); top: 25%; left: 25%; opacity: 0.2; }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .container { padding: 20px 20px 140px; }
 
         /* HEADER */
         .header {
@@ -79,153 +60,190 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 40px;
-            padding-top: env(safe-area-inset-top);
+            padding-top: 10px;
         }
 
-        .brand-section { display: flex; align-items: center; gap: 15px; }
-        .avatar {
-            width: 50px; height: 50px;
-            border-radius: 12px;
-            background: linear-gradient(225deg, #111, #222);
-            border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
-        .avatar i { color: var(--accent-cyan); }
-        
-        .user-meta { display: flex; flex-direction: column; }
-        .user-greeting { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-        .user-id { font-size: 18px; font-weight: 700; color: #fff; }
-
-        .notif-wrapper {
-            width: 45px; height: 45px;
-            border-radius: 12px;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--text-secondary);
-            position: relative;
-        }
-        .notif-status {
-            position: absolute;
-            top: 12px; right: 12px;
-            width: 6px; height: 6px;
-            background: var(--accent-cyan);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-cyan);
-        }
-
-        /* GRID SYSTEM */
-        .section-label {
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--accent-cyan);
-            margin: 45px 0 20px 5px;
-        }
-
-        .asym-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 15px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            transition: all 0.3s ease;
-        }
-
-        .card:active { transform: translateY(2px) scale(0.98); border-color: var(--accent-cyan); }
-
-        /* Дизайн плиток */
-        .card-small { grid-column: span 3; height: 160px; }
-        .card-large { grid-column: span 6; height: 180px; }
-        
-        /* Особый стиль для Премиум тарифа */
-        .card-infinite {
-            grid-column: span 6;
-            height: 220px;
-            background: linear-gradient(135deg, rgba(66, 32, 6, 0.4), rgba(5, 5, 5, 0.9));
-            border-color: rgba(251, 191, 36, 0.2);
-        }
-
-        .card-infinite::after {
-            content: "";
-            position: absolute;
-            top: -50%; right: -20%;
-            width: 200px; height: 200px;
-            background: radial-gradient(circle, var(--accent-gold) 0%, transparent 70%);
-            opacity: 0.1;
-        }
-
-        .card-icon {
-            position: absolute;
-            top: 20px; right: 20px;
-            color: var(--text-secondary);
-            opacity: 0.4;
-        }
-
-        .card-tag {
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .card-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
-        .card-price { font-size: 16px; font-weight: 600; color: var(--accent-cyan); }
-        .card-price-gold { color: var(--accent-gold); }
-
-        /* NAVIGATION BAR */
-        .nav-pill {
-            position: fixed;
-            bottom: 30px;
-            left: 20px;
-            right: 20px;
-            height: 70px;
-            background: rgba(10, 10, 10, 0.85);
-            border: 1px solid var(--border);
-            border-radius: 24px;
+        .user-profile {
             display: flex;
             align-items: center;
-            justify-content: space-around;
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            z-index: 1000;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            gap: 12px;
         }
 
-        .nav-link {
+        .avatar-box {
+            width: 48px; height: 48px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #222, #111);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .username-stack { display: flex; flex-direction: column; }
+        .status-pill {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--accent-dim);
+            background: rgba(56, 189, 248, 0.1);
+            padding: 2px 8px;
+            border-radius: 6px;
+            width: fit-content;
+            margin-bottom: 4px;
+        }
+        .user-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+
+        .action-icon {
+            width: 44px; height: 44px;
+            border-radius: 14px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-s);
+        }
+
+        /* BENTO GRID */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .bento-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .bento-item:active { transform: scale(0.96); border-color: rgba(255,255,255,0.2); }
+
+        .bento-item.wide { grid-column: span 2; height: 160px; }
+        .bento-item.tall { grid-row: span 2; height: 336px; }
+
+        .item-icon {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px;
+            color: var(--accent-dim);
+        }
+
+        .item-label { font-size: 12px; color: var(--text-s); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .item-name { font-size: 22px; font-weight: 800; margin: 4px 0 12px; }
+        .item-price { font-size: 16px; font-weight: 700; color: #fff; opacity: 0.9; }
+
+        .add-btn {
+            position: absolute;
+            bottom: 20px; right: 20px;
+            width: 40px; height: 40px;
+            background: #fff;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: #000;
+        }
+
+        /* PAGES */
+        .view-page { display: none; }
+        .view-page.active { display: block; animation: viewIn 0.4s ease forwards; }
+
+        @keyframes viewIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ORDERS PAGE (VAULT) */
+        .order-card {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .order-status {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+        .status-active { background: rgba(56, 189, 248, 0.1); color: var(--accent-dim); }
+
+        /* BONUSES (REWARDS) */
+        .bonus-stat-card {
+            background: linear-gradient(135deg, #1c1c24 0%, #0a0a0b 100%);
+            border-radius: 32px;
+            padding: 32px;
+            text-align: center;
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+        .balance-val { font-size: 48px; font-weight: 800; margin: 10px 0; }
+
+        .ref-box {
+            background: var(--glass);
+            border: 1px dashed var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* SUPPORT (HELP) */
+        .faq-item {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+        }
+        .faq-q { font-weight: 700; font-size: 15px; margin-bottom: 5px; display: block; }
+        .faq-a { font-size: 14px; color: var(--text-s); line-height: 1.5; }
+
+        /* NAVIGATION BAR */
+        .nav-bar {
+            position: fixed;
+            bottom: calc(20px + var(--safe-area-bottom));
+            left: 20px; right: 20px;
+            height: 72px;
+            background: rgba(18, 18, 22, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: var(--text-s);
             transition: 0.3s;
+            flex: 1;
         }
 
-        .nav-link.active { color: var(--accent-cyan); }
-        .nav-link i { width: 22px; height: 22px; }
+        .nav-item.active { color: var(--accent-dim); }
+        .nav-item i { width: 22px; height: 22px; }
+        .nav-item span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* DRAWER (BOTTOM SHEET) */
+        /* DRAWER */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8);
@@ -233,173 +251,181 @@
             display: none; z-index: 2000;
             opacity: 0; transition: 0.3s;
         }
-
         .drawer {
-            position: fixed;
-            bottom: -100%; left: 0;
-            width: 100%;
-            background: #0a0a0a;
-            border-top: 1px solid var(--border);
-            border-radius: 30px 30px 0 0;
-            padding: 40px 25px 60px;
-            box-sizing: border-box;
+            position: fixed; bottom: -100%; left: 0; width: 100%;
+            background: var(--surface);
+            border-radius: 32px 32px 0 0;
+            padding: 40px 24px calc(40px + var(--safe-area-bottom));
             z-index: 2001;
             transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            border-top: 1px solid var(--border);
         }
         .drawer.active { bottom: 0; }
-
         .drawer-handle {
             width: 40px; height: 4px;
-            background: #222;
-            border-radius: 10px;
+            background: var(--surface-light);
+            border-radius: 2px;
             margin: -20px auto 30px;
         }
 
-        .drawer-h1 { font-size: 32px; font-weight: 800; margin: 0 0 10px; }
-        .drawer-price { font-size: 24px; font-weight: 700; color: var(--accent-cyan); margin-bottom: 30px; }
-        .drawer-list { color: var(--text-secondary); line-height: 1.8; margin-bottom: 40px; font-size: 15px; }
-
         .cta-button {
-            background: var(--text-primary);
+            background: #fff;
             color: #000;
             border: none;
             width: 100%;
-            height: 65px;
-            border-radius: 18px;
-            font-weight: 900;
-            font-size: 18px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            height: 64px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 17px;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(255,255,255,0.1);
-        }
-
-        /* Страницы */
-        .view { display: none; }
-        .view.active { display: block; animation: fadeIn 0.4s ease forwards; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            box-shadow: 0 10px 20px rgba(255,255,255,0.1);
         }
     </style>
 </head>
 <body>
-    <div class="aurora-container">
-        <div class="aurora-element ae-1"></div>
-        <div class="aurora-element ae-2"></div>
-        <div class="aurora-element ae-3"></div>
-    </div>
+    <div class="bg-glow"></div>
 
-    <div class="container">
+    <div class="app-container">
         <!-- HEADER -->
         <header class="header">
-            <div class="brand-section">
-                <div class="avatar">
-                    <i data-lucide="zap"></i>
+            <div class="user-profile">
+                <div class="avatar-box">
+                    <i data-lucide="user" style="color: #444"></i>
                 </div>
-                <div class="user-meta">
-                    <span class="user-greeting">System Active</span>
-                    <span id="username" class="user-id">Loading...</span>
+                <div class="username-stack">
+                    <span class="status-pill">Premium Active</span>
+                    <span id="user-name" class="user-title">Загрузка...</span>
                 </div>
             </div>
-            <div class="notif-wrapper" onclick="tg.showAlert('Все системы работают в штатном режиме')">
-                <i data-lucide="bell"></i>
-                <div class="notif-status"></div>
+            <div class="action-icon" onclick="tg.showAlert('У вас нет новых сообщений')">
+                <i data-lucide="message-square"></i>
             </div>
         </header>
 
-        <!-- VIEW: MAIN -->
-        <main id="view-home" class="view active">
-            <h3 class="section-label">Private Banking</h3>
-            <div class="asym-grid">
-                <div class="card card-small" onclick="openDrawer('Essential')">
-                    <i data-lucide="credit-card" class="card-icon"></i>
-                    <span class="card-tag">Base Entry</span>
-                    <span class="card-title">Essential</span>
-                    <span class="card-price">9,500 ₽</span>
+        <!-- PAGE 1: MARKET -->
+        <main id="view-market" class="view-page active">
+            <div class="bento-grid">
+                <div class="bento-item tall" onclick="openProduct('Infinite Elite')">
+                    <div class="item-icon"><i data-lucide="crown"></i></div>
+                    <div>
+                        <div class="item-label">Top Choice</div>
+                        <div class="item-name">Infinite Elite</div>
+                        <div class="item-price">39,900 ₽</div>
+                    </div>
+                    <div class="add-btn"><i data-lucide="arrow-right"></i></div>
                 </div>
-                <div class="card card-small" onclick="openDrawer('Duo Safe')">
-                    <i data-lucide="shield" class="card-icon"></i>
-                    <span class="card-tag">Personal Set</span>
-                    <span class="card-title">Duo Safe</span>
-                    <span class="card-price">14,000 ₽</span>
+                <div class="bento-item" onclick="openProduct('Essential')">
+                    <div class="item-icon"><i data-lucide="credit-card"></i></div>
+                    <div>
+                        <div class="item-label">Entry</div>
+                        <div class="item-name">Essential</div>
+                        <div class="item-price">9,500 ₽</div>
+                    </div>
                 </div>
-                <div class="card card-large" onclick="openDrawer('Business Prime')">
-                    <i data-lucide="trending-up" class="card-icon"></i>
-                    <span class="card-tag">Pro Level</span>
-                    <span class="card-title">Business Prime</span>
-                    <span class="card-price">19,900 ₽</span>
+                <div class="bento-item" onclick="openProduct('Duo Safe')">
+                    <div class="item-icon"><i data-lucide="shield-check"></i></div>
+                    <div>
+                        <div class="item-label">Secure</div>
+                        <div class="item-name">Duo Safe</div>
+                        <div class="item-price">14,000 ₽</div>
+                    </div>
                 </div>
-                <div class="card card-infinite" onclick="openDrawer('Infinite Elite')">
-                    <i data-lucide="crown" class="card-icon" style="color:var(--accent-gold); opacity: 1;"></i>
-                    <span class="card-tag" style="color:var(--accent-gold)">Premium Network</span>
-                    <span class="card-title">Infinite Elite</span>
-                    <span class="card-price card-price-gold">39,900 ₽</span>
+                <div class="bento-item wide" onclick="openProduct('Business Prime')">
+                    <div class="item-icon"><i data-lucide="briefcase"></i></div>
+                    <div>
+                        <div class="item-label">Pro Level</div>
+                        <div class="item-name">Business Prime</div>
+                        <div class="item-price">19,900 ₽</div>
+                    </div>
+                    <div class="add-btn"><i data-lucide="plus"></i></div>
                 </div>
-            </div>
-
-            <h3 class="section-label">Verified Drops</h3>
-            <div class="asym-grid">
-                <div class="card card-small" onclick="openDrawer('Wise')">
-                    <i data-lucide="globe" class="card-icon"></i>
-                    <span class="card-tag">EU IBAN</span>
-                    <span class="card-title">Wise</span>
-                    <span class="card-price">20,000 ₽</span>
+                <div class="bento-item" onclick="openProduct('Wise')">
+                    <div class="item-icon"><i data-lucide="landmark"></i></div>
+                    <div>
+                        <div class="item-label">Drops</div>
+                        <div class="item-name">Wise Account</div>
+                        <div class="item-price">20,000 ₽</div>
+                    </div>
                 </div>
-                <div class="card card-small" onclick="openDrawer('Revolut')">
-                    <i data-lucide="repeat" class="card-icon"></i>
-                    <span class="card-tag">Crypto Ready</span>
-                    <span class="card-title">Revolut</span>
-                    <span class="card-price">20,000 ₽</span>
+                <div class="bento-item" onclick="openProduct('PayPal Pro')">
+                    <div class="item-icon"><i data-lucide="wallet"></i></div>
+                    <div>
+                        <div class="item-label">Addon</div>
+                        <div class="item-name">PayPal Pro</div>
+                        <div class="item-price">4,900 ₽</div>
+                    </div>
                 </div>
             </div>
         </main>
 
-        <!-- VIEW: ORDERS -->
-        <section id="view-orders" class="view">
-            <h2 style="font-size: 32px; font-weight: 800;">Activity</h2>
-            <div style="margin-top: 100px; text-align: center; color: var(--text-secondary);">
-                <i data-lucide="activity" style="width: 60px; height: 60px; margin-bottom: 20px; opacity: 0.2;"></i>
-                <p>Нет активных процессов в системе</p>
+        <!-- PAGE 2: ORDERS -->
+        <section id="view-orders" class="view-page">
+            <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 25px;">Активные заказы</h2>
+            <div id="orders-list">
+                <div style="text-align: center; padding-top: 60px; opacity: 0.3;">
+                    <i data-lucide="inbox" style="width: 48px; height: 48px; margin-bottom: 15px;"></i>
+                    <p>Нет активных процессов</p>
+                </div>
             </div>
         </section>
 
-        <!-- VIEW: PROFILE -->
-        <section id="view-profile" class="view">
-            <h2 style="font-size: 32px; font-weight: 800;">Vault</h2>
-            <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; padding: 30px; margin-top: 20px;">
-                <span class="user-greeting">Balance Available</span>
-                <div style="font-size: 48px; font-weight: 800; margin: 10px 0;">0.00 ₽</div>
-                <button class="cta-button" style="height: 50px; font-size: 14px; background: transparent; color: #fff; border: 1px solid #333;" onclick="tg.showAlert('Минимум для вывода: 5,000 ₽')">Withdraw</button>
+        <!-- PAGE 3: BONUSES -->
+        <section id="view-bonuses" class="view-page">
+            <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 25px;">Бонусы</h2>
+            <div class="bonus-stat-card">
+                <span class="item-label">Доступно к выводу</span>
+                <div class="balance-val">0.00 ₽</div>
+                <button class="cta-button" style="height: 50px; font-size: 14px; background: transparent; color: #fff; border: 1px solid #333;" onclick="tg.showAlert('Вывод от 5,000 ₽')">Вывести</button>
+            </div>
+            
+            <h3 class="section-label">Реферальная программа</h3>
+            <div class="ref-box">
+                <div>
+                    <div style="font-weight: 700;">+ 500 ₽ за друга</div>
+                    <div style="font-size: 12px; color: var(--text-s);">Получайте бонусы за каждую оплату</div>
+                </div>
+                <div class="action-icon" style="color: var(--accent-dim)" onclick="copyRef()"><i data-lucide="copy"></i></div>
             </div>
         </section>
+
+        <!-- PAGE 4: SUPPORT -->
+        <section id="view-support" class="view-page">
+            <h2 style="font-size: 28px; font-weight: 800; margin-bottom: 25px;">Помощь</h2>
+            <div class="faq-item">
+                <span class="faq-q">Как пополнить карту?</span>
+                <p class="faq-a">Вы можете пополнять карту через криптобиржи (P2P) — покупка USDT и обмен на валюту карты внутри приложения банка.</p>
+            </div>
+            <div class="faq-item">
+                <span class="faq-q">Какие нужны документы?</span>
+                <p class="faq-a">Для большинства тарифов достаточно только вашего действующего заграничного паспорта.</p>
+            </div>
+            <div class="faq-item">
+                <span class="faq-q">Срок выпуска?</span>
+                <p class="faq-a">Стандартный срок оформления — от 1 до 3 рабочих дней в зависимости от выбранного банка.</p>
+            </div>
+            <button class="cta-button" style="background: var(--surface); color: #fff; border: 1px solid var(--border);" onclick="tg.openTelegramLink('https://t.me/eurocardsapp_bot')">Связаться с менеджером</button>
+        </section>
+
+        <!-- NAV BAR -->
+        <nav class="nav-bar">
+            <div class="nav-item active" onclick="switchPage('view-market', this)"><i data-lucide="shopping-bag"></i><span>Витрина</span></div>
+            <div class="nav-item" onclick="switchPage('view-orders', this)"><i data-lucide="package"></i><span>Заказы</span></div>
+            <div class="nav-item" onclick="switchPage('view-bonuses', this)"><i data-lucide="sparkles"></i><span>Бонусы</span></div>
+            <div class="nav-item" onclick="switchPage('view-support', this)"><i data-lucide="help-circle"></i><span>Помощь</span></div>
+        </nav>
     </div>
 
-    <!-- BOTTOM NAV -->
-    <nav class="nav-pill">
-        <div class="nav-link active" onclick="switchView('view-home', this)">
-            <i data-lucide="layout-grid"></i>
-            <span>Market</span>
-        </div>
-        <div class="nav-link" onclick="switchView('view-orders', this)">
-            <i data-lucide="box"></i>
-            <span>Vault</span>
-        </div>
-        <div class="nav-link" onclick="switchView('view-profile', this)">
-            <i data-lucide="user"></i>
-            <span>System</span>
-        </div>
-    </nav>
-
-    <!-- DRAWER -->
+    <!-- PRODUCT DRAWER -->
     <div id="overlay" class="overlay" onclick="closeDrawer()"></div>
     <div id="drawer" class="drawer">
         <div class="drawer-handle"></div>
-        <h2 id="d-name" class="drawer-h1">Essential</h2>
-        <div id="d-price" class="drawer-price">9,500 ₽</div>
-        <div id="d-desc" class="drawer-list"></div>
-        <button class="cta-button" onclick="confirmOrder()">Initialize Order</button>
+        <div id="d-label" class="item-label">Premium</div>
+        <h2 id="d-title" style="font-size: 32px; font-weight: 800; margin: 10px 0;">Essential</h2>
+        <div id="d-price" style="font-size: 24px; font-weight: 700; color: var(--accent-dim); margin-bottom: 30px;">9,500 ₽</div>
+        <div id="d-desc" style="color: var(--text-s); line-height: 1.8; margin-bottom: 40px;">
+            • Полноценный европейский счет<br>• Виртуальная карта в Apple Wallet<br>• Моментальное пополнение
+        </div>
+        <button class="cta-button" onclick="initializeOrder()">Оформить заявку</button>
     </div>
 
     <script>
@@ -409,38 +435,40 @@
         lucide.createIcons();
 
         const PRODUCT_DB = {
-            'Essential': { price: '9,500 ₽', desc: '• Мгновенная виртуальная карта<br>• Поддержка Apple/Google Pay<br>• Доступ к мировым сервисам' },
-            'Duo Safe': { price: '14,000 ₽', desc: '• Комплект из 2 разных банков<br>• Страховка от блокировок<br>• Скидка 30% на обслуживание' },
-            'Business Prime': { price: '19,900 ₽', d: 'Pro Level', desc: '• Повышенные лимиты транзакций<br>• Выделенный канал поддержки<br>• Приоритетный выпуск за 12 часов' },
-            'Infinite Elite': { price: '39,900 ₽', desc: '• Премиальный пакет из 3 банков<br>• Верифицированный PayPal Pro<br>• Бессрочная гарантия на замену' },
-            'Wise': { price: '20,000 ₽', desc: '• Персональный IBAN (Европа)<br>• Идеально для крупных переводов<br>• Верифицированный аккаунт' },
-            'Revolut': { price: '20,000 ₽', desc: '• Мультивалютный банкинг<br>• Встроенная крипто-биржа<br>• Полный функционал приложения' }
+            'Essential': { p: '9,500 ₽', l: 'Entry', d: '• Моментальный выпуск<br>• Поддержка Apple/Google Pay<br>• Доступ к мировым сервисам' },
+            'Duo Safe': { p: '14,000 ₽', l: 'Secure', d: '• Комплект из 2 разных банков<br>• Защита от блокировок<br>• Скидка 30% на второй аккаунт' },
+            'Business Prime': { p: '19,900 ₽', l: 'Pro Level', d: '• Высокие лимиты транзакций<br>• Приоритетная поддержка<br>• Верификация за 12 часов' },
+            'Infinite Elite': { p: '39,900 ₽', l: 'Top Choice', d: '• 3 Банковских аккаунта<br>• PayPal Pro в комплекте<br>• Пожизненная гарантия на замену' },
+            'Wise': { p: '20,000 ₽', l: 'Drops', d: '• Личный IBAN в Европе<br>• Идеально для крупных переводов<br>• Полный доступ к кабинету' },
+            'PayPal Pro': { p: '4,900 ₽', l: 'Addon', d: '• Верифицированный PayPal<br>• Привязка к любому банку<br>• Безопасные оплаты онлайн' }
         };
 
         function init() {
             const user = tg.initDataUnsafe.user;
-            const name = user ? (user.first_name || user.username) : "Guest_User";
-            document.getElementById('username').innerText = name;
+            const name = user ? (user.first_name || user.username) : "Клиент";
+            document.getElementById('user-name').innerText = name;
         }
         init();
 
-        function switchView(id, el) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        function switchPage(id, el) {
+            document.querySelectorAll('.view-page').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             el.classList.add('active');
             
             tg.HapticFeedback.impactOccurred('medium');
+            window.scrollTo(0, 0);
         }
 
         let activeProduct = '';
-        function openDrawer(name) {
+        function openProduct(name) {
             activeProduct = name;
             const data = PRODUCT_DB[name];
-            document.getElementById('d-name').innerText = name;
-            document.getElementById('d-price').innerText = data.price;
-            document.getElementById('d-desc').innerHTML = data.desc;
+            document.getElementById('d-title').innerText = name;
+            document.getElementById('d-label').innerText = data.l;
+            document.getElementById('d-price').innerText = data.p;
+            document.getElementById('d-desc').innerHTML = data.d;
 
             document.getElementById('overlay').style.display = 'block';
             setTimeout(() => {
@@ -457,10 +485,18 @@
             setTimeout(() => document.getElementById('overlay').style.display = 'none', 400);
         }
 
-        function confirmOrder() {
+        function initializeOrder() {
             tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert(`Инициализация процесса "${activeProduct}". Переход к анкете...`);
+            tg.showAlert(`Инициализация оформления: ${activeProduct}`);
             closeDrawer();
+        }
+
+        function copyRef() {
+            const user = tg.initDataUnsafe.user;
+            const link = `t.me/eurocardsapp_bot?start=${user ? user.id : '0'}`;
+            navigator.clipboard.writeText(link);
+            tg.HapticFeedback.notificationOccurred('success');
+            tg.showAlert("Реферальная ссылка скопирована!");
         }
     </script>
 </body>
