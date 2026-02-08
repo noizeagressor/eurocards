@@ -54,7 +54,7 @@
             opacity: 0.15;
             letter-spacing: 0.02em;
             text-transform: uppercase;
-            white-space: nowrap; /* Чтобы не складывалось в гармошку */
+            white-space: nowrap;
         }
 
         /* Навигация-облако */
@@ -110,6 +110,7 @@
             justify-content: space-between;
         }
         .vault-card:active { transform: scale(0.98); }
+        .vault-card.is-selected { border-color: var(--brand-green) !important; box-shadow: 0 0 15px rgba(159, 232, 112, 0.2); }
 
         /* Drawer */
         .drawer {
@@ -125,17 +126,6 @@
         }
         .drawer.open { bottom: 0; }
 
-        .tab-btn {
-            font-size: 14px; font-weight: 700;
-            color: rgba(255,255,255,0.3);
-            padding-bottom: 10px;
-            position: relative;
-        }
-        .tab-btn.active { color: #ffffff; }
-        .tab-btn.active::after {
-            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: #ffffff; border-radius: 2px;
-        }
-
         .metric-card { background: #0f0f0f; border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; }
         
         .dropdown-menu {
@@ -144,20 +134,6 @@
             border-radius: 14px; z-index: 150; overflow: hidden;
         }
         .dropdown-menu.open { display: block; }
-
-        .select-indicator {
-            position: absolute;
-            top: 14px; right: 14px;
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.1);
-            display: none;
-            align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.3);
-            z-index: 20;
-        }
-        .is-selecting .select-indicator { display: flex; }
-        .is-selected .select-indicator { background: var(--brand-green); border-color: var(--brand-green); color: black; }
 
         ::-webkit-scrollbar { width: 0px; }
     </style>
@@ -209,13 +185,12 @@
         <div class="space-y-4 mb-10">
             <!-- Skrill -->
             <div id="card-skrill" onclick="handleCardClick('skrill', '9 500 ₽')" class="vault-card skrill-gradient rounded-[28px] p-6 shadow-xl">
-                <div class="select-indicator"><i data-lucide="check" class="w-3 h-3"></i></div>
                 <div class="flex flex-col items-start">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Skrill_logo.svg/960px-Skrill_logo.svg.png" class="h-7 w-auto object-contain mb-1">
                     <p class="text-[10px] text-white/40 font-bold uppercase tracking-wider italic">НА ВАШИ ДОКУМЕНТЫ. ВЫПУСК ЗА 24 ЧАСА.</p>
                 </div>
                 <div class="flex justify-between items-end gap-2">
-                    <div class="lto-tag flex-shrink-0">LIMITED TIME OFFER</div>
+                    <div class="lto-tag flex-shrink-0 translate-y-1.5">LIMITED TIME OFFER</div>
                     <div class="text-right flex-shrink-0">
                         <p class="text-4xl font-black tracking-tighter text-white whitespace-nowrap">9 500 ₽</p>
                         <p class="text-[10px] font-black text-white/40 uppercase mt-1 text-right">Бонус 5 евро</p>
@@ -225,13 +200,12 @@
             
             <!-- Neteller -->
             <div id="card-neteller" onclick="handleCardClick('neteller', '12 000 ₽')" class="vault-card neteller-gradient rounded-[28px] p-6 shadow-xl">
-                <div class="select-indicator"><i data-lucide="check" class="w-3 h-3"></i></div>
                 <div class="flex flex-col items-start">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Neteller.svg/960px-Neteller.svg.png" class="h-5 w-auto object-contain mb-1">
                     <p class="text-[10px] text-white/40 font-bold uppercase tracking-wider italic">НА ВАШИ ДОКУМЕНТЫ. ВЫПУСК ЗА 24 ЧАСА.</p>
                 </div>
                 <div class="flex justify-between items-end gap-2">
-                    <div class="lto-tag flex-shrink-0">LIMITED TIME OFFER</div>
+                    <div class="lto-tag flex-shrink-0 translate-y-1.5">LIMITED TIME OFFER</div>
                     <div class="text-right flex-shrink-0">
                         <p class="text-4xl font-black tracking-tighter text-white whitespace-nowrap">12 000 ₽</p>
                         <p class="text-[10px] font-black text-white/40 uppercase mt-1 text-right">Бонус 5 евро</p>
@@ -247,7 +221,6 @@
         <div class="space-y-4 mb-10">
             <!-- Redotpay -->
             <div id="card-redotpay" onclick="handleCardClick('redotpay', '5 000 ₽')" class="vault-card redotpay-gradient rounded-[28px] p-6 shadow-xl">
-                <div class="select-indicator"><i data-lucide="check" class="w-3 h-3"></i></div>
                 <div class="flex flex-col items-start">
                     <img src="https://staticsource1.redotpay.com/web/img/logo.svg?t=1770172675664" class="h-6 w-auto mb-1 object-contain">
                     <p class="text-[10px] text-white/40 font-bold uppercase mb-1 italic tracking-widest">ВЫПУСК ЗА 5 МИНУТ</p>
@@ -263,7 +236,6 @@
 
             <!-- Wise -->
             <div id="card-wise" onclick="handleCardClick('wise', '15 000 ₽')" class="vault-card wise-gradient rounded-[28px] p-6 shadow-xl">
-                <div class="select-indicator"><i data-lucide="check" class="w-3 h-3"></i></div>
                 <div class="flex flex-col items-start">
                     <img src="https://companieslogo.com/img/orig/WISE.L_BIG.D-95705462.svg?t=1720244494" class="h-5 w-auto mb-1 object-contain text-white">
                     <p class="text-[10px] font-bold uppercase mb-1 italic opacity-40 text-white">ГАРАНТИЯ 30 ДНЕЙ</p>
@@ -279,7 +251,6 @@
 
             <!-- Revolut -->
             <div id="card-revolut" onclick="handleCardClick('revolut', '18 000 ₽')" class="vault-card revolut-gradient rounded-[28px] p-6 shadow-xl">
-                <div class="select-indicator"><i data-lucide="check" class="w-3 h-3"></i></div>
                 <div class="flex flex-col items-start">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Revolut_logo.svg/960px-Revolut_logo.svg.png" class="h-6 logo-white w-auto mb-1 object-contain">
                     <p class="text-[10px] font-bold uppercase mb-1 italic opacity-40">ЕВРОПЕЙСКИЙ ЛИМИТ</p>
@@ -301,13 +272,12 @@
         <div class="space-y-4 mb-10">
             <!-- PayPal -->
             <div id="card-paypal" onclick="handleCardClick('paypal', '14 000 ₽')" class="vault-card paypal-gradient rounded-[28px] p-6 shadow-xl">
-                <div class="select-indicator"><i data-lucide="check" class="w-3 h-3"></i></div>
                 <div class="flex flex-col items-start">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-7 w-auto mb-1 object-contain">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-8 w-auto mb-1 object-contain">
                     <p class="text-[10px] text-white/40 font-bold uppercase mb-1 italic tracking-widest">ВЕРИФИКАЦИЯ АККАУНТА ПОД КЛЮЧ</p>
                 </div>
                 <div class="flex justify-between items-end gap-2">
-                    <div class="lto-tag flex-shrink-0">LIMITED TIME OFFER</div>
+                    <div class="lto-tag flex-shrink-0 translate-y-1.5">LIMITED TIME OFFER</div>
                     <div class="text-right ml-auto text-white flex-shrink-0">
                         <p class="text-4xl font-black tracking-tighter whitespace-nowrap">14 000 ₽</p>
                         <p class="text-[10px] font-black text-white/40 uppercase mt-1 text-right">Бонус 5 евро</p>
@@ -317,7 +287,7 @@
         </div>
     </div>
 
-    <!-- Вкладка Мои заказы -->
+    <!-- Вкладки (Профиль и прочее) -->
     <div id="orders" class="tab-content p-7 text-white text-center">
         <h1 class="text-3xl font-black mb-8 pt-4 tracking-tighter text-white">Мои заказы</h1>
         <div class="flex flex-col items-center justify-center pt-24 opacity-20">
@@ -326,7 +296,6 @@
         </div>
     </div>
 
-    <!-- Вкладка Бонусы -->
     <div id="bonuses" class="tab-content pt-4 px-6 text-white text-center">
         <div class="flex justify-center mb-8"><div class="bg-white/10 px-4 py-2 rounded-full border border-white/5 text-xs font-black uppercase text-white/60">Бонусы</div></div>
         <div class="bg-[#111] rounded-[36px] p-8 border border-white/5 shadow-2xl">
@@ -339,7 +308,6 @@
         </div>
     </div>
 
-    <!-- Вкладка Профиль -->
     <div id="settings" class="tab-content px-7 pt-12 text-white">
         <div class="flex flex-col items-center mb-12 text-center">
             <div class="w-24 h-24 rounded-[28px] border-[4px] border-white/5 overflow-hidden mb-5 shadow-2xl mx-auto">
@@ -372,7 +340,6 @@
         </div>
 
         <div id="drawerMainContent">
-            <!-- Header: аккуратно слева -->
             <div class="flex items-center gap-4 mb-8 text-white">
                 <div id="drawerLogoLabel" class="w-14 h-14 bg-white/5 rounded-xl flex items-center justify-center p-2 border border-white/5 text-white"></div>
                 <div>
@@ -393,9 +360,8 @@
             </div>
 
             <div id="drawerTabOverview">
-                <!-- Рабочий График -->
                 <div class="bg-white/5 rounded-[28px] p-6 border border-white/5 mb-8 text-white">
-                    <div class="flex justify-between items-center mb-6 text-white">
+                    <div class="flex justify-between items-center mb-6 text-white text-center">
                         <span class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">График EUR/RUB</span>
                         <div class="relative">
                             <button onclick="toggleFilterMenu()" class="text-[10px] font-black uppercase bg-white/10 px-4 py-2 rounded-full border border-white/10 flex items-center gap-2 text-white">
@@ -416,7 +382,6 @@
                     </div>
                 </div>
 
-                <!-- Рабочий Калькулятор -->
                 <div class="bg-white/5 rounded-[28px] p-7 border border-white/5 mb-10 text-white text-center">
                     <p class="text-[10px] font-black text-white/30 uppercase mb-5 tracking-widest text-white text-center">Конвертер RUB → EUR</p>
                     <input id="calcInputRub" oninput="calculateExchange()" type="number" placeholder="Введите сумму..." class="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black outline-none mb-5 text-center text-white">
@@ -513,9 +478,7 @@
             document.getElementById('drawerProductLightDesc').innerText = shortDescs[id];
             document.getElementById('drawerDynamicDetails').innerHTML = `<p>${descriptions[id]}</p>`;
             
-            // Логика инверсии логотипа в Drawer, если это Revolut
             const isRevolut = id === 'revolut';
-            // Для Wise уменьшаем размер в Drawer (h-4)
             const hSize = id === 'wise' ? 'h-4' : 'h-8';
             document.getElementById('drawerLogoLabel').innerHTML = `<img src="${logos[id]}" class="${hSize} w-auto object-contain ${isRevolut ? 'logo-white' : ''}">`;
             
