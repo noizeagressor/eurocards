@@ -2,462 +2,575 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EuroCards Zen Premium</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Satoshi:wght@400;700;900&display=swap');
-
         :root {
-            --bg: #F2F4F7;
-            --surface: #FFFFFF;
-            --accent: #007AFF; /* Apple Blue */
-            --accent-soft: #E5F1FF;
-            --text-main: #1D1D1F;
-            --text-dim: #86868B;
-            --border: rgba(0, 0, 0, 0.05);
-            --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.04);
-            --shadow-inner: inset 0 2px 4px rgba(255, 255, 255, 0.8);
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            font-family: 'Satoshi', -apple-system, sans-serif;
+            --bg-dark: #000000;
+            --accent-green: #e2ff6f;
+            --brand-green: #9FE870;
+            --glass-border: rgba(255, 255, 255, 0.05);
         }
 
         body {
-            background-color: var(--bg);
-            margin: 0;
-            padding: 0;
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(210,100%,95%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 100%, hsla(220,100%,92%,1) 0, transparent 50%);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-dark);
+            color: white;
+            transition: background-color 0.4s ease;
+            overflow: hidden;
+            height: 100vh;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .app-shell {
-            padding: 20px 20px 140px;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        /* HEADER */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 35px;
-            padding-top: env(safe-area-inset-top);
-        }
-
-        .user-pill {
-            background: var(--surface);
-            padding: 6px 16px 6px 6px;
-            border-radius: 40px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: var(--shadow-soft);
-            border: 1px solid var(--border);
-        }
-
-        .avatar {
-            width: 38px; height: 38px;
-            border-radius: 50%;
-            background: var(--accent-soft);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--accent);
-            font-weight: 900;
-        }
-
-        .user-info-text { font-size: 14px; font-weight: 700; }
-        .user-status { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
-
-        .notif-bell {
-            width: 48px; height: 48px;
-            background: var(--surface);
-            border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-soft);
-            color: var(--text-main);
-        }
-
-        /* BENTO GRID SHOWCASE */
-        .section-title {
-            font-size: 24px;
-            font-weight: 900;
-            margin: 0 0 20px 5px;
-            letter-spacing: -0.5px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .card {
-            background: var(--surface);
-            border-radius: 32px;
-            padding: 24px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-soft);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        /* Hero Style */
+        .premium-hero {
+            background: linear-gradient(135deg, #111b11 0%, #050505 100%);
+            border: 1px solid rgba(226, 255, 111, 0.1);
             position: relative;
             overflow: hidden;
         }
 
-        .card:active { transform: scale(0.95); background: #fafafa; }
+        /* КЛАССИЧЕСКИЕ ТЕМНЫЕ ГРАДИЕНТЫ */
+        .skrill-gradient { background: linear-gradient(135deg, #1b111b 0%, #050505 100%); border: 1px solid rgba(168, 85, 247, 0.1) !important; }
+        .neteller-gradient { background: linear-gradient(135deg, #111b11 0%, #050505 100%); border: 1px solid rgba(34, 197, 94, 0.1) !important; }
+        .wise-gradient { background: linear-gradient(135deg, #002b3d 0%, #050505 100%); border: 1px solid rgba(0, 185, 255, 0.1) !important; }
+        .revolut-gradient { background: linear-gradient(135deg, #1f1f21 0%, #050505 100%); border: 1px solid rgba(255, 255, 255, 0.05) !important; }
+        .redotpay-gradient { background: linear-gradient(135deg, #3d0a0a 0%, #050505 100%); border: 1px solid rgba(255, 63, 63, 0.1) !important; }
+        .paypal-gradient { background: linear-gradient(135deg, #001c4d 0%, #050505 100%); border: 1px solid rgba(0, 112, 186, 0.15) !important; }
 
-        .card-hero { grid-column: span 2; padding: 30px; background: linear-gradient(135deg, #fff 0%, #f9fbff 100%); }
-        .card-hero::after {
-            content: ""; position: absolute; top: -20%; right: -10%; 
-            width: 150px; height: 150px; 
-            background: var(--accent); opacity: 0.05; filter: blur(40px);
+        /* Инверсия для черных логотипов, чтобы они стали белыми */
+        .logo-white {
+            filter: brightness(0) invert(1);
         }
 
-        .card-icon-box {
-            width: 50px; height: 50px;
-            background: var(--accent-soft);
-            border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--accent);
-            margin-bottom: 20px;
+        /* Надпись Limited Time Offer внизу слева */
+        .lto-tag {
+            font-size: 20px; /* Увеличено до 20px по запросу */
+            font-weight: 900;
+            opacity: 0.15;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
         }
 
-        .card-hero .card-icon-box { background: var(--accent); color: #fff; box-shadow: 0 10px 20px rgba(0, 122, 255, 0.2); }
-
-        .card-name { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
-        .card-desc { font-size: 12px; color: var(--text-dim); line-height: 1.4; margin-bottom: 15px; }
-        .card-price { font-size: 16px; font-weight: 900; color: var(--accent); }
-
-        /* NAV BAR (The Floating Dock) */
-        .dock {
+        /* Навигация-облако */
+        .nav-dock {
             position: fixed;
-            bottom: 30px; left: 20px; right: 20px;
-            height: 76px;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 400px;
+            height: 68px;
+            border-radius: 24px;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-            z-index: 1000;
+            z-index: 50;
+            background: rgba(18, 18, 18, 0.85);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            padding: 0 12px;
         }
 
-        .dock-item {
-            display: flex; flex-direction: column; align-items: center;
-            gap: 6px; color: #B0B0B8; transition: 0.3s; flex: 1;
-        }
-
-        .dock-item.active { color: var(--accent); }
-        .dock-item i { width: 24px; height: 24px; }
-        .dock-item span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
-
-        /* VIEWS */
-        .view { display: none; }
-        .view.active { display: block; animation: slideUp 0.5s ease forwards; }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ORDERS VIEW */
-        .order-row {
-            background: var(--surface);
-            border-radius: 24px;
-            padding: 18px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border);
+        .nav-item {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            opacity: 0.35;
+            transition: all 0.3s ease;
+            flex: 1;
         }
+        .nav-item.active { opacity: 1; color: #ffffff; }
 
-        .status-tag {
-            margin-left: auto;
-            font-size: 10px; font-weight: 800;
-            padding: 4px 10px; border-radius: 8px;
-            background: #E8F5E9; color: #2E7D32;
+        .tab-content {
+            display: none;
+            height: 100vh;
+            overflow-y: auto;
+            padding-bottom: 140px;
         }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-out; }
 
-        /* BONUSES VIEW */
-        .wallet-card {
-            background: var(--accent);
-            border-radius: 35px;
-            padding: 40px 30px;
-            color: #fff;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0, 122, 255, 0.2);
-            margin-bottom: 30px;
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .ref-link-box {
-            background: #fff;
-            border: 2px dashed var(--accent-soft);
-            padding: 20px;
-            border-radius: 20px;
-            display: flex; justify-content: space-between; align-items: center;
+        /* Карточка продукта */
+        .vault-card {
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            position: relative;
+            min-height: 165px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
+        .vault-card:active { transform: scale(0.98); }
 
-        /* FAQ VIEW */
-        .faq-card {
-            background: var(--surface);
-            border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border);
-        }
-        .faq-q { font-weight: 800; font-size: 16px; margin-bottom: 8px; color: var(--text-main); }
-        .faq-a { font-size: 14px; color: var(--text-dim); line-height: 1.5; }
-
-        /* BOTTOM DRAWER */
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.2); backdrop-filter: blur(5px);
-            display: none; z-index: 2000; opacity: 0; transition: 0.3s;
-        }
+        /* Drawer */
         .drawer {
-            position: fixed; bottom: -100%; left: 0; width: 100%;
-            background: var(--surface);
-            border-radius: 40px 40px 0 0;
-            padding: 40px 25px 60px;
-            z-index: 2001; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 -20px 40px rgba(0,0,0,0.05);
+            position: fixed;
+            bottom: -100%; left: 0; right: 0;
+            background: #000000;
+            border-radius: 36px 36px 0 0;
+            padding: 24px;
+            z-index: 101;
+            transition: bottom 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+            max-height: 94vh;
+            overflow-y: auto;
         }
-        .drawer.active { bottom: 0; }
-        .drawer-handle { width: 40px; height: 5px; background: var(--bg); border-radius: 10px; margin: -20px auto 30px; }
+        .drawer.open { bottom: 0; }
 
-        .btn-buy {
-            background: var(--accent);
-            color: #fff; border: none; width: 100%; height: 64px;
-            border-radius: 20px; font-weight: 800; font-size: 18px;
-            cursor: pointer; box-shadow: 0 10px 25px rgba(0, 122, 255, 0.2);
+        .tab-btn {
+            font-size: 14px; font-weight: 700;
+            color: rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+            position: relative;
         }
+        .tab-btn.active { color: #ffffff; }
+        .tab-btn.active::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: #ffffff; border-radius: 2px;
+        }
+
+        .metric-card { background: #0f0f0f; border: 1px solid rgba(255,255,255,0.05); border-radius: 24px; }
+        
+        .dropdown-menu {
+            display: none; position: absolute; right: 0; top: 100%;
+            margin-top: 8px; background: #1a1a1a; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px; z-index: 150; overflow: hidden;
+        }
+        .dropdown-menu.open { display: block; }
+
+        .select-indicator {
+            position: absolute;
+            top: 14px; right: 14px;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.1);
+            display: none;
+            align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.3);
+            z-index: 20;
+        }
+        .is-selecting .select-indicator { display: flex; }
+        .is-selected .select-indicator { background: var(--brand-green); border-color: var(--brand-green); color: black; }
+
+        ::-webkit-scrollbar { width: 0px; }
     </style>
 </head>
 <body>
 
-    <div class="app-shell">
-        <!-- HEADER -->
-        <header class="header">
-            <div class="user-pill">
-                <div class="avatar" id="user-initial">C</div>
-                <div class="user-meta">
-                    <div class="user-status">Platinum Member</div>
-                    <div class="user-info-text" id="user-name">Клиент</div>
-                </div>
+    <!-- Вкладка Кошелек -->
+    <div id="home" class="tab-content active px-5 pt-4">
+        <header class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-white text-black rounded-lg flex items-center justify-center font-black italic text-sm text-center">E</div>
+                <span class="font-bold text-lg tracking-tight text-white">EuroCards</span>
             </div>
-            <div class="notif-bell" onclick="tg.showAlert('Все системы активны')">
-                <i data-lucide="bell-ring"></i>
+            <div class="flex items-center gap-3">
+                <div class="bg-[#e2ff6f] text-black px-4 py-1.5 rounded-full text-[10px] font-black uppercase">Elite</div>
+                <i data-lucide="menu" class="w-6 h-6 text-white"></i>
             </div>
         </header>
 
-        <!-- VIEW 1: MARKET -->
-        <main id="view-market" class="view active">
-            <h2 class="section-title">Витрина</h2>
-            <div class="grid">
-                <!-- FEATURED CARD -->
-                <div class="card card-hero" onclick="openDrawer('Infinite Elite')">
-                    <div class="card-icon-box"><i data-lucide="crown"></i></div>
-                    <div>
-                        <div class="card-name">Infinite Elite</div>
-                        <div class="card-desc">Максимальный пакет: 3 банка + PayPal Pro + консьерж сервис.</div>
-                        <div class="card-price">39,900 ₽</div>
-                    </div>
-                </div>
-
-                <div class="card" onclick="openDrawer('Essential')">
-                    <div class="card-icon-box"><i data-lucide="credit-card"></i></div>
-                    <div>
-                        <div class="card-name">Essential</div>
-                        <div class="card-desc">Входной билет в мир оплат.</div>
-                        <div class="card-price">9,500 ₽</div>
-                    </div>
-                </div>
-
-                <div class="card" onclick="openDrawer('Duo Safe')">
-                    <div class="card-icon-box"><i data-lucide="shield-check"></i></div>
-                    <div>
-                        <div class="card-name">Duo Safe</div>
-                        <div class="card-desc">Набор из двух карт.</div>
-                        <div class="card-price">14,000 ₽</div>
-                    </div>
-                </div>
-
-                <div class="card card-hero" onclick="openDrawer('Wise')">
-                    <div class="card-icon-box" style="background:#00B9FF;"><i data-lucide="globe"></i></div>
-                    <div>
-                        <div class="card-name">Wise Account</div>
-                        <div class="card-desc">Персональный IBAN и бизнес возможности.</div>
-                        <div class="card-price">20,000 ₽</div>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- VIEW 2: ORDERS -->
-        <section id="view-orders" class="view">
-            <h2 class="section-title">Ваши заказы</h2>
-            <div class="order-row">
-                <div class="card-icon-box"><i data-lucide="package"></i></div>
+        <!-- Главная плашка -->
+        <div class="premium-hero rounded-[32px] p-6 mb-8 shadow-2xl">
+            <div class="flex justify-between items-start mb-8 relative z-10">
                 <div>
-                    <div style="font-weight:800">Essential Card</div>
-                    <div style="font-size:12px; color:var(--text-dim)">Заказ №4482</div>
+                    <div class="bg-white/10 px-3 py-1 rounded-full inline-flex items-center gap-2 mb-4">
+                        <span class="w-1.5 h-1.5 bg-[#e2ff6f] rounded-full animate-pulse"></span>
+                        <span class="text-[9px] font-bold uppercase tracking-widest text-[#e2ff6f]">Service Online</span>
+                    </div>
+                    <h1 class="text-4xl font-black mb-1 tracking-tighter text-white">EuroCards</h1>
+                    <p class="text-[11px] font-bold text-white/40 uppercase tracking-[0.2em]">Banking Solution</p>
                 </div>
-                <div class="status-tag">В работе</div>
-            </div>
-            <div style="text-align:center; margin-top:50px; opacity:0.3">
-                <i data-lucide="archive" style="width:48px; height:48px; margin-bottom:10px"></i>
-                <p>История пуста</p>
-            </div>
-        </section>
-
-        <!-- VIEW 3: BONUSES -->
-        <section id="view-bonuses" class="view">
-            <h2 class="section-title">Бонусы</h2>
-            <div class="wallet-card">
-                <div style="font-size:14px; opacity:0.8; font-weight:700; text-transform:uppercase; letter-spacing:1px">Баланс</div>
-                <div style="font-size:54px; font-weight:900; margin:15px 0">0.00 ₽</div>
-                <div style="font-size:13px; opacity:0.8">Вывод от 5,000 ₽</div>
-            </div>
-
-            <div class="section-title" style="font-size:18px">Реферальная система</div>
-            <div class="ref-link-box">
-                <div>
-                    <div style="font-weight:900">+ 500 ₽ за друга</div>
-                    <div style="font-size:12px; color:var(--text-dim)">Поделитесь ссылкой с близкими</div>
-                </div>
-                <div class="notif-bell" style="box-shadow:none; border-color:var(--accent-soft); color:var(--accent)" onclick="copyLink()">
-                    <i data-lucide="copy"></i>
+                <div class="w-12 h-12 bg-[#e2ff6f]/10 rounded-2xl flex items-center justify-center border border-[#e2ff6f]/20">
+                    <i data-lucide="globe" class="text-[#e2ff6f] w-6 h-6"></i>
                 </div>
             </div>
-        </section>
 
-        <!-- VIEW 4: FAQ -->
-        <section id="view-faq" class="view">
-            <h2 class="section-title">Помощь</h2>
-            <div class="faq-card">
-                <div class="faq-q">Как долго ждать карту?</div>
-                <div class="faq-a">Обычно выпуск занимает от 24 до 48 часов с момента подачи заявки.</div>
+            <div class="grid grid-cols-3 gap-3 relative z-10">
+                <div class="text-center"><i data-lucide="shield-check" class="w-4 h-4 mx-auto mb-1 text-white/60"></i><p class="text-[8px] font-bold uppercase text-white/40">Verified</p></div>
+                <div class="text-center"><i data-lucide="zap" class="w-4 h-4 mx-auto mb-1 text-white/60"></i><p class="text-[8px] font-bold uppercase text-white/40">Instant</p></div>
+                <div class="text-center"><i data-lucide="clock" class="w-4 h-4 mx-auto mb-1 text-white/60"></i><p class="text-[8px] font-bold uppercase text-white/40">24/7 Live</p></div>
             </div>
-            <div class="faq-card">
-                <div class="faq-q">Нужен ли ВНЖ?</div>
-                <div class="faq-a">Нет, мы оформляем карты на ваш действующий загранпаспорт РФ.</div>
-            </div>
-            <div class="faq-card">
-                <div class="faq-q">Как пополнить?</div>
-                <div class="faq-a">Вы можете использовать криптобиржи (P2P) или SWIFT переводы из дружественных банков.</div>
-            </div>
-            <button class="btn-buy" style="background:#F2F4F7; color:var(--text-main); box-shadow:none; margin-top:20px" onclick="tg.openTelegramLink('https://t.me/eurocardsapp_bot')">Чат с поддержкой</button>
-        </section>
+        </div>
 
-        <!-- FLOATING DOCK -->
-        <nav class="dock">
-            <div class="dock-item active" onclick="switchPage('view-market', this)"><i data-lucide="layout-grid"></i><span>Витрина</span></div>
-            <div class="dock-item" onclick="switchPage('view-orders', this)"><i data-lucide="shopping-bag"></i><span>Заказы</span></div>
-            <div class="dock-item" onclick="switchPage('view-bonuses', this)"><i data-lucide="sparkles"></i><span>Бонусы</span></div>
-            <div class="dock-item" onclick="switchPage('view-faq', this)"><i data-lucide="help-circle"></i><span>Помощь</span></div>
-        </nav>
+        <!-- Категория 1 -->
+        <div class="flex items-center justify-between mb-4 px-4">
+            <h2 class="text-[15px] font-extrabold uppercase tracking-[0.1em] text-white/50 pl-1">Банки на РФ загран</h2>
+            <button id="compareModeBtn" onclick="toggleCompareMode()" class="text-[11px] font-black uppercase text-[#9FE870]">Сравнить</button>
+        </div>
+
+        <div class="space-y-4 mb-10">
+            <!-- Skrill -->
+            <div id="card-skrill" onclick="handleCardClick('skrill', '9 500 ₽')" class="vault-card skrill-gradient rounded-[28px] p-6 shadow-xl">
+                <div class="select-indicator"><i data-lucide="check" class="w-3 h-3"></i></div>
+                <div class="flex flex-col items-start">
+                    <!-- Логотип Skrill: увеличен до h-7 -->
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Skrill_logo.svg/960px-Skrill_logo.svg.png" class="h-7 w-auto object-contain mb-1">
+                    <p class="text-[10px] text-white/40 font-bold uppercase tracking-wider italic">НА ВАШИ ДОКУМЕНТЫ. ВЫПУСК ЗА 24 ЧАСА.</p>
+                </div>
+                <div class="flex justify-between items-end">
+                    <div class="lto-tag">LIMITED TIME OFFER</div>
+                    <div class="text-right">
+                        <p class="text-4xl font-black tracking-tighter text-white">9 500 ₽</p>
+                        <p class="text-[10px] font-black text-white/40 uppercase mt-1 text-right">Бонус 5 евро</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Neteller -->
+            <div id="card-neteller" onclick="handleCardClick('neteller', '12 000 ₽')" class="vault-card neteller-gradient rounded-[28px] p-6 shadow-xl">
+                <div class="select-indicator"><i data-lucide="check" class="w-3 h-3"></i></div>
+                <div class="flex flex-col items-start">
+                    <!-- Логотип Neteller: увеличен до h-5 -->
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Neteller.svg/960px-Neteller.svg.png" class="h-5 w-auto object-contain mb-1">
+                    <p class="text-[10px] text-white/40 font-bold uppercase tracking-wider italic">НА ВАШИ ДОКУМЕНТЫ. ВЫПУСК ЗА 24 ЧАСА.</p>
+                </div>
+                <div class="flex justify-between items-end">
+                    <div class="lto-tag">LIMITED TIME OFFER</div>
+                    <div class="text-right">
+                        <p class="text-4xl font-black tracking-tighter text-white">12 000 ₽</p>
+                        <p class="text-[10px] font-black text-white/40 uppercase mt-1 text-right">Бонус 5 евро</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Категория 2 -->
+        <div class="mb-4 px-4">
+            <h2 class="text-[15px] font-extrabold uppercase tracking-[0.1em] text-white/50 pl-1">Банки на дропов</h2>
+        </div>
+        <div class="space-y-4 mb-10">
+            <!-- Redotpay -->
+            <div id="card-redotpay" onclick="handleCardClick('redotpay', '5 000 ₽')" class="vault-card redotpay-gradient rounded-[28px] p-6 shadow-xl">
+                <div class="select-indicator"><i data-lucide="check" class="w-3 h-3"></i></div>
+                <div class="flex flex-col items-start">
+                    <img src="https://staticsource1.redotpay.com/web/img/logo.svg?t=1770172675664" class="h-6 w-auto mb-1 object-contain">
+                    <p class="text-[10px] text-white/40 font-bold uppercase mb-1 italic tracking-widest">ВЫПУСК ЗА 5 МИНУТ</p>
+                </div>
+                <div class="flex justify-between items-end"><div class="lto-tag opacity-0">NONE</div><div class="text-right ml-auto"><p class="text-4xl font-black tracking-tighter text-white">5 000 ₽</p><p class="text-[10px] font-black text-white/40 uppercase mt-1">Бонус 5 евро</p></div></div>
+            </div>
+
+            <!-- Wise -->
+            <div id="card-wise" onclick="handleCardClick('wise', '15 000 ₽')" class="vault-card wise-gradient rounded-[28px] p-6 shadow-xl">
+                <div class="select-indicator"><i data-lucide="check" class="w-3 h-3"></i></div>
+                <div class="flex flex-col items-start">
+                    <!-- Логотип Wise: установлен размер h-6 -->
+                    <img src="https://companieslogo.com/img/orig/WISE.L_BIG.D-95705462.svg?t=1720244494" class="h-6 w-auto mb-1 object-contain">
+                    <p class="text-[10px] font-bold uppercase mb-1 italic opacity-40 text-white">ГАРАНТИЯ 30 ДНЕЙ</p>
+                </div>
+                <div class="flex justify-between items-end"><div class="lto-tag opacity-0">NONE</div><div class="text-right ml-auto text-white"><p class="text-4xl font-black tracking-tighter">15 000 ₽</p><p class="text-[10px] font-black uppercase mt-1 opacity-50 text-white">Бонус 5 евро</p></div></div>
+            </div>
+
+            <!-- Revolut -->
+            <div id="card-revolut" onclick="handleCardClick('revolut', '18 000 ₽')" class="vault-card revolut-gradient rounded-[28px] p-6 shadow-xl">
+                <div class="select-indicator"><i data-lucide="check" class="w-3 h-3"></i></div>
+                <div class="flex flex-col items-start">
+                    <!-- Логотип Revolut: инвертирован в белый и установлен размер h-7 -->
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Revolut_logo.svg/960px-Revolut_logo.svg.png" class="h-7 logo-white w-auto mb-1 object-contain">
+                    <p class="text-[10px] font-bold uppercase mb-1 italic opacity-40">ЕВРОПЕЙСКИЙ ЛИМИТ</p>
+                </div>
+                <div class="flex justify-between items-end"><div class="lto-tag opacity-0">NONE</div><div class="text-right ml-auto text-white"><p class="text-4xl font-black tracking-tighter">18 000 ₽</p><p class="text-[10px] font-black uppercase mt-1 opacity-50 text-white">Бонус 5 евро</p></div></div>
+            </div>
+        </div>
+
+        <!-- Категория 3 -->
+        <div class="mb-4 px-4">
+            <h2 class="text-[15px] font-extrabold uppercase tracking-[0.1em] text-white/50 pl-1">Доп. услуги</h2>
+        </div>
+        <div class="space-y-4 mb-10">
+            <!-- PayPal -->
+            <div id="card-paypal" onclick="handleCardClick('paypal', '14 000 ₽')" class="vault-card paypal-gradient rounded-[28px] p-6 shadow-xl">
+                <div class="select-indicator"><i data-lucide="check" class="w-3 h-3"></i></div>
+                <div class="flex flex-col items-start">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" class="h-7 w-auto mb-1 object-contain">
+                    <p class="text-[10px] text-white/40 font-bold uppercase mb-1 italic tracking-widest">ВЕРИФИКАЦИЯ АККАУНТА ПОД КЛЮЧ</p>
+                </div>
+                <div class="flex justify-between items-end">
+                    <div class="lto-tag">LIMITED TIME OFFER</div>
+                    <div class="text-right ml-auto text-white">
+                        <p class="text-4xl font-black tracking-tighter">14 000 ₽</p>
+                        <p class="text-[10px] font-black text-white/40 uppercase mt-1">Бонус 5 евро</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- DRAWER -->
-    <div id="overlay" class="overlay" onclick="closeDrawer()"></div>
-    <div id="drawer" class="drawer">
-        <div class="drawer-handle"></div>
-        <div style="text-align:center">
-            <div id="d-icon" class="card-icon-box" style="margin: 0 auto 20px; width:70px; height:70px;"><i data-lucide="package" style="width:32px; height:32px"></i></div>
-            <h2 id="d-title" style="font-size:32px; font-weight:900; margin:0 0 5px">Essential</h2>
-            <div id="d-price" style="font-size:24px; font-weight:800; color:var(--accent); margin-bottom:30px">9,500 ₽</div>
-            <div id="d-desc" style="color:var(--text-dim); line-height:1.8; margin-bottom:40px; text-align:left">
-                • Личный банковский счет в Европе<br>
-                • Поддержка всех подписок (Netflix, Spotify)<br>
-                • Привязка к Apple Pay
-            </div>
-            <button class="btn-buy" onclick="startProcess()">Оформить сейчас</button>
+    <!-- Вкладка Мои заказы -->
+    <div id="orders" class="tab-content p-7 text-white text-center">
+        <h1 class="text-3xl font-black mb-8 pt-4 tracking-tighter text-white">Мои заказы</h1>
+        <div class="flex flex-col items-center justify-center pt-24 opacity-20">
+            <i data-lucide="archive" class="w-20 h-20 mb-6 text-white text-center mx-auto"></i>
+            <p class="font-bold text-sm uppercase tracking-widest text-white text-center">История заказов пуста</p>
         </div>
+    </div>
+
+    <!-- Вкладка Бонусы -->
+    <div id="bonuses" class="tab-content pt-4 px-6 text-white text-center">
+        <div class="flex justify-center mb-8"><div class="bg-white/10 px-4 py-2 rounded-full border border-white/5 text-xs font-black uppercase text-white/60">Бонусы</div></div>
+        <div class="bg-[#111] rounded-[36px] p-8 border border-white/5 shadow-2xl">
+            <h2 class="text-5xl font-black mb-2 text-[#9FE870] tracking-tighter">2000 ₽</h2>
+            <p class="text-white/40 text-xs font-bold uppercase tracking-[0.2em] mb-8 text-center">за каждого приглашенного</p>
+            <div class="flex gap-4">
+                <button class="flex-1 bg-white text-black py-4.5 rounded-[22px] font-black text-xs uppercase shadow-xl">Пригласить</button>
+                <button class="w-16 h-16 bg-white/5 text-white rounded-[22px] flex items-center justify-center border border-white/5"><i data-lucide="copy" class="w-5 h-5 opacity-40"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Вкладка Профиль -->
+    <div id="settings" class="tab-content px-7 pt-12 text-white">
+        <div class="flex flex-col items-center mb-12 text-center">
+            <div class="w-24 h-24 rounded-[28px] border-[4px] border-white/5 overflow-hidden mb-5 shadow-2xl mx-auto">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-full h-full object-cover">
+            </div>
+            <h2 class="text-2xl font-black tracking-tighter text-white">Felix</h2>
+            <p class="text-[10px] text-[#9FE870] font-black uppercase mt-1 tracking-widest opacity-60">ID 8829102</p>
+        </div>
+        <div class="space-y-3">
+            <div class="flex items-center p-5 bg-white/5 rounded-[22px] border border-white/5 text-white"><i data-lucide="settings" class="w-5 h-5 mr-4 text-white/30"></i><span class="flex-1 text-sm font-bold text-white">Настройки аккаунта</span><i data-lucide="chevron-right" class="w-4 h-4 opacity-10 text-white"></i></div>
+            <div class="flex items-center p-5 bg-white/5 rounded-[22px] border border-white/5 text-white"><i data-lucide="mail" class="w-5 h-5 mr-4 text-white/30"></i><span class="flex-1 text-sm font-bold text-white">Поддержка</span><i data-lucide="external-link" class="w-4 h-4 opacity-10 text-white"></i></div>
+        </div>
+    </div>
+
+    <!-- Навигация -->
+    <nav class="nav-dock">
+        <div onclick="switchTab('home')" id="nav-home" class="nav-item active"><i data-lucide="wallet" class="w-6 h-6 mb-1"></i><span>Кошелек</span></div>
+        <div onclick="switchTab('orders')" id="nav-orders" class="nav-item"><i data-lucide="shopping-bag" class="w-6 h-6 mb-1"></i><span>Заказы</span></div>
+        <div onclick="switchTab('bonuses')" id="nav-bonuses" class="nav-item"><i data-lucide="gift" class="w-6 h-6 mb-1"></i><span>Бонусы</span></div>
+        <div onclick="switchTab('settings')" id="nav-settings" class="nav-item"><i data-lucide="circle-user" class="w-6 h-6 mb-1"></i><span>Профиль</span></div>
+    </nav>
+
+    <!-- Drawer -->
+    <div id="drawerOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-lg z-[100] hidden opacity-0 transition-opacity" onclick="closeDrawer()"></div>
+    <div id="productDrawer" class="drawer">
+        <div class="flex items-center justify-between mb-8 text-white">
+            <button onclick="closeDrawer()" class="flex items-center text-white/40 font-bold uppercase text-[10px] tracking-widest"><i data-lucide="chevron-down" class="w-5 h-5 mr-1"></i>Назад</button>
+            <div class="w-12 h-1 bg-white/10 rounded-full"></div>
+            <div class="w-16"></div>
+        </div>
+
+        <div id="drawerMainContent">
+            <!-- Header: аккуратно слева -->
+            <div class="flex items-center gap-4 mb-8 text-white">
+                <div id="drawerLogoLabel" class="w-14 h-14 bg-white/5 rounded-xl flex items-center justify-center p-2 border border-white/5 text-white"></div>
+                <div>
+                    <h2 id="drawerProductTitle" class="text-2xl font-black uppercase tracking-tighter text-white">Bank</h2>
+                    <p id="drawerProductLightDesc" class="text-[10px] text-white/40 font-bold uppercase italic tracking-wider"></p>
+                </div>
+            </div>
+            
+            <div class="metric-card p-6 flex items-center justify-around mb-8 text-white shadow-2xl">
+                <div class="text-center"><p class="text-[9px] font-black uppercase text-white/20 mb-2 tracking-widest text-center">Цена</p><p id="drawerNetAsset" class="text-2xl font-black text-white">0 ₽</p></div>
+                <div class="w-px h-10 bg-white/10"></div>
+                <div class="text-center"><p class="text-[9px] font-black uppercase text-white/30 mb-2 tracking-widest text-center text-white text-center">Курс EUR</p><p id="drawerMainMetric" class="text-xl font-black text-white">90.31</p></div>
+            </div>
+
+            <div class="flex justify-around border-b border-white/5 mb-8">
+                <button id="tabBtnOverview" onclick="setDrawerTab('overview')" class="tab-btn active uppercase tracking-widest text-[11px] text-white">Обзор</button>
+                <button id="tabBtnDetails" onclick="setDrawerTab('details')" class="tab-btn uppercase tracking-widest text-[11px] text-white">Детали</button>
+            </div>
+
+            <div id="drawerTabOverview">
+                <!-- Рабочий График -->
+                <div class="bg-white/5 rounded-[28px] p-6 border border-white/5 mb-8 text-white">
+                    <div class="flex justify-between items-center mb-6 text-white">
+                        <span class="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">График EUR/RUB</span>
+                        <div class="relative">
+                            <button onclick="toggleFilterMenu()" class="text-[10px] font-black uppercase bg-white/10 px-4 py-2 rounded-full border border-white/10 flex items-center gap-2 text-white">
+                                <span id="currentFilterLabel">30 Days</span> <i data-lucide="chevron-down" class="w-3 h-3 text-[#9FE870]"></i>
+                            </button>
+                            <div id="filterMenu" class="dropdown-menu">
+                                <div onclick="updatePeriod(30, '30 Days')" class="p-4 text-[10px] font-black border-b border-white/5 active:bg-[#9FE870] active:text-black text-white text-center">30 DAYS</div>
+                                <div onclick="updatePeriod(365, '1 Year')" class="p-4 text-[10px] font-black active:bg-[#9FE870] active:text-black text-white text-center">1 YEAR</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-40 flex items-end mb-4">
+                        <svg viewBox="0 0 100 40" class="w-full h-full" preserveAspectRatio="none">
+                            <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#9FE870" stop-opacity="0.4"></stop><stop offset="100%" stop-color="#9FE870" stop-opacity="0"></stop></linearGradient></defs>
+                            <path id="chartFillPath" d="" fill="url(#g1)"></path>
+                            <path id="chartLinePath" d="" fill="none" stroke="#9FE870" stroke-width="2" stroke-linecap="round"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Рабочий Калькулятор -->
+                <div class="bg-white/5 rounded-[28px] p-7 border border-white/5 mb-10 text-white text-center">
+                    <p class="text-[10px] font-black text-white/30 uppercase mb-5 tracking-widest text-white text-center">Конвертер RUB → EUR</p>
+                    <input id="calcInputRub" oninput="calculateExchange()" type="number" placeholder="Введите сумму..." class="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-2xl font-black outline-none mb-5 text-center text-white">
+                    <div class="bg-[#9FE870] rounded-2xl p-5 flex justify-between items-center text-black shadow-lg">
+                        <p id="calcOutputEur" class="text-2xl font-black text-black">0.00</p>
+                        <span class="font-black text-xs uppercase tracking-widest opacity-60 text-black">EUR</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="drawerTabDetails" class="hidden text-white/60 text-center">
+                <div class="bg-white/5 rounded-[28px] p-8 border border-white/5 mb-10 italic text-white">
+                    <h3 class="text-lg font-black mb-5 text-white tracking-tighter uppercase not-italic text-center">Особенности тарифа</h3>
+                    <div id="drawerDynamicDetails" class="text-sm leading-relaxed space-y-4 text-center text-white"></div>
+                </div>
+            </div>
+        </div>
+
+        <button class="w-full bg-[#9FE870] text-black py-5.5 rounded-[24px] font-black uppercase text-sm active:scale-95 transition-all shadow-xl mb-10 tracking-widest">Оформить заказ</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-        lucide.createIcons();
+        tg.ready(); tg.expand();
+        let activeTab = 'home';
+        let currentEurRate = 90.31;
+        let isSelectionMode = false;
+        let selectedItems = [];
 
-        const PRODUCT_DB = {
-            'Essential': { p: '9,500 ₽', d: '• Моментальный выпуск<br>• Работает с Apple/Google Pay<br>• Пополнение через P2P' },
-            'Duo Safe': { p: '14,000 ₽', d: '• 2 разных банка<br>• Двойная надежность<br>• Скидка на второй аккаунт' },
-            'Infinite Elite': { p: '39,900 ₽', d: '• 3 Банка + PayPal Pro<br>• Персональный менеджер<br>• Бессрочная поддержка' },
-            'Wise': { p: '20,000 ₽', d: '• Бизнес возможности<br>• Личный IBAN (Европа)<br>• Верифицированный аккаунт' }
+        const logos = {
+            skrill: `https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Skrill_logo.svg/960px-Skrill_logo.svg.png`,
+            neteller: `https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Neteller.svg/960px-Neteller.svg.png`,
+            wise: `https://companieslogo.com/img/orig/WISE.L_BIG.D-95705462.svg?t=1720244494`,
+            revolut: `https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Revolut_logo.svg/960px-Revolut_logo.svg.png`,
+            redotpay: `https://staticsource1.redotpay.com/web/img/logo.svg?t=1770172675664`,
+            paypal: `https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg`
         };
 
-        function init() {
-            const user = tg.initDataUnsafe.user;
-            const name = user ? (user.first_name || user.username) : "Guest";
-            document.getElementById('user-name').innerText = name;
-            document.getElementById('user-initial').innerText = name.charAt(0).toUpperCase();
+        const titles = { skrill: "Skrill", neteller: "Neteller", wise: "Wise", revolut: "Revolut", redotpay: "Redotpay", paypal: "PayPal" };
+        const shortDescs = {
+            skrill: "Выпуск за 24 часа. СНГ.",
+            neteller: "Выпуск за 24 часа. СНГ.",
+            wise: "Гарантия 30 дней. Низкие комиссии.",
+            revolut: "EU Лимит. Лучшее приложение.",
+            redotpay: "Выпуск за 5 минут. Крипто-карта.",
+            paypal: "Верификация аккаунта под ключ."
+        };
+        const descriptions = {
+            skrill: "Международная платежная система, идеально подходящая для оплат в Европе и пополнения зарубежных счетов.",
+            neteller: "Электронный кошелек с поддержкой криптовалют. Быстрая верификация и высокие лимиты.",
+            wise: "Мультивалютный счет with real IBAN. Минимальные комиссии на конвертацию валют.",
+            revolut: "Полноценный банковский счет в Европе with виртуальными картами and инвестиционными инструментами.",
+            redotpay: "Инновационная крипто-карта. Тратьте свои USDT прямо с кошелька по всему миру.",
+            paypal: "Полностью верифицированный аккаунт PayPal для приема платежей и безопасных покупок."
+        };
+
+        function toggleCompareMode() {
+            isSelectionMode = !isSelectionMode;
+            const btn = document.getElementById('compareModeBtn');
+            if (isSelectionMode) {
+                btn.innerText = 'Отмена';
+                btn.classList.add('bg-white', 'text-black', 'px-3', 'py-1', 'rounded-full');
+            } else {
+                btn.innerText = 'Сравнить';
+                btn.classList.remove('bg-white', 'text-black', 'px-3', 'py-1', 'rounded-full');
+                exitSelectionMode();
+            }
         }
-        init();
 
-        function switchPage(id, el) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            
-            document.querySelectorAll('.dock-item').forEach(item => item.classList.remove('active'));
-            el.classList.add('active');
-            
-            tg.HapticFeedback.impactOccurred('medium');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function exitSelectionMode() {
+            isSelectionMode = false; selectedItems = [];
+            document.querySelectorAll('.vault-card').forEach(c => c.classList.remove('is-selected'));
+            lucide.createIcons();
         }
 
-        let activeProduct = '';
-        function openDrawer(name) {
-            activeProduct = name;
-            const data = PRODUCT_DB[name];
-            document.getElementById('d-title').innerText = name;
-            document.getElementById('d-price').innerText = data.p;
-            document.getElementById('d-desc').innerHTML = data.d;
+        function handleCardClick(id, asset) {
+            if (isSelectionMode) {
+                const card = document.getElementById(`card-${id}`);
+                if (selectedItems.includes(id)) {
+                    selectedItems = selectedItems.filter(i => i !== id);
+                    card.classList.remove('is-selected');
+                } else if (selectedItems.length < 2) {
+                    selectedItems.push(id);
+                    card.classList.add('is-selected');
+                }
+                return;
+            }
+            openVaultDrawer(id, asset);
+        }
 
-            document.getElementById('overlay').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('overlay').style.opacity = '1';
-                document.getElementById('drawer').classList.add('active');
+        function openVaultDrawer(id, asset) {
+            document.getElementById('drawerNetAsset').innerText = asset;
+            document.getElementById('drawerProductTitle').innerText = titles[id];
+            document.getElementById('drawerProductLightDesc').innerText = shortDescs[id];
+            document.getElementById('drawerDynamicDetails').innerHTML = `<p>${descriptions[id]}</p>`;
+            
+            // Логика инверсии логотипа в Drawer, если это Revolut
+            const isRevolut = id === 'revolut';
+            // Для Wise уменьшаем размер в Drawer (h-4)
+            const hSize = id === 'wise' ? 'h-4' : 'h-8';
+            document.getElementById('drawerLogoLabel').innerHTML = `<img src="${logos[id]}" class="${hSize} w-auto object-contain ${isRevolut ? 'logo-white' : ''}">`;
+            
+            setDrawerTab('overview');
+            drawChart();
+            openDrawerUI();
+        }
+
+        function calculateExchange() {
+            const i = document.getElementById('calcInputRub');
+            const r = parseFloat(i.value) || 0;
+            document.getElementById('calcOutputEur').innerText = (r / currentEurRate).toFixed(2);
+        }
+
+        function drawChart() {
+            const data = Array.from({length: 22}, () => 40 - Math.random() * 25);
+            let path = `M 0 ${data[0]}`;
+            let fill = `M 0 40 L 0 ${data[0]}`;
+            data.forEach((val, i) => { 
+                const x = i * 4.76;
+                path += ` L ${x} ${val}`; 
+                fill += ` L ${x} ${val}`;
+            });
+            fill += ` L 100 40 Z`;
+            document.getElementById('chartLinePath').setAttribute('d', path);
+            document.getElementById('chartFillPath').setAttribute('d', fill);
+        }
+
+        function setDrawerTab(t) {
+            const o = document.getElementById('drawerTabOverview');
+            const d = document.getElementById('drawerTabDetails');
+            const bo = document.getElementById('tabBtnOverview');
+            const bd = document.getElementById('tabBtnDetails');
+            if (t === 'overview') { o.classList.remove('hidden'); d.classList.add('hidden'); bo.classList.add('active'); bd.classList.remove('active'); }
+            else { o.classList.add('hidden'); d.classList.remove('hidden'); bo.classList.remove('active'); bd.classList.add('active'); }
+        }
+
+        function openDrawerUI() {
+            document.getElementById('drawerOverlay').classList.remove('hidden');
+            setTimeout(() => { 
+                document.getElementById('drawerOverlay').classList.add('opacity-100'); 
+                document.getElementById('productDrawer').classList.add('open'); 
             }, 10);
-            
-            tg.HapticFeedback.impactOccurred('light');
+            lucide.createIcons();
         }
 
         function closeDrawer() {
-            document.getElementById('drawer').classList.remove('active');
-            document.getElementById('overlay').style.opacity = '0';
-            setTimeout(() => document.getElementById('overlay').style.display = 'none', 400);
+            document.getElementById('drawerOverlay').classList.remove('opacity-100');
+            document.getElementById('productDrawer').classList.remove('open');
+            setTimeout(() => document.getElementById('drawerOverlay').classList.add('hidden'), 300);
         }
 
-        function startProcess() {
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert(`Начинаем оформление тарифа "${activeProduct}". Сейчас вас перенаправит к менеджеру.`);
-            closeDrawer();
+        function toggleFilterMenu() { document.getElementById('filterMenu').classList.toggle('open'); }
+        function updatePeriod(days, label) {
+            document.getElementById('currentFilterLabel').innerText = label;
+            document.getElementById('filterMenu').classList.remove('open');
+            drawChart();
         }
 
-        function copyLink() {
-            const user = tg.initDataUnsafe.user;
-            const link = `t.me/eurocardsapp_bot?start=${user ? user.id : 'ref'}`;
-            navigator.clipboard.writeText(link);
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert("Реферальная ссылка скопирована!");
+        function switchTab(id) {
+            if (activeTab === id) return;
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById(`nav-${id}`).classList.add('active');
+            activeTab = id; 
+            lucide.createIcons();
         }
+
+        window.onload = () => lucide.createIcons();
     </script>
 </body>
 </html>
