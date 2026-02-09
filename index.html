@@ -537,9 +537,6 @@
         const apiKey = ""; 
         let currentBankId = ""; let basePrice = 0; let finalPrice = 0; let promoApplied = false; let activeTab = 'home'; let currentEurRate = 90.31;
         
-        // Переменная для хранения заказа перед отправкой
-        let pendingOrderData = null;
-
         // --- ЛОГИКА ИНТЕГРАЦИИ С PYTHON ---
         function loadPythonData() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -585,7 +582,7 @@
             }
         }
 
-        // --- ОБНОВЛЕННЫЙ ФУНКЦИОНАЛ ОТПРАВКИ ---
+        // --- ОБНОВЛЕННЫЙ ФУНКЦИОНАЛ ОТПРАВКИ ЧЕРЕЗ GOOGLE APPS SCRIPT ---
         async function sendOrder() {
             const fio = document.getElementById('orderFio').value.trim();
             const dob = document.getElementById('orderDob').value;
@@ -598,59 +595,53 @@
             }
             
             const btn = document.getElementById('submitOrderBtn');
-            btn.innerText = "ОБРАБОТКА..."; btn.disabled = true;
+            btn.innerText = "ОТПРАВКА..."; 
+            btn.disabled = true;
 
-            // Формируем данные для отправки в Python
-            pendingOrderData = {
-                action: "new_order", // Метка для бота
-                tarif: currentBankId.toUpperCase(),
+            // Формируем данные для твоего Google Script
+            // Поля названы так, как ждет твой скрипт: tariff, price, fio, birth, promo, username
+            const orderPayload = {
+                tariff: currentBankId.toUpperCase(),
                 price: finalPrice,
                 fio: fio.toUpperCase(),
-                dob: dob,
+                birth: dob, 
                 promo: promo || "нет",
-                comment: comment || "нет",
-                order_id: "ORD-" + Math.floor(Math.random() * 1000000),
-                client: tg.initDataUnsafe?.user?.username ? `@${tg.initDataUnsafe.user.username}` : "не указан",
-                user_id: tg.initDataUnsafe?.user?.id || "неизвестно"
+                comment: comment || "нет", // Коммент добавил в payload, но если скрипт его не читает, ничего страшного
+                username: tg.initDataUnsafe?.user?.username || "no_username"
             };
 
-            // Старый код отправки в Google Script пока закомментирован, так как мы теперь шлем в бота напрямую
-            /*
+            // Ссылка на твой Google Script
+            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec";
+
             try {
-                const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/ВАШ_ID/exec";
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(pendingOrderData)
+                    mode: 'no-cors', // Важно для GAS
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderPayload)
                 });
-            } catch (err) { console.error("Google Script Error:", err); }
-            */
 
-            // Эмуляция задержки (чтобы было ощущение работы сервера)
-            setTimeout(() => {
+                // Визуальная эмуляция успеха (так как no-cors не возвращает статус, мы предполагаем успех, если не вылетела ошибка сети)
                 tg.HapticFeedback.notificationOccurred('success');
-                // Показываем экран успеха, но пока НЕ отправляем данные, 
-                // чтобы юзер успел насладиться анимацией галочки
                 document.getElementById('successOverlay').classList.remove('hidden');
-                
-                btn.innerText = "ОТПРАВИТЬ ЗАЯВКУ"; btn.disabled = false;
-            }, 800);
+
+            } catch (err) {
+                console.error("Google Script Error:", err);
+                alert("Ошибка соединения. Проверьте интернет.");
+            } finally {
+                btn.innerText = "ОТПРАВИТЬ ЗАЯВКУ"; 
+                btn.disabled = false;
+            }
         }
 
-        // --- ОБНОВЛЕННАЯ ФУНКЦИЯ ЗАКРЫТИЯ ---
+        // --- ФУНКЦИЯ ЗАКРЫТИЯ (БЕЗ ЗАКРЫТИЯ ПРИЛОЖЕНИЯ) ---
         function closeAllAndGoHome() { 
-            // ВОТ ЗДЕСЬ мы отправляем данные в бота
-            if (pendingOrderData) {
-                // Превращаем объект в строку и отправляем в Telegram
-                tg.sendData(JSON.stringify(pendingOrderData));
-                // tg.sendData автоматически закроет приложение!
-            } else {
-                // Если данных нет (просто закрыли), то просто скрываем окна
-                document.getElementById('successOverlay').classList.add('hidden'); 
-                closeOrderForm(); 
-                closeDrawer(); 
-                switchTab('home'); 
-            }
+            // Просто скрываем окна и возвращаем на главную
+            document.getElementById('successOverlay').classList.add('hidden'); 
+            closeOrderForm(); 
+            closeDrawer(); 
+            switchTab('home'); 
         }
 
         // --- ОСТАЛЬНАЯ ЛОГИКА ---
