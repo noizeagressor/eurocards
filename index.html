@@ -458,15 +458,8 @@
                 <div class="bg-white/5 rounded-[28px] p-8 border border-white/5 mb-6 text-white text-center">
                     <h3 class="text-lg font-black mb-5 text-white tracking-tighter uppercase not-italic text-center">Особенности тарифа</h3>
                     <div id="drawerDynamicDetails" class="text-sm leading-relaxed space-y-4 text-white mb-6 text-center"></div>
-                    <ul class="text-left space-y-3 text-sm font-semibold text-white/80">
-                        <li class="flex items-center gap-3"><span class="w-1.5 h-1.5 bg-[#9FE870] rounded-full"></span> Мгновенный доступ после верификации</li>
-                        <li class="flex items-center gap-3"><span class="w-1.5 h-1.5 bg-[#9FE870] rounded-full"></span> Пополнение в любой криптовалюте</li>
-                        <li class="flex items-center gap-3"><span class="w-1.5 h-1.5 bg-[#9FE870] rounded-full"></span> Минимальные комиссии на конвертацию</li>
-                        <li class="flex items-center gap-3"><span class="w-1.5 h-1.5 bg-[#9FE870] rounded-full"></span> Поддержка Apple Pay и Google Pay</li>
-                        <li class="flex items-center gap-3"><span class="w-1.5 h-1.5 bg-[#9FE870] rounded-full"></span> Выпуск виртуальной карты за 60 минут</li>
-                        <li class="flex items-center gap-3"><span class="w-1.5 h-1.5 bg-[#9FE870] rounded-full"></span> Глобальное использование без границ</li>
-                        <li class="flex items-center gap-3"><span class="w-1.5 h-1.5 bg-[#9FE870] rounded-full"></span> Круглосуточная поддержка клиентов</li>
-                    </ul>
+                    <ul id="drawerFeaturesList" class="text-left space-y-3 text-sm font-semibold text-white/80">
+                        </ul>
                 </div>
             </div>
             <div id="drawerTabOverview" class="hidden">
@@ -534,36 +527,65 @@
         const tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
         
-        const apiKey = ""; 
+        // Ссылка на твой Google Script (она теперь общая для заказов и для ИИ)
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec";
+
         let currentBankId = ""; let basePrice = 0; let finalPrice = 0; let promoApplied = false; let activeTab = 'home'; let currentEurRate = 90.31;
         
+        // --- ДАННЫЕ ДЛЯ ШТОРОК ТОВАРОВ ---
+        const bankData = {
+            skrill: {
+                desc: "Skrill — надежная британская платежная система, идеально подходящая для оплаты зарубежных сервисов, фриланса и онлайн-казино. Личный счет оформляется на ваши данные.",
+                delivery: "ОТ 12 ЧАСОВ",
+                features: ["Полная верификация на ваш паспорт", "Именная карта (виртуальная)", "Поддержка Apple Pay и Google Pay", "Лимиты до €15,000 в месяц"]
+            },
+            neteller: {
+                desc: "Neteller предлагает безопасные международные переводы и удобную оплату в миллионах магазинов. Личный аккаунт с высоким уровнем доверия.",
+                delivery: "ОТ 12 ЧАСОВ",
+                features: ["Персональный кабинет «под ключ»", "Мгновенные переводы внутри системы", "Низкие комиссии на вывод", "Верификация по загранпаспорту РФ"]
+            },
+            redotpay: {
+                desc: "RedotPay — современный крипто-банк из Гонконга. Позволяет тратить криптовалюту напрямую через карту в любой точке мира, где принимают Visa.",
+                delivery: "ОТ 1 ЧАСА",
+                features: ["Мгновенное пополнение криптой (USDT)", "Виртуальная карта за 60 минут", "Привязка к Apple Pay", "Нет ежемесячной платы"]
+            },
+            wise: {
+                desc: "Wise — лучший выбор для мультивалютных операций по биржевому курсу. Позволяет хранить более 50 валют и получать реквизиты местных банков Европы и США.",
+                delivery: "ДО 48 ЧАСОВ",
+                features: ["Реквизиты IBAN (Бельгия/Германия)", "Самый выгодный курс конвертации", "Удобное приложение", "Оформление на европейского дропа"]
+            },
+            revolut: {
+                desc: "Revolut — золотой стандарт необанкинга. Продвинутая аналитика, крипто-трейдинг, страхование и безупречный интерфейс.",
+                delivery: "ДО 48 ЧАСОВ",
+                features: ["Лучший банковский софт в мире", "Виртуальные одноразовые карты", "Аналитика расходов и копилки", "Полный доступ к Revolut Business"]
+            },
+            paypal: {
+                desc: "Комплексная верификация вашего аккаунта PayPal для работы без блокировок. Позволяет принимать платежи и оплачивать покупки по всему миру.",
+                delivery: "ОТ 24 ЧАСОВ",
+                features: ["Привязка к надежному банку", "Подтвержденная личность", "Инструкции по безопасному использованию", "Поддержка при выводе средств"]
+            }
+        };
+
         // --- ЛОГИКА ИНТЕГРАЦИИ С PYTHON ---
         function loadPythonData() {
             const urlParams = new URLSearchParams(window.location.search);
             const rawOrders = urlParams.get('orders');
-            
             if (rawOrders) {
                 try {
-                    // Декодируем Base64 с поддержкой кириллицы
                     const decodedData = decodeURIComponent(atob(rawOrders).split('').map(function(c) {
                         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                     }).join(''));
-                    
                     const orders = JSON.parse(decodedData);
                     renderOrders(orders);
-                } catch (e) {
-                    console.error("Error decoding Python data:", e);
-                }
+                } catch (e) { console.error("Error decoding Python data:", e); }
             }
         }
 
         function renderOrders(orders) {
             const container = document.getElementById('ordersContainer');
             const emptyState = document.getElementById('emptyOrders');
-            
             if (orders && orders.length > 0) {
                 emptyState.classList.add('hidden');
-                // Очищаем контейнер, оставляя заголовок
                 container.innerHTML = orders.map(order => `
                     <div class="flex flex-col p-5 bg-white/5 rounded-[22px] border border-white/5 text-left mb-3">
                         <div class="flex justify-between items-start mb-2">
@@ -582,86 +604,68 @@
             }
         }
 
-        // --- ОБНОВЛЕННЫЙ ФУНКЦИОНАЛ ОТПРАВКИ ЧЕРЕЗ GOOGLE APPS SCRIPT ---
+        // --- ОБНОВЛЕННЫЙ ФУНКЦИОНАЛ ОТПРАВКИ ---
         async function sendOrder() {
             const fio = document.getElementById('orderFio').value.trim();
             const dob = document.getElementById('orderDob').value;
             const promo = document.getElementById('orderPromo').value;
             const comment = document.getElementById('orderComment').value;
-            
-            if (!fio || !dob || !validateAge()) { 
-                tg.HapticFeedback.notificationOccurred('error'); 
-                return; 
-            }
-            
+            if (!fio || !dob || !validateAge()) { tg.HapticFeedback.notificationOccurred('error'); return; }
             const btn = document.getElementById('submitOrderBtn');
-            btn.innerText = "ОТПРАВКА..."; 
-            btn.disabled = true;
+            btn.innerText = "ОТПРАВКА..."; btn.disabled = true;
 
-            // Формируем данные для твоего Google Script
-            // Поля названы так, как ждет твой скрипт: tariff, price, fio, birth, promo, username
             const orderPayload = {
                 tariff: currentBankId.toUpperCase(),
                 price: finalPrice,
                 fio: fio.toUpperCase(),
                 birth: dob, 
                 promo: promo || "нет",
-                comment: comment || "нет", // Коммент добавил в payload, но если скрипт его не читает, ничего страшного
+                comment: comment || "нет",
                 username: tg.initDataUnsafe?.user?.username || "no_username"
             };
-
-            // Ссылка на твой Google Script
-            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec";
 
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // Важно для GAS
+                    mode: 'no-cors',
                     cache: 'no-cache',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(orderPayload)
                 });
-
-                // Визуальная эмуляция успеха (так как no-cors не возвращает статус, мы предполагаем успех, если не вылетела ошибка сети)
                 tg.HapticFeedback.notificationOccurred('success');
                 document.getElementById('successOverlay').classList.remove('hidden');
-
             } catch (err) {
                 console.error("Google Script Error:", err);
                 alert("Ошибка соединения. Проверьте интернет.");
             } finally {
-                btn.innerText = "ОТПРАВИТЬ ЗАЯВКУ"; 
-                btn.disabled = false;
+                btn.innerText = "ОТПРАВИТЬ ЗАЯВКУ"; btn.disabled = false;
             }
         }
 
-        // --- ФУНКЦИЯ ЗАКРЫТИЯ (БЕЗ ЗАКРЫТИЯ ПРИЛОЖЕНИЯ) ---
         function closeAllAndGoHome() { 
-            // Просто скрываем окна и возвращаем на главную
             document.getElementById('successOverlay').classList.add('hidden'); 
-            closeOrderForm(); 
-            closeDrawer(); 
-            switchTab('home'); 
+            closeOrderForm(); closeDrawer(); switchTab('home'); 
         }
 
-        // --- ОСТАЛЬНАЯ ЛОГИКА ---
+        // --- ОБНОВЛЕННЫЙ ИИ-ПОМОЩНИК (БЕЗ КЛЮЧА) ---
         function cleanMarkdown(text) { return text.replace(/[\*\_]/g, ''); }
+        
         async function askGemini(prompt) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const systemPrompt = "Ты — помощник EuroCards. Отвечай кратко, без Markdown.";
-            let delay = 1000;
-            for (let i = 0; i < 5; i++) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], systemInstruction: { parts: [{ text: systemPrompt }] } })
-                    });
-                    if (response.ok) { const data = await response.json(); return cleanMarkdown(data.candidates?.[0]?.content?.parts?.[0]?.text || "..."); }
-                } catch (err) {}
-                await new Promise(r => setTimeout(r, delay)); delay *= 2;
+            // Теперь стучимся не в Google напрямую, а в твой скрипт-прокси
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: "ask_ai", // Флаг для Google Script
+                        prompt: prompt
+                    })
+                });
+                const data = await response.json();
+                return cleanMarkdown(data.result || "...");
+            } catch (err) {
+                console.error("AI Proxy Error:", err);
+                return "Извините, сейчас я не могу ответить. Попробуйте позже.";
             }
-            return "...";
         }
 
         async function aiQuickAsk(topic) {
@@ -717,10 +721,21 @@
             document.getElementById('pricePromoContainer').classList.add('hidden'); openVaultDrawer(id, asset);
         }
 
+        // --- ОБНОВЛЕННАЯ ДИНАМИЧЕСКАЯ ШТОРКА ---
         function openVaultDrawer(id, asset) {
+            const data = bankData[id];
             document.getElementById('drawerNetAsset').innerText = asset;
-            const d = {skrill: "Система Skrill...", neteller: "Кошелек Neteller...", wise: "Счет Wise...", revolut: "Банк Revolut...", redotpay: "Карта Redotpay...", paypal: "Аккаунт PayPal..."};
-            document.getElementById('drawerDynamicDetails').innerHTML = `<p>${d[id]}</p>`;
+            document.getElementById('drawerMainMetric').innerText = data.delivery;
+            document.getElementById('drawerDynamicDetails').innerHTML = `<p>${data.desc}</p>`;
+
+            // Наполняем список буллитов
+            const featuresHTML = data.features.map(f => `
+                <li class="flex items-center gap-3">
+                    <span class="w-1.5 h-1.5 bg-[#9FE870] rounded-full"></span> ${f}
+                </li>
+            `).join('');
+            document.getElementById('drawerFeaturesList').innerHTML = featuresHTML;
+
             const isRevolut = id === 'revolut'; const hSize = id === 'wise' ? 'h-10' : 'h-12';
             document.getElementById('drawerLogoLabel').innerHTML = `<img src="${logos[id]}" class="${hSize} w-auto object-contain ${isRevolut ? 'logo-white' : ''}">`;
             setDrawerTab('details'); openDrawerUI();
@@ -745,9 +760,7 @@
 
         window.onload = () => {
             lucide.createIcons();
-            loadPythonData(); // Загружаем заказы из Python при старте
-            
-            // Данные профиля из Telegram
+            loadPythonData();
             const u = tg.initDataUnsafe?.user;
             if (u) {
                 if (u.photo_url) { document.getElementById('headerAvatar').src = u.photo_url; document.getElementById('profileAvatar').src = u.photo_url; }
