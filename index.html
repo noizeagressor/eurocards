@@ -660,20 +660,17 @@ async function askGemini(prompt) {
         const response = await fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             body: JSON.stringify({
-                action: "ask_ai", // Обязательный флаг для нашего скрипта
+                action: "ask_ai",
                 prompt: prompt
             })
         });
 
-        // Сначала получаем ответ как текст (GAS капризен к типам контента)
         const textResponse = await response.text();
         
         try {
-            // Пробуем превратить текст в JSON объект
             const data = JSON.parse(textResponse);
             return cleanMarkdown(data.result || "Извините, не удалось получить внятный ответ.");
         } catch (e) {
-            // Если пришёл не JSON, а просто строка текста — отдаем её
             return cleanMarkdown(textResponse);
         }
     } catch (err) {
@@ -681,7 +678,6 @@ async function askGemini(prompt) {
         return "Извините, сейчас я не могу ответить. Попробуйте позже или напишите в поддержку.";
     }
 }
-
         async function aiQuickAsk(topic) {
             let query = (topic === 'для путешествий') ? "Совет для путешествий?" : (topic === 'для подписок') ? "Совет для подписок?" : "Совет для арбитража?";
             addChatMessage(query, 'user'); const tid = addChatMessage("Думаю...", 'bot'); const res = await askGemini(query); updateChatMessage(tid, res);
