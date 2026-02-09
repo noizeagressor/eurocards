@@ -527,7 +527,7 @@
         const tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
         
-        // Ссылка на твой Google Script (она теперь общая для заказов и для ИИ)
+        // --- КОНФИГУРАЦИЯ ---
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec";
 
         let currentBankId = ""; let basePrice = 0; let finalPrice = 0; let promoApplied = false; let activeTab = 'home'; let currentEurRate = 90.31;
@@ -545,7 +545,7 @@
                 features: ["Персональный кабинет «под ключ»", "Мгновенные переводы внутри системы", "Низкие комиссии на вывод", "Верификация по загранпаспорту РФ"]
             },
             redotpay: {
-                desc: "RedotPay — современный крипто-банк из Гонконга. Позволяет тратить криптовалюту напрямую через карту в любой точке мира, где принимают Visa.",
+                desc: "RedotPay — современный крипто-банк из Гроконга. Позволяет тратить криптовалюту напрямую через карту в любой точке мира, где принимают Visa.",
                 delivery: "ОТ 1 ЧАСА",
                 features: ["Мгновенное пополнение криптой (USDT)", "Виртуальная карта за 60 минут", "Привязка к Apple Pay", "Нет ежемесячной платы"]
             },
@@ -604,7 +604,7 @@
             }
         }
 
-        // --- ОБНОВЛЕННЫЙ ФУНКЦИОНАЛ ОТПРАВКИ ---
+        // --- ОТПРАВКА ЗАЯВКИ ЧЕРЕЗ GOOGLE APPS SCRIPT ---
         async function sendOrder() {
             const fio = document.getElementById('orderFio').value.trim();
             const dob = document.getElementById('orderDob').value;
@@ -647,37 +647,35 @@
             closeOrderForm(); closeDrawer(); switchTab('home'); 
         }
 
-// --- КОНФИГУРАЦИЯ ---
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec";
-
-// --- ИИ-ПОМОЩНИК (ПРОКСИ ЧЕРЕЗ GOOGLE SCRIPT) ---
-function cleanMarkdown(text) { 
-    return text.replace(/[\*\_]/g, ''); 
-}
-
-async function askGemini(prompt) {
-    try {
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-                action: "ask_ai",
-                prompt: prompt
-            })
-        });
-
-        const textResponse = await response.text();
-        
-        try {
-            const data = JSON.parse(textResponse);
-            return cleanMarkdown(data.result || "Извините, не удалось получить внятный ответ.");
-        } catch (e) {
-            return cleanMarkdown(textResponse);
+        // --- ИИ-ПОМОЩНИК (ПРОКСИ ЧЕРЕЗ GOOGLE SCRIPT) ---
+        function cleanMarkdown(text) { 
+            return text.replace(/[\*\_]/g, ''); 
         }
-    } catch (err) {
-        console.error("AI Proxy Error:", err);
-        return "Извините, сейчас я не могу ответить. Попробуйте позже или напишите в поддержку.";
-    }
-}
+
+        async function askGemini(prompt) {
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: "ask_ai", 
+                        prompt: prompt
+                    })
+                });
+
+                const textResponse = await response.text();
+                
+                try {
+                    const data = JSON.parse(textResponse);
+                    return cleanMarkdown(data.result || "Извините, не удалось получить внятный ответ.");
+                } catch (e) {
+                    return cleanMarkdown(textResponse);
+                }
+            } catch (err) {
+                console.error("AI Proxy Error:", err);
+                return "Извините, сейчас я не могу ответить. Попробуйте позже.";
+            }
+        }
+
         async function aiQuickAsk(topic) {
             let query = (topic === 'для путешествий') ? "Совет для путешествий?" : (topic === 'для подписок') ? "Совет для подписок?" : "Совет для арбитража?";
             addChatMessage(query, 'user'); const tid = addChatMessage("Думаю...", 'bot'); const res = await askGemini(query); updateChatMessage(tid, res);
@@ -731,14 +729,12 @@ async function askGemini(prompt) {
             document.getElementById('pricePromoContainer').classList.add('hidden'); openVaultDrawer(id, asset);
         }
 
-        // --- ОБНОВЛЕННАЯ ДИНАМИЧЕСКАЯ ШТОРКА ---
         function openVaultDrawer(id, asset) {
             const data = bankData[id];
             document.getElementById('drawerNetAsset').innerText = asset;
             document.getElementById('drawerMainMetric').innerText = data.delivery;
             document.getElementById('drawerDynamicDetails').innerHTML = `<p>${data.desc}</p>`;
 
-            // Наполняем список буллитов
             const featuresHTML = data.features.map(f => `
                 <li class="flex items-center gap-3">
                     <span class="w-1.5 h-1.5 bg-[#9FE870] rounded-full"></span> ${f}
