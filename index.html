@@ -439,7 +439,7 @@
             <div class="metric-card p-6 flex items-center justify-around mb-8 text-white shadow-2xl text-center">
                 <div class="text-center"><p class="text-[9px] font-black uppercase text-white/20 mb-2 tracking-widest text-center">Цена</p><p id="drawerNetAsset" class="text-2xl font-black text-white text-center">0 ₽</p></div>
                 <div class="w-px h-10 bg-white/10 text-center"></div>
-                <div class="text-center text-center"><p class="text-[9px] font-black uppercase text-white/20 mb-2 tracking-widest text-center">ВЫПУСК КАРТЫ</p><p id="drawerMainMetric" class="text-xl font-black text-white text-center">ОТ 1 ЧАСА</p></div>
+                <div class="text-center"><p class="text-[9px] font-black uppercase text-white/20 mb-2 tracking-widest text-center">ВЫПУСК КАРТЫ</p><p id="drawerMainMetric" class="text-xl font-black text-white text-center">ОТ 1 ЧАСА</p></div>
             </div>
             <div class="flex justify-around border-b border-white/5 mb-8 text-center">
                 <button id="tabBtnDetails" onclick="setDrawerTab('details')" class="tab-btn active uppercase tracking-widest text-[11px] text-white text-center">Детали</button>
@@ -489,7 +489,7 @@
                 <input id="orderPromo" oninput="checkPromo()" type="text" placeholder="Введите код..." class="order-input text-left">
             </div>
             <div>
-                <label class="order-label text-left text-left">Комментарий и пожелания</label>
+                <label class="order-label text-left">Комментарий и пожелания</label>
                 <textarea id="orderComment" placeholder="Любые вопросы или пожелания..." class="order-input text-left min-h-[100px]"></textarea>
             </div>
         </div>
@@ -498,7 +498,7 @@
             <div id="priceNormalContainer" class="flex flex-col items-center">
                 <span id="priceNormal" class="text-4xl font-black text-white text-center">9 500 ₽</span>
             </div>
-            <div id="pricePromoContainer" class="hidden flex flex-col items-center text-center text-center">
+            <div id="pricePromoContainer" class="hidden flex flex-col items-center text-center">
                 <span id="priceOld" class="price-old text-center">9 500 ₽</span>
                 <span id="priceNew" class="price-new text-center">8 500 ₽</span>
             </div>
@@ -507,7 +507,7 @@
         <button id="submitOrderBtn" onclick="sendOrder()" class="w-full btn-main-action bg-[#9FE870] active:scale-95 transition-all text-center">Отправить заявку</button>
     </div>
 
-    <div id="successOverlay" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[300] hidden flex flex-col items-center justify-center p-8 text-center text-center">
+    <div id="successOverlay" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[300] hidden flex flex-col items-center justify-center p-8 text-center">
         <div class="success-checkmark mb-8"><div class="check-icon text-center"></div></div>
         <h2 class="text-2xl font-black text-white mb-4 text-center">Заявка успешно отправлена</h2>
         <p class="text-sm font-bold text-white/60 mb-12 max-w-[240px] text-center">Администратор напишет вам в течение 12 часов</p>
@@ -517,13 +517,48 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready(); tg.expand();
-        
-        // --- КОНФИГУРАЦИЯ ---
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec";
 
-        let currentBankId = ""; let basePrice = 0; let finalPrice = 0; let promoApplied = false; let activeTab = 'home'; let currentEurRate = 90.31;
-        
-        // --- ДАННЫЕ ДЛЯ ШТОРОК ТОВАРОВ ---
+        // --- КОНФИГУРАЦИЯ (единая точка изменений) ---
+        const CONFIG = {
+            GOOGLE_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbwe2qV6ec0IDIGezVQbXAXdd3AfPohJgV3PmyQtCkOfSPtM35ElypEx-cRsA_kGsmbkMA/exec",
+            BOT_USERNAME: "eurocardsapp_bot",
+            PROMO_CODE: "AVITO1000",       // TODO: перенести проверку на бэкенд
+            PROMO_DISCOUNT: 1000,
+            EUR_RATE_FALLBACK: 90.31,      // TODO: заменить на fetch к API курсов
+        };
+
+        // --- СОСТОЯНИЕ ПРИЛОЖЕНИЯ (вместо 6 разрозненных глобалов) ---
+        const state = {
+            currentBankId: "",
+            basePrice: 0,
+            finalPrice: 0,
+            promoApplied: false,
+            activeTab: 'home',
+            eurRate: CONFIG.EUR_RATE_FALLBACK,
+        };
+
+        // --- API-СЛОЙ (единая точка HTTP-запросов) ---
+        const Api = {
+            // Шаг 1: FormData вместо no-cors+JSON — теперь запрос реально доходит
+            async submitOrder(payload) {
+                const form = new FormData();
+                Object.entries(payload).forEach(([k, v]) => form.append(k, String(v)));
+                const res = await fetch(CONFIG.GOOGLE_SCRIPT_URL, { method: 'POST', body: form });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json().catch(() => ({}));
+            },
+
+            async askAi(prompt) {
+                const res = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'ask_ai', prompt })
+                });
+                const text = await res.text();
+                try { return JSON.parse(text); } catch { return { result: text }; }
+            }
+        };
+
+        // --- ДАННЫЕ ПРОДУКТОВ ---
         const bankData = {
             skrill: {
                 desc: "Skrill — Универсальный европейский банк для тех, кому важна скорость и стабильность. Идеально подходит для оплаты сервисов онлайн и оффлайн, толерантен к ру айпи.. Личный счет оформляется на ваши данные.",
@@ -543,18 +578,27 @@
             wise: {
                 desc: "Wise — Полноценный европейский банкинг, получение IBAN-реквизитов для переводов, оплат и путешествий.",
                 delivery: "от 24 часов",
-                features: ["Готовый аккаунт на дропа", "Личныый IBAN и SWIFT", "Поддержка Apple Pay, Google Pay, AliPay", "Лимиты: отсутствуют", "Безопасность: 3D-Secure и подтверждение через Push-уведомления", "Пополнение: Быстрый ввод USDT напрямую"]
+                features: ["Готовый аккаунт на дропа", "Личный IBAN и SWIFT", "Поддержка Apple Pay, Google Pay, AliPay", "Лимиты: отсутствуют", "Безопасность: 3D-Secure и подтверждение через Push-уведомления", "Пополнение: Быстрый ввод USDT напрямую"]
             },
             revolut: {
                 desc: "Revolut — золотой стандарт необанкинга. Продвинутая аналитика, крипто-трейдинг, страхование и безупречный интерфейс.",
                 delivery: "от 24 часов",
-                features: ["Готовый аккаунт на дропа", "Личныый IBAN и SWIFT", "Поддержка Apple Pay, Google Pay, AliPay", "Лимиты: отсутствуют", "Безопасность: 3D-Secure и подтверждение через Push-уведомления", "Пополнение: Быстрый ввод USDT напрямую"]
+                features: ["Готовый аккаунт на дропа", "Личный IBAN и SWIFT", "Поддержка Apple Pay, Google Pay, AliPay", "Лимиты: отсутствуют", "Безопасность: 3D-Secure и подтверждение через Push-уведомления", "Пополнение: Быстрый ввод USDT напрямую"]
             },
             paypal: {
                 desc: "Верификация аккаунта PayPal под ключ. Отличное приложение к любому банку, так как позволяет принимать платежи и оплачивать покупки по всему миру.",
                 delivery: "от 24 часов",
                 features: ["Доступна верификация на ваше имя и на дропа", "Подойдет для получения выплат Фрилансерам / ТикТокерам", "Для доп. безопасности платежей", "Поддержка при выводе средств"]
             }
+        };
+
+        const logos = {
+            skrill: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Skrill_logo.svg/960px-Skrill_logo.svg.png",
+            neteller: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Neteller.svg/960px-Neteller.svg.png",
+            wise: "https://companieslogo.com/img/orig/WISE.L_BIG.D-95705462.svg?t=1720244494",
+            revolut: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Revolut_logo.svg/960px-Revolut_logo.svg.png",
+            redotpay: "https://staticsource1.redotpay.com/web/img/logo.svg?t=1770172675664",
+            paypal: "https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
         };
 
         // --- ЛОГИКА ИНТЕГРАЦИИ С PYTHON ---
@@ -572,29 +616,57 @@
             }
         }
 
+        // COMPONENT: OrdersTab — безопасный рендер через DOM (без XSS через innerHTML)
         function renderOrders(orders) {
             const container = document.getElementById('ordersContainer');
             const emptyState = document.getElementById('emptyOrders');
-            if (orders && orders.length > 0) {
-                emptyState.classList.add('hidden');
-                container.innerHTML = orders.map(order => `
-                    <div class="flex flex-col p-5 bg-white/5 rounded-[22px] border border-white/5 text-left mb-3">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs font-black uppercase text-[#9FE870] tracking-widest">${order.num || 'ЗАКАЗ'}</span>
-                            <span class="text-[10px] font-black text-white/30 uppercase">${order.date || ''}</span>
-                        </div>
-                        <h3 class="text-lg font-black text-white mb-1 uppercase tracking-tighter">${order.name || 'Тариф'}</h3>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-xl font-black text-white">${order.price || '0'} ₽</span>
-                            <div class="px-3 py-1 bg-white/10 rounded-full text-[9px] font-black uppercase tracking-widest text-white/60">
-                                ${order.status || 'В обработке'}
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            }
+            if (!orders || orders.length === 0) return;
+            emptyState.classList.add('hidden');
+            container.innerHTML = '';
+
+            orders.forEach(order => {
+                const card = document.createElement('div');
+                card.className = 'flex flex-col p-5 bg-white/5 rounded-[22px] border border-white/5 text-left mb-3';
+
+                const header = document.createElement('div');
+                header.className = 'flex justify-between items-start mb-2';
+
+                const num = document.createElement('span');
+                num.className = 'text-xs font-black uppercase text-[#9FE870] tracking-widest';
+                num.textContent = order.num || 'ЗАКАЗ';
+
+                const date = document.createElement('span');
+                date.className = 'text-[10px] font-black text-white/30 uppercase';
+                date.textContent = order.date || '';
+
+                header.appendChild(num);
+                header.appendChild(date);
+
+                const name = document.createElement('h3');
+                name.className = 'text-lg font-black text-white mb-1 uppercase tracking-tighter';
+                name.textContent = order.name || 'Тариф';
+
+                const footer = document.createElement('div');
+                footer.className = 'flex justify-between items-center mt-2';
+
+                const price = document.createElement('span');
+                price.className = 'text-xl font-black text-white';
+                price.textContent = `${order.price || '0'} ₽`;
+
+                const status = document.createElement('div');
+                status.className = 'px-3 py-1 bg-white/10 rounded-full text-[9px] font-black uppercase tracking-widest text-white/60';
+                status.textContent = order.status || 'В обработке';
+
+                footer.appendChild(price);
+                footer.appendChild(status);
+                card.appendChild(header);
+                card.appendChild(name);
+                card.appendChild(footer);
+                container.appendChild(card);
+            });
         }
 
+        // COMPONENT: OrderFormDrawer
         async function sendOrder() {
             const fio = document.getElementById('orderFio').value.trim();
             const dob = document.getElementById('orderDob').value;
@@ -605,60 +677,41 @@
             btn.innerText = "ОТПРАВКА..."; btn.disabled = true;
 
             const orderPayload = {
-                tariff: currentBankId.toUpperCase(),
-                price: finalPrice,
+                tariff: state.currentBankId.toUpperCase(),
+                price: state.finalPrice,
                 fio: fio.toUpperCase(),
-                birth: dob, 
+                birth: dob,
                 promo: promo || "нет",
                 comment: comment || "нет",
                 username: tg.initDataUnsafe?.user?.username || "no_username"
             };
 
             try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(orderPayload)
-                });
+                await Api.submitOrder(orderPayload);
                 tg.HapticFeedback.notificationOccurred('success');
                 document.getElementById('successOverlay').classList.remove('hidden');
             } catch (err) {
-                console.error("Google Script Error:", err);
+                console.error("Order submission error:", err);
                 alert("Ошибка соединения. Проверьте интернет.");
             } finally {
                 btn.innerText = "ОТПРАВИТЬ ЗАЯВКУ"; btn.disabled = false;
             }
         }
 
-        function closeAllAndGoHome() { 
-            document.getElementById('successOverlay').classList.add('hidden'); 
-            closeOrderForm(); closeDrawer(); switchTab('home'); 
+        function closeAllAndGoHome() {
+            document.getElementById('successOverlay').classList.add('hidden');
+            closeOrderForm(); closeDrawer(); switchTab('home');
         }
 
-        function cleanMarkdown(text) { 
-            return text.replace(/[\*\_]/g, ''); 
+        // COMPONENT: AiChat
+        function cleanMarkdown(text) {
+            return text.replace(/[\*\_]/g, '');
         }
 
         async function askGemini(prompt) {
             try {
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: "ask_ai", 
-                        prompt: prompt
-                    })
-                });
-
-                const textResponse = await response.text();
-                
-                try {
-                    const data = JSON.parse(textResponse);
-                    return cleanMarkdown(data.result || "Извините, не удалось получить внятный ответ.");
-                } catch (e) {
-                    return cleanMarkdown(textResponse);
-                }
+                const data = await Api.askAi(prompt);
+                return cleanMarkdown(data.result || "Извините, не удалось получить внятный ответ.");
             } catch (err) {
                 console.error("AI Proxy Error:", err);
                 return "Извините, сейчас я не могу ответить. Попробуйте позже.";
@@ -666,99 +719,237 @@
         }
 
         async function aiQuickAsk(topic) {
-            let query = (topic === 'для путешествий') ? "Совет для путешествий?" : (topic === 'для подписок') ? "Совет для подписок?" : "Совет для арбитража?";
-            addChatMessage(query, 'user'); const tid = addChatMessage("Думаю...", 'bot'); const res = await askGemini(query); updateChatMessage(tid, res);
+            const queries = {
+                'для путешествий': "Совет для путешествий?",
+                'для подписок': "Совет для подписок?",
+                'для арбитража': "Совет для арбитража?"
+            };
+            const query = queries[topic] || topic;
+            addChatMessage(query, 'user');
+            const tid = addChatMessage("Думаю...", 'bot');
+            const res = await askGemini(query);
+            updateChatMessage(tid, res);
         }
 
         async function sendAiMessage() {
-            const input = document.getElementById('aiInput'); const txt = input.value.trim(); if (!txt) return; input.value = "";
-            addChatMessage(txt, 'user'); const tid = addChatMessage("Думаю...", 'bot'); const res = await askGemini(txt); updateChatMessage(tid, res);
+            const input = document.getElementById('aiInput');
+            const txt = input.value.trim();
+            if (!txt) return;
+            input.value = "";
+            addChatMessage(txt, 'user');
+            const tid = addChatMessage("Думаю...", 'bot');
+            const res = await askGemini(txt);
+            updateChatMessage(tid, res);
         }
 
         function addChatMessage(text, role) {
-            const chatBox = document.getElementById('aiChatBox'); const msgDiv = document.createElement('div'); const id = 'msg-' + Date.now();
-            msgDiv.id = id; msgDiv.className = `ai-msg ${role === 'bot' ? 'ai-msg-bot' : 'ai-msg-user'}`; msgDiv.innerText = text;
-            chatBox.appendChild(msgDiv); chatBox.scrollTop = chatBox.scrollHeight; return id;
+            const chatBox = document.getElementById('aiChatBox');
+            const msgDiv = document.createElement('div');
+            const id = 'msg-' + Date.now();
+            msgDiv.id = id;
+            msgDiv.className = `ai-msg ${role === 'bot' ? 'ai-msg-bot' : 'ai-msg-user'}`;
+            msgDiv.innerText = text;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return id;
         }
 
-        function updateChatMessage(id, text) { const m = document.getElementById(id); if (m) m.innerText = text; const c = document.getElementById('aiChatBox'); c.scrollTop = c.scrollHeight; }
+        function updateChatMessage(id, text) {
+            const m = document.getElementById(id);
+            if (m) m.innerText = text;
+            const c = document.getElementById('aiChatBox');
+            c.scrollTop = c.scrollHeight;
+        }
 
+        // COMPONENT: TabManager
         function switchTab(id) {
-            if (activeTab === id) return;
+            if (state.activeTab === id) return;
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.getElementById(`nav-${id}`).classList.add('active');
-            activeTab = id; lucide.createIcons();
+            state.activeTab = id;
+            lucide.createIcons();
         }
 
+        // COMPONENT: BonusesTab
         function inviteFriend() {
-            const link = `https://eurocardsapp_bot/?startapp=${tg.initDataUnsafe?.user?.id || '8829102'}`;
+            const userId = tg.initDataUnsafe?.user?.id;
+            if (!userId) return;
+            const link = `https://t.me/${CONFIG.BOT_USERNAME}/?startapp=${userId}`;
             tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Забирай карту!`);
         }
 
-        function copyRefLink() {
-            const link = `https://t.me/eurocardsapp_bot/?startapp=${tg.initDataUnsafe?.user?.id || '8829102'}`;
-            const input = document.createElement('input'); input.value = link; document.body.appendChild(input); input.select(); document.execCommand('copy'); document.body.removeChild(input);
+        // Шаг 6: navigator.clipboard вместо устаревшего execCommand
+        async function copyRefLink() {
+            const userId = tg.initDataUnsafe?.user?.id;
+            if (!userId) return;
+            const link = `https://t.me/${CONFIG.BOT_USERNAME}/?startapp=${userId}`;
+            try {
+                await navigator.clipboard.writeText(link);
+            } catch {
+                const input = document.createElement('input');
+                input.value = link;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+            }
             tg.HapticFeedback.notificationOccurred('success');
         }
 
         function validateAge() {
-            const i = document.getElementById('orderDob'); const b = document.getElementById('submitOrderBtn'); const v = i.value; if (!v) return false;
-            const d = new Date(v); const e = new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate());
-            if (d > e) { i.style.borderColor = "#ff4d4d"; b.disabled = true; b.style.opacity = "0.5"; return false; }
-            else { i.style.borderColor = ""; b.disabled = false; b.style.opacity = "1"; return true; }
+            const i = document.getElementById('orderDob');
+            const b = document.getElementById('submitOrderBtn');
+            const v = i.value;
+            if (!v) return false;
+            const d = new Date(v);
+            const e = new Date(new Date().getFullYear() - 18, new Date().getMonth(), new Date().getDate());
+            if (d > e) {
+                i.style.borderColor = "#ff4d4d"; b.disabled = true; b.style.opacity = "0.5";
+                return false;
+            }
+            i.style.borderColor = ""; b.disabled = false; b.style.opacity = "1";
+            return true;
         }
 
+        // COMPONENT: ProductDrawer
         function handleCardClick(id, asset, priceNum) {
-            currentBankId = id; basePrice = priceNum; finalPrice = priceNum; promoApplied = false;
-            document.getElementById('orderPromo').value = ""; document.getElementById('orderPromo').style.borderColor = "";
-            document.getElementById('orderDob').value = ""; document.getElementById('priceNormal').innerText = asset;
-            document.getElementById('priceOld').innerText = asset; document.getElementById('priceNormalContainer').classList.remove('hidden');
-            document.getElementById('pricePromoContainer').classList.add('hidden'); openVaultDrawer(id, asset);
+            state.currentBankId = id;
+            state.basePrice = priceNum;
+            state.finalPrice = priceNum;
+            state.promoApplied = false;
+            document.getElementById('orderPromo').value = "";
+            document.getElementById('orderPromo').style.borderColor = "";
+            document.getElementById('orderDob').value = "";
+            document.getElementById('priceNormal').innerText = asset;
+            document.getElementById('priceOld').innerText = asset;
+            document.getElementById('priceNormalContainer').classList.remove('hidden');
+            document.getElementById('pricePromoContainer').classList.add('hidden');
+            openVaultDrawer(id, asset);
         }
 
         function openVaultDrawer(id, asset) {
             const data = bankData[id];
             document.getElementById('drawerNetAsset').innerText = asset;
             document.getElementById('drawerMainMetric').innerText = data.delivery;
-            document.getElementById('drawerDynamicDetails').innerHTML = `<p>${data.desc}</p>`;
 
-            const featuresHTML = data.features.map(f => `
-                <li class="flex items-center gap-3">
-                    <span class="w-1.5 h-1.5 bg-[#9FE870] rounded-full"></span> ${f}
-                </li>
-            `).join('');
-            document.getElementById('drawerFeaturesList').innerHTML = featuresHTML;
+            const descEl = document.getElementById('drawerDynamicDetails');
+            descEl.innerHTML = '';
+            const p = document.createElement('p');
+            p.textContent = data.desc;
+            descEl.appendChild(p);
 
-            const isRevolut = id === 'revolut'; const hSize = id === 'wise' ? 'h-10' : 'h-12';
-            document.getElementById('drawerLogoLabel').innerHTML = `<img src="${logos[id]}" class="${hSize} w-auto object-contain ${isRevolut ? 'logo-white' : ''}">`;
-            setDrawerTab('details'); openDrawerUI();
+            const featuresList = document.getElementById('drawerFeaturesList');
+            featuresList.innerHTML = '';
+            data.features.forEach(f => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center gap-3';
+                const dot = document.createElement('span');
+                dot.className = 'w-1.5 h-1.5 bg-[#9FE870] rounded-full flex-shrink-0';
+                const text = document.createElement('span');
+                text.textContent = f;
+                li.appendChild(dot);
+                li.appendChild(text);
+                featuresList.appendChild(li);
+            });
+
+            const isRevolut = id === 'revolut';
+            const hSize = id === 'wise' ? 'h-10' : 'h-12';
+            const img = document.createElement('img');
+            img.src = logos[id];
+            img.className = `${hSize} w-auto object-contain${isRevolut ? ' logo-white' : ''}`;
+            const logoLabel = document.getElementById('drawerLogoLabel');
+            logoLabel.innerHTML = '';
+            logoLabel.appendChild(img);
+
+            setDrawerTab('details');
+            openDrawerUI();
         }
 
-        function openOrderForm() { document.getElementById('orderOverlay').classList.remove('hidden'); setTimeout(() => { document.getElementById('orderOverlay').classList.add('opacity-100'); document.getElementById('orderDrawer').classList.add('open'); }, 10); }
-        function closeOrderForm() { document.getElementById('orderOverlay').classList.remove('opacity-100'); document.getElementById('orderDrawer').classList.remove('open'); setTimeout(() => document.getElementById('orderOverlay').classList.add('hidden'), 300); }
+        function openOrderForm() {
+            document.getElementById('orderOverlay').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('orderOverlay').classList.add('opacity-100');
+                document.getElementById('orderDrawer').classList.add('open');
+            }, 10);
+        }
+
+        function closeOrderForm() {
+            document.getElementById('orderOverlay').classList.remove('opacity-100');
+            document.getElementById('orderDrawer').classList.remove('open');
+            setTimeout(() => document.getElementById('orderOverlay').classList.add('hidden'), 300);
+        }
 
         function checkPromo() {
-            const code = document.getElementById('orderPromo').value.trim().toUpperCase(); const f = document.getElementById('orderPromo');
-            if (code === "AVITO1000") {
-                if (!promoApplied) { promoApplied = true; finalPrice = basePrice - 1000; f.style.borderColor = "#9FE870"; f.style.background = "rgba(159, 232, 112, 0.05)"; tg.HapticFeedback.notificationOccurred('success'); document.getElementById('priceNew').innerText = `${finalPrice.toLocaleString()} ₽`; document.getElementById('priceNormalContainer').classList.add('hidden'); document.getElementById('pricePromoContainer').classList.remove('hidden'); }
-            } else { promoApplied = false; finalPrice = basePrice; f.style.borderColor = ""; f.style.background = ""; document.getElementById('priceNormalContainer').classList.remove('hidden'); document.getElementById('pricePromoContainer').classList.add('hidden'); }
+            const code = document.getElementById('orderPromo').value.trim().toUpperCase();
+            const f = document.getElementById('orderPromo');
+            if (code === CONFIG.PROMO_CODE) {
+                if (!state.promoApplied) {
+                    state.promoApplied = true;
+                    state.finalPrice = state.basePrice - CONFIG.PROMO_DISCOUNT;
+                    f.style.borderColor = "#9FE870";
+                    f.style.background = "rgba(159, 232, 112, 0.05)";
+                    tg.HapticFeedback.notificationOccurred('success');
+                    document.getElementById('priceNew').innerText = `${state.finalPrice.toLocaleString()} ₽`;
+                    document.getElementById('priceNormalContainer').classList.add('hidden');
+                    document.getElementById('pricePromoContainer').classList.remove('hidden');
+                }
+            } else {
+                state.promoApplied = false;
+                state.finalPrice = state.basePrice;
+                f.style.borderColor = "";
+                f.style.background = "";
+                document.getElementById('priceNormalContainer').classList.remove('hidden');
+                document.getElementById('pricePromoContainer').classList.add('hidden');
+            }
         }
 
-        function setDrawerTab(t) { const o = document.getElementById('drawerTabOverview'); const d = document.getElementById('drawerTabDetails'); const bo = document.getElementById('tabBtnOverview'); const bd = document.getElementById('tabBtnDetails'); if (t === 'overview') { o.classList.remove('hidden'); d.classList.add('hidden'); bo.classList.add('active'); bd.classList.remove('active'); } else { o.classList.add('hidden'); d.classList.remove('hidden'); bo.classList.remove('active'); bd.classList.add('active'); } }
-        function openDrawerUI() { document.getElementById('drawerOverlay').classList.remove('hidden'); setTimeout(() => { document.getElementById('drawerOverlay').classList.add('opacity-100'); document.getElementById('productDrawer').classList.add('open'); }, 10); lucide.createIcons(); }
-        function closeDrawer() { document.getElementById('drawerOverlay').classList.remove('opacity-100'); document.getElementById('productDrawer').classList.remove('open'); setTimeout(() => document.getElementById('drawerOverlay').classList.add('hidden'), 300); }
-        function calculateExchange() { const i = document.getElementById('calcInputRub'); const r = parseFloat(i.value) || 0; document.getElementById('calcOutputEur').innerText = (r / currentEurRate).toFixed(2); }
+        function setDrawerTab(t) {
+            const o = document.getElementById('drawerTabOverview');
+            const d = document.getElementById('drawerTabDetails');
+            const bo = document.getElementById('tabBtnOverview');
+            const bd = document.getElementById('tabBtnDetails');
+            if (t === 'overview') {
+                o.classList.remove('hidden'); d.classList.add('hidden');
+                bo.classList.add('active'); bd.classList.remove('active');
+            } else {
+                o.classList.add('hidden'); d.classList.remove('hidden');
+                bo.classList.remove('active'); bd.classList.add('active');
+            }
+        }
 
-        const logos = { skrill: `https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Skrill_logo.svg/960px-Skrill_logo.svg.png`, neteller: `https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Neteller.svg/960px-Neteller.svg.png`, wise: `https://companieslogo.com/img/orig/WISE.L_BIG.D-95705462.svg?t=1720244494`, revolut: `https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Revolut_logo.svg/960px-Revolut_logo.svg.png`, redotpay: `https://staticsource1.redotpay.com/web/img/logo.svg?t=1770172675664`, paypal: `https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg` };
+        function openDrawerUI() {
+            document.getElementById('drawerOverlay').classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('drawerOverlay').classList.add('opacity-100');
+                document.getElementById('productDrawer').classList.add('open');
+            }, 10);
+            lucide.createIcons();
+        }
+
+        function closeDrawer() {
+            document.getElementById('drawerOverlay').classList.remove('opacity-100');
+            document.getElementById('productDrawer').classList.remove('open');
+            setTimeout(() => document.getElementById('drawerOverlay').classList.add('hidden'), 300);
+        }
+
+        // COMPONENT: Calculator
+        function calculateExchange() {
+            const i = document.getElementById('calcInputRub');
+            const r = parseFloat(i.value) || 0;
+            document.getElementById('calcOutputEur').innerText = (r / state.eurRate).toFixed(2);
+        }
 
         window.onload = () => {
             lucide.createIcons();
             loadPythonData();
             const u = tg.initDataUnsafe?.user;
             if (u) {
-                if (u.photo_url) { document.getElementById('headerAvatar').src = u.photo_url; document.getElementById('profileAvatar').src = u.photo_url; }
+                if (u.photo_url) {
+                    document.getElementById('headerAvatar').src = u.photo_url;
+                    document.getElementById('profileAvatar').src = u.photo_url;
+                }
                 if (u.first_name) document.getElementById('userName').innerText = u.first_name;
                 document.getElementById('userId').innerText = `ID ${u.id}`;
             }
